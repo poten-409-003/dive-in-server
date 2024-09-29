@@ -4,6 +4,8 @@ on:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
+  workflow_dispatch:  # 수동 실행 트리거 추가
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -16,8 +18,8 @@ jobs:
       with:
         java-version: '17'
         distribution: 'zulu'
-    # Secret YML 파일 생성
-    - name: Setting secret
+    # Aplication YML 파일 생성
+    - name: Make application.yml
       run: |
         mkdir -p src/main/resources
         echo "${{ secrets.APPLICATION_YML }}" | base64 --decode > src/main/resources/application.yml
