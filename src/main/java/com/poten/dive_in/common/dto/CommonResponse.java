@@ -1,4 +1,4 @@
-package com.poten.dive_in.dto;
+package com.poten.dive_in.common.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,9 +21,9 @@ public class CommonResponse<T> {
                 .build();
     }
 
-    public static<T> CommonResponse<T> success(final String message, final T t){
+    public static<T> CommonResponse<T> success(final String message, final T data){
         return CommonResponse.<T>builder()
-                .data(t)
+                .data(data)
                 .success(true)
                 .message(message)
                 .build();
@@ -32,6 +32,14 @@ public class CommonResponse<T> {
     public static<T> CommonResponse<T> error(final String message){
         return CommonResponse.<T>builder()
                 .data(null)
+                .success(false)
+                .message(message)
+                .build();
+    }
+
+    public static<T> CommonResponse<T> error(final String message,T data){
+        return CommonResponse.<T>builder()
+                .data(data)
                 .success(false)
                 .message(message)
                 .build();

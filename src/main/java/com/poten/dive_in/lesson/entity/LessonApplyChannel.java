@@ -1,10 +1,11 @@
-package com.poten.dive_in.entity;
+package com.poten.dive_in.lesson.entity;
 
-import com.poten.dive_in.enums.LessonChannelType;
+import com.poten.dive_in.common.entity.BaseTimeEntity;
+import com.poten.dive_in.lesson.enums.LessonChannelType;
 import jakarta.persistence.*;
 
 @Entity
-public class LessonApplyChannel {
+public class LessonApplyChannel extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

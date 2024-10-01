@@ -1,10 +1,13 @@
-package com.poten.dive_in.entity;
+package com.poten.dive_in.lesson.entity;
 
-import com.poten.dive_in.enums.LessonStatus;
+import com.poten.dive_in.academy.entity.Academy;
+import com.poten.dive_in.common.entity.BaseTimeEntity;
+import com.poten.dive_in.lesson.enums.LessonStatus;
+import com.poten.dive_in.pool.entity.Pool;
 import jakarta.persistence.*;
 
 @Entity
-public class Lesson {
+public class Lesson extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
