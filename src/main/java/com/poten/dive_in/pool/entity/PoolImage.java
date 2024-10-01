@@ -1,9 +1,10 @@
-package com.poten.dive_in.entity;
+package com.poten.dive_in.pool.entity;
 
+import com.poten.dive_in.common.entity.BaseTimeEntity;
 import jakarta.persistence.*;
 
 @Entity
-public class PoolImage {
+public class PoolImage extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "pool_image_id")

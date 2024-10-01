@@ -1,9 +1,11 @@
-package com.poten.dive_in.entity;
+package com.poten.dive_in.lesson.entity;
 
+import com.poten.dive_in.common.entity.BaseTimeEntity;
+import com.poten.dive_in.instructor.entity.Instructor;
 import jakarta.persistence.*;
 
 @Entity
-public class LessonInstructor {
+public class LessonInstructor extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

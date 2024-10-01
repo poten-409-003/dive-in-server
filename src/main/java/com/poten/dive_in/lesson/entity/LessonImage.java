@@ -1,5 +1,6 @@
-package com.poten.dive_in.entity;
+package com.poten.dive_in.lesson.entity;
 
+import com.poten.dive_in.common.entity.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +10,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @AllArgsConstructor
 @Entity
-public class LessonImage {
+public class LessonImage extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
