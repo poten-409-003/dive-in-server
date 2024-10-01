@@ -1,6 +1,6 @@
 package com.poten.dive_in.entity;
 
-import com.poten.dive_in.enums.LessonLinkType;
+import com.poten.dive_in.enums.LessonChannelType;
 import jakarta.persistence.*;
 
 @Entity
@@ -14,7 +14,7 @@ public class LessonApplyChannel {
     private String applyUrl;
 
     @Enumerated(EnumType.STRING)
-    private LessonLinkType applyUrlType;
+    private LessonChannelType applyUrlType;
 
     @ManyToOne
     @JoinColumn(name = "lesson_id")
