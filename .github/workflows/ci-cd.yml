@@ -52,7 +52,8 @@ jobs:
         port: ${{ secrets.NCP_PORT }}
         script: |
           sudo docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+          sudo docker network create web-network || true
           sudo docker stop diveincontainer
           sudo docker rm -f diveincontainer
           sudo docker pull ${{ secrets.DOCKER_USERNAME }}/dive-in
-          sudo docker run -d -p 8080:8080 --name diveincontainer ${{ secrets.DOCKER_USERNAME }}/dive-in
+          sudo docker run -d -p 8080:8080 --network web-network --name diveincontainer ${{ secrets.DOCKER_USERNAME }}/dive-in
