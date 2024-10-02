@@ -41,6 +41,8 @@ public class Pool extends BaseTimeEntity {
 
     private String maxDepth;
 
+    private String minDepth;
+
     private String facilities;
 
     private String region;
@@ -70,6 +72,7 @@ public class Pool extends BaseTimeEntity {
         this.laneLength = poolRequestDto.getLaneLength();
         this.laneCount = poolRequestDto.getLaneCount();
         this.maxDepth = poolRequestDto.getMaxDepth();
+        this.minDepth = poolRequestDto.getMinDepth();
         this.facilities = poolRequestDto.getFacilities();
         this.region = poolRequestDto.getRegion();
     }

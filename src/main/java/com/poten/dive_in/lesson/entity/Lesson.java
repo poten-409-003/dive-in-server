@@ -2,7 +2,6 @@ package com.poten.dive_in.lesson.entity;
 
 import com.poten.dive_in.academy.entity.Academy;
 import com.poten.dive_in.common.entity.BaseTimeEntity;
-import com.poten.dive_in.lesson.enums.LessonLevel;
 import com.poten.dive_in.lesson.enums.LessonStatus;
 import com.poten.dive_in.pool.entity.Pool;
 import jakarta.persistence.*;
@@ -26,16 +25,13 @@ public class Lesson extends BaseTimeEntity {
 
     private String lessonName;
 
-    @Enumerated(EnumType.STRING)
-    private LessonLevel level;
+    private String level;
 
     private Integer capacity;
 
     private String price;
 
     private String keyword;
-
-    private String lessonInfo;
 
     private String lessonDetail;
 

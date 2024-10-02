@@ -27,6 +27,8 @@ public class PoolRequestDto {
 
     private String maxDepth;
 
+    private String minDepth;
+
     private String facilities;
 
     private String region;
@@ -42,6 +44,7 @@ public class PoolRequestDto {
                 .laneLength(this.laneLength)
                 .laneCount(this.laneCount)
                 .maxDepth(this.maxDepth)
+                .minDepth(this.minDepth)
                 .facilities(this.facilities)
                 .region(this.region)
                 .build();

@@ -1,7 +1,6 @@
 package com.poten.dive_in.lesson.dto;
 
 import com.poten.dive_in.lesson.entity.Lesson;
-import com.poten.dive_in.lesson.enums.LessonLevel;
 import com.poten.dive_in.lesson.enums.LessonStatus;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Builder;
@@ -15,15 +14,13 @@ public class LessonRequestDto {
     @NotEmpty(message = "수업명은 필수입니다.")
     private String lessonName;
 
-    private LessonLevel level;
+    private String level;
 
     private Integer capacity;
 
     private String price;
 
     private String keyword;
-
-    private String lessonInfo;
 
     private String lessonDetail;
 
@@ -46,7 +43,6 @@ public class LessonRequestDto {
                 .capacity(this.capacity)
                 .price(this.price)
                 .keyword(this.keyword)
-                .lessonInfo(this.lessonInfo)
                 .lessonDetail(this.lessonDetail)
                 .lessonSchedule(this.lessonSchedule)
                 .lessonStatus(this.lessonStatus)
