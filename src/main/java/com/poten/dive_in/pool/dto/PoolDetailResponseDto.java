@@ -1,5 +1,7 @@
 package com.poten.dive_in.pool.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.poten.dive_in.lesson.dto.LessonListResponseDto;
 import com.poten.dive_in.pool.entity.Pool;
 import lombok.Builder;
 import lombok.Getter;
@@ -9,7 +11,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Getter @Builder
-public class PoolResponseDto {
+public class PoolDetailResponseDto {
 
     private Long id;
 
@@ -35,9 +37,13 @@ public class PoolResponseDto {
 
     private String region;
 
+    @JsonProperty("pool_image")
     private List<PoolImageDto> poolImageDtoList;
 
-    public static PoolResponseDto ofEntity(Pool pool){
+    @JsonProperty("lesson")
+    private List<LessonListResponseDto> lessonListResponseDtoList;
+
+    public static PoolDetailResponseDto ofEntity(Pool pool){
 
         List<PoolImageDto> poolImageDtoList = (pool.getImageList() != null) ?
                 pool.getImageList().stream()
@@ -45,7 +51,13 @@ public class PoolResponseDto {
                         .collect(Collectors.toList())
                 : new ArrayList<>();
 
-        return PoolResponseDto.builder()
+        List<LessonListResponseDto> lessonListResponseDtoList = (pool.getLessonList() != null) ?
+                pool.getLessonList().stream()
+                        .map(LessonListResponseDto::ofEntity)
+                        .collect(Collectors.toList())
+                : new ArrayList<>();
+
+        return PoolDetailResponseDto.builder()
                 .id(pool.getId())
                 .poolName(pool.getPoolName())
                 .poolAddress(pool.getPoolAddress())
@@ -59,6 +71,7 @@ public class PoolResponseDto {
                 .facilities(pool.getFacilities())
                 .region(pool.getRegion())
                 .poolImageDtoList(poolImageDtoList)
+                .lessonListResponseDtoList(lessonListResponseDtoList)
                 .build();
         }
     }

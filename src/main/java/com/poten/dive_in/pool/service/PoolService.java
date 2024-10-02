@@ -1,8 +1,9 @@
 package com.poten.dive_in.pool.service;
 
 import com.poten.dive_in.common.service.S3Service;
+import com.poten.dive_in.pool.dto.PoolListResponseDto;
 import com.poten.dive_in.pool.dto.PoolRequestDto;
-import com.poten.dive_in.pool.dto.PoolResponseDto;
+import com.poten.dive_in.pool.dto.PoolDetailResponseDto;
 import com.poten.dive_in.pool.entity.Pool;
 import com.poten.dive_in.pool.entity.PoolImage;
 import com.poten.dive_in.pool.repository.PoolRepository;
@@ -26,7 +27,7 @@ public class PoolService {
     private final PoolRepository poolRepository;
 
     @Transactional
-    public PoolResponseDto createPool(PoolRequestDto poolRequestDto, List<MultipartFile> multipartFileList){
+    public PoolDetailResponseDto createPool(PoolRequestDto poolRequestDto, List<MultipartFile> multipartFileList){
 
         // DTO -> 엔티티 변환
         Pool pool = poolRequestDto.toEntity();
@@ -42,23 +43,23 @@ public class PoolService {
         // cascade 설정으로 Pool만 저장해도 Image까지 저장됨
         poolRepository.save(pool);
 
-        return PoolResponseDto.ofEntity(pool);
+        return PoolDetailResponseDto.ofEntity(pool);
     }
 
     @Transactional(readOnly = true)
-    public List<PoolResponseDto> getPoolList() {
+    public List<PoolListResponseDto> getPoolList() {
         List<Pool> poolList = poolRepository.findAll();
-        return poolList.stream().map(PoolResponseDto::ofEntity).toList();
+        return poolList.stream().map(PoolListResponseDto::ofEntity).toList();
     }
 
     @Transactional(readOnly = true)
-    public PoolResponseDto getPool(Long poolId){
+    public PoolDetailResponseDto getPool(Long poolId){
         Pool pool = poolRepository.findById(poolId).orElseThrow(()-> new EntityNotFoundException("존재하지 않는 수영장입니다."));
-        return PoolResponseDto.ofEntity(pool);
+        return PoolDetailResponseDto.ofEntity(pool);
     }
 
     @Transactional
-    public PoolResponseDto updatePool(Long poolId, PoolRequestDto poolRequestDto, List<MultipartFile> multipartFileList) {
+    public PoolDetailResponseDto updatePool(Long poolId, PoolRequestDto poolRequestDto, List<MultipartFile> multipartFileList) {
 
         Pool pool = poolRepository.findById(poolId).orElseThrow(() -> new EntityNotFoundException("존재하지 않는 수영장입니다."));
 
@@ -70,7 +71,7 @@ public class PoolService {
             pool.replaceImageList(poolImageList);
         }
 
-        return PoolResponseDto.ofEntity(pool);
+        return PoolDetailResponseDto.ofEntity(pool);
     }
 
     @Transactional
