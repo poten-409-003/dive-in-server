@@ -31,7 +31,7 @@ public class PoolDetailResponseDto {
 
     private Integer laneCount;
 
-    private String poolDepth;
+    private String maxDepth;
 
     private String facilities;
 
@@ -67,7 +67,7 @@ public class PoolDetailResponseDto {
                 .contact(pool.getContact())
                 .laneLength(pool.getLaneLength())
                 .laneCount(pool.getLaneCount())
-                .poolDepth(pool.getPoolDepth())
+                .maxDepth(pool.getMaxDepth())
                 .facilities(pool.getFacilities())
                 .region(pool.getRegion())
                 .poolImageDtoList(poolImageDtoList)
