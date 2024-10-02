@@ -2,7 +2,14 @@ package com.poten.dive_in.pool.entity;
 
 import com.poten.dive_in.common.entity.BaseTimeEntity;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
+@Getter @Builder
+@AllArgsConstructor
+@RequiredArgsConstructor
 @Entity
 public class PoolImage extends BaseTimeEntity {
     @Id
