@@ -29,6 +29,8 @@ public class Pool extends BaseTimeEntity {
 
     private String operatingHours;
 
+    private String closingDays;
+
     private String latitude;
 
     private String longitude;
@@ -66,6 +68,7 @@ public class Pool extends BaseTimeEntity {
         this.poolName = poolRequestDto.getPoolName();
         this.poolAddress = poolRequestDto.getPoolAddress();
         this.operatingHours = poolRequestDto.getOperatingHours();
+        this.closingDays = poolRequestDto.getClosingDays();
         this.latitude = poolRequestDto.getLatitude();
         this.longitude = poolRequestDto.getLongitude();
         this.contact = poolRequestDto.getContact();

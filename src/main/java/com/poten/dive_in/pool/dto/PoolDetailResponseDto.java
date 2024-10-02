@@ -21,6 +21,8 @@ public class PoolDetailResponseDto {
 
     private String operatingHours;
 
+    private String closingDays;
+
     private String latitude;
 
     private String longitude;
@@ -64,6 +66,7 @@ public class PoolDetailResponseDto {
                 .poolName(pool.getPoolName())
                 .poolAddress(pool.getPoolAddress())
                 .operatingHours(pool.getOperatingHours())
+                .closingDays(pool.getClosingDays())
                 .latitude(pool.getLatitude())
                 .longitude(pool.getLongitude())
                 .contact(pool.getContact())
