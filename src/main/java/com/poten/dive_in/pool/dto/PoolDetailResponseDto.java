@@ -31,9 +31,9 @@ public class PoolDetailResponseDto {
 
     private Integer laneCount;
 
-    private String maxDepth;
+    private Float maxDepth;
 
-    private String minDepth;
+    private Float minDepth;
 
     private String facilities;
 

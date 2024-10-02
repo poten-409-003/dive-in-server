@@ -39,9 +39,9 @@ public class Pool extends BaseTimeEntity {
 
     private Integer laneCount;
 
-    private String maxDepth;
+    private Float maxDepth;
 
-    private String minDepth;
+    private Float minDepth;
 
     private String facilities;
 
