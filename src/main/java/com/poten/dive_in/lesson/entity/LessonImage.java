@@ -4,9 +4,10 @@ import com.poten.dive_in.common.entity.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-@Builder
+@Builder @Getter
 @RequiredArgsConstructor
 @AllArgsConstructor
 @Entity
