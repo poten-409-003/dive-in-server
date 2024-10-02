@@ -25,7 +25,7 @@ public class PoolRequestDto {
 
     private Integer laneCount;
 
-    private String poolDepth;
+    private String maxDepth;
 
     private String facilities;
 
@@ -41,7 +41,7 @@ public class PoolRequestDto {
                 .contact(this.contact)
                 .laneLength(this.laneLength)
                 .laneCount(this.laneCount)
-                .poolDepth(this.poolDepth)
+                .maxDepth(this.maxDepth)
                 .facilities(this.facilities)
                 .region(this.region)
                 .build();
