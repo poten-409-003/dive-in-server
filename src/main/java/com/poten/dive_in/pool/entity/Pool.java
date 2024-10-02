@@ -64,6 +64,6 @@ public class Pool extends BaseTimeEntity {
         } else{
             this.imageList = new ArrayList<>(newPoolImageList);
         }
-        }
+    }
 
 }

@@ -3,7 +3,14 @@ package com.poten.dive_in.lesson.entity;
 import com.poten.dive_in.common.entity.BaseTimeEntity;
 import com.poten.dive_in.lesson.enums.LessonChannelType;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
+@Getter @Builder
+@RequiredArgsConstructor
+@AllArgsConstructor
 @Entity
 public class LessonApplyChannel extends BaseTimeEntity {
 

@@ -2,10 +2,20 @@ package com.poten.dive_in.lesson.entity;
 
 import com.poten.dive_in.academy.entity.Academy;
 import com.poten.dive_in.common.entity.BaseTimeEntity;
+import com.poten.dive_in.lesson.enums.LessonLevel;
 import com.poten.dive_in.lesson.enums.LessonStatus;
 import com.poten.dive_in.pool.entity.Pool;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
+import java.util.List;
+
+@Getter @Builder
+@AllArgsConstructor
+@RequiredArgsConstructor
 @Entity
 public class Lesson extends BaseTimeEntity {
 
@@ -16,7 +26,8 @@ public class Lesson extends BaseTimeEntity {
 
     private String lessonName;
 
-    private String level;
+    @Enumerated(EnumType.STRING)
+    private LessonLevel level;
 
     private Integer capacity;
 
@@ -40,5 +51,44 @@ public class Lesson extends BaseTimeEntity {
     @ManyToOne
     @JoinColumn(name = "pool_id")
     private Pool pool;
+
+    @OneToMany(mappedBy = "lesson", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<LessonImage> imageList;
+
+    @OneToMany(mappedBy = "lesson", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<LessonInstructor> lessonInstructorList;
+
+    @OneToMany(mappedBy = "lesson", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<LessonApplyChannel> applyChannelList;
+
+
+    public void addImage(List<LessonImage> lessonImageList) {
+        this.imageList = lessonImageList;
+    }
+
+    public void assignAcademy(Academy academy){
+        this.academy = academy;
+    }
+
+    public void assignPool(Pool pool){
+        this.pool = pool;
+    }
+
+    public void assignInstructors(List<LessonInstructor> lessonInstructorList) {
+        this.lessonInstructorList.clear();
+        this.lessonInstructorList.addAll(lessonInstructorList);
+    }
+
+    public void addImages(List<LessonImage> lessonImageList) {
+        this.imageList.clear();
+        this.imageList.addAll(lessonImageList);
+    }
+
+    public void assignApplyChannels(List<LessonApplyChannel> applyChannels) {
+        this.applyChannelList.clear();
+        this.applyChannelList.addAll(applyChannels);
+    }
+
+
 
 }
