@@ -84,4 +84,8 @@ public class S3Service {
         }
         return fileExtension;
     }
+
+    public static String extractFileName(String imageUrl){
+        return imageUrl.substring(imageUrl.lastIndexOf(".com/") + 5);
+    }
 }

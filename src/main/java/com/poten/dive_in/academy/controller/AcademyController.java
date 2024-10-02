@@ -23,7 +23,7 @@ public class AcademyController {
     }
 
     @PostMapping("/academy")
-    public ResponseEntity<CommonResponse<AcademyResponseDto>> createAcademy(@Valid AcademyRequestDto academyRequestDto, @RequestParam("image") MultipartFile file){
+    public ResponseEntity<CommonResponse<AcademyResponseDto>> createAcademy(@Valid AcademyRequestDto academyRequestDto, @RequestParam(value = "image",required = false) MultipartFile file){
         AcademyResponseDto academyResponseDto = academyService.createAcademy(academyRequestDto,file);
         return new ResponseEntity<>(CommonResponse.success("업체 등록 성공하였습니다. ",academyResponseDto), HttpStatus.OK);
     }

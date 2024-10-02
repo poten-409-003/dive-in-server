@@ -9,10 +9,13 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Collections;
 import java.util.List;
+
+import static com.poten.dive_in.common.service.S3Service.extractFileName;
 
 
 @RequiredArgsConstructor
@@ -26,14 +29,14 @@ public class AcademyService {
     @Transactional
     public AcademyResponseDto createAcademy(AcademyRequestDto academyRequestDto, MultipartFile file){
 
-        // 업체 프로필 등록을 안했다면
-        if (file==null){
-            throw new RuntimeException("프로필 이미지를 등록해주세요.");
+        String profileImageUrl = null;
+
+        // 이미지가 있는 경우만 업로드
+        if (file != null && !file.isEmpty()) {
+            List<String> urlList = s3Service.uploadFile(Collections.singletonList(file));
+            profileImageUrl  = urlList.get(0);
         }
 
-        // 이미지 스토리지 저장
-        List<String> urlList = s3Service.uploadFile(Collections.singletonList(file));
-        String profileImageUrl  = urlList.get(0);
 
         Academy academy = academyRequestDto.toEntity(profileImageUrl);
 
@@ -54,7 +57,7 @@ public class AcademyService {
 
 
     @Transactional
-    public AcademyResponseDto updateAcademy(Long academyId, AcademyRequestDto academyRequestDto, MultipartFile file){
+    public AcademyResponseDto updateAcademy(Long academyId, AcademyRequestDto academyRequestDto, @RequestParam(value = "image",required = false) MultipartFile file){
 
         // id 존재하는지 확인
         Academy academy = academyRepository.findById(academyId)
@@ -66,7 +69,8 @@ public class AcademyService {
         if(file!=null && !file.isEmpty()){
             // 기존 이미지 삭제
             if(academy.getProfileImageUrl()!=null) {
-                s3Service.deleteFile(academy.getProfileImageUrl());
+                String fileName = extractFileName(academy.getProfileImageUrl());
+                s3Service.deleteFile(fileName);
             }
             // 새로운 이미지 저장
             List<String> urlList = s3Service.uploadFile(Collections.singletonList(file));
@@ -89,12 +93,14 @@ public class AcademyService {
 
         // S3 이미지 삭제
         if(academy.getProfileImageUrl()!=null){
-            s3Service.deleteFile(academy.getProfileImageUrl());
+            String fileName = extractFileName(academy.getProfileImageUrl());
+            s3Service.deleteFile(fileName);
         }
 
         academyRepository.delete(academy);
 
     }
+
 
 
 }

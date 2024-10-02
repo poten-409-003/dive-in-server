@@ -8,6 +8,8 @@ import lombok.Getter;
 @Builder
 public class AcademyResponseDto {
 
+    private Long id;
+
     private String academyName;
 
     private String academyInfo;
@@ -16,6 +18,7 @@ public class AcademyResponseDto {
 
     public static AcademyResponseDto ofEntity(Academy academy){
         return AcademyResponseDto.builder()
+                .id(academy.getId())
                 .academyInfo(academy.getAcademyInfo())
                 .academyName(academy.getAcademyName())
                 .profileImageUrl(academy.getProfileImageUrl())
