@@ -1,6 +1,7 @@
 package com.poten.dive_in.pool.entity;
 
 import com.poten.dive_in.common.entity.BaseTimeEntity;
+import com.poten.dive_in.lesson.entity.Lesson;
 import com.poten.dive_in.pool.dto.PoolRequestDto;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -47,6 +48,13 @@ public class Pool extends BaseTimeEntity {
     @OneToMany(mappedBy = "pool", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PoolImage> imageList;
 
+    @OneToMany(mappedBy = "pool", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Lesson> lessonList;
+
+    public void addLesson(Lesson lesson) {
+        if (!lessonList.contains(lesson)) {
+            lessonList.add(lesson);
+        }    }
 
     public void addImage(List<PoolImage> poolImageList) {
         this.imageList = poolImageList;
@@ -55,6 +63,15 @@ public class Pool extends BaseTimeEntity {
     public void updatePool(PoolRequestDto poolRequestDto) {
         this.poolName = poolRequestDto.getPoolName();
         this.poolAddress = poolRequestDto.getPoolAddress();
+        this.operatingHours = poolRequestDto.getOperatingHours();
+        this.latitude = poolRequestDto.getLatitude();
+        this.longitude = poolRequestDto.getLongitude();
+        this.contact = poolRequestDto.getContact();
+        this.laneLength = poolRequestDto.getLaneLength();
+        this.laneCount = poolRequestDto.getLaneCount();
+        this.poolDepth = poolRequestDto.getPoolDepth();
+        this.facilities = poolRequestDto.getFacilities();
+        this.region = poolRequestDto.getRegion();
     }
 
     public void replaceImageList(List<PoolImage> newPoolImageList){

@@ -13,7 +13,6 @@ import com.poten.dive_in.lesson.entity.LessonApplyChannel;
 import com.poten.dive_in.lesson.entity.LessonImage;
 import com.poten.dive_in.lesson.entity.LessonInstructor;
 import com.poten.dive_in.lesson.repository.LessonRepository;
-import com.poten.dive_in.pool.dto.PoolResponseDto;
 import com.poten.dive_in.pool.entity.Pool;
 import com.poten.dive_in.pool.repository.PoolRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -82,9 +81,7 @@ public class LessonService {
         Lesson lesson = lessonRequestDto.toEntity();
 
 
-        // 값이 있을 때만 설정
         if (academy != null) lesson.assignAcademy(academy);
-        if (pool != null) lesson.assignPool(pool);
 
         if (!instructors.isEmpty()) {
             List<LessonInstructor> lessonInstructorList = new ArrayList<>();
@@ -111,6 +108,11 @@ public class LessonService {
         if (multipartFileList != null && !multipartFileList.isEmpty()){
             List<LessonImage> lessonImageList = uploadAndCreateLessonImages(multipartFileList,lesson);
             lesson.addImage(lessonImageList);
+        }
+
+        if (pool != null) {
+            lesson.assignPool(pool);
+            pool.addLesson(lesson);
         }
 
         lessonRepository.save(lesson);

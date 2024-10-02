@@ -5,7 +5,7 @@ import com.poten.dive_in.academy.dto.AcademyResponseDto;
 import com.poten.dive_in.instructor.dto.LessonInstructorResponseDto;
 import com.poten.dive_in.lesson.entity.Lesson;
 import com.poten.dive_in.lesson.enums.LessonStatus;
-import com.poten.dive_in.pool.dto.PoolResponseDto;
+import com.poten.dive_in.pool.dto.PoolListResponseDto;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -40,7 +40,7 @@ public class LessonDetailResponseDto {
     private AcademyResponseDto academyResponseDto;
 
     @JsonProperty("pool")
-    private PoolResponseDto poolResponseDto;
+    private PoolListResponseDto poolResponseDto;
 
     @JsonProperty("instructor")
     private List<LessonInstructorResponseDto> lessonInstructorResponseDtoList;
@@ -85,7 +85,7 @@ public class LessonDetailResponseDto {
                 .lessonSchedule(lesson.getLessonSchedule() != null ? lesson.getLessonSchedule() : null)
                 .lessonStatus(lesson.getLessonStatus() != null ? lesson.getLessonStatus() : null)
                 .academyResponseDto(lesson.getAcademy() != null ? AcademyResponseDto.ofEntity(lesson.getAcademy()) : null)
-                .poolResponseDto(lesson.getPool() != null ? PoolResponseDto.ofEntity(lesson.getPool()) : null)
+                .poolResponseDto(lesson.getPool() != null ? PoolListResponseDto.ofEntity(lesson.getPool()) : null)
                 .lessonInstructorResponseDtoList(lessonInstructorResponseDtoList)
                 .lessonImageDtoList(lessonImageDtoList)
                 .lessonApplyChannelDtoList(lessonApplyChannelList)
