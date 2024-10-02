@@ -15,6 +15,8 @@ public class PoolRequestDto {
 
     private String operatingHours;
 
+    private String closingDays;
+
     private String latitude;
 
     private String longitude;
@@ -38,6 +40,7 @@ public class PoolRequestDto {
                 .poolName(this.poolName)
                 .poolAddress(this.poolAddress)
                 .operatingHours(this.operatingHours)
+                .closingDays(this.closingDays)
                 .latitude(this.latitude)
                 .longitude(this.longitude)
                 .contact(this.contact)
