@@ -11,17 +11,17 @@ public class LessonListResponseDto {
     private String academyImageUrl;
     private String keyword;
     private String lessonName;
-    private String lessonInfo;
+    private String level;
     private String price;
 
     public static LessonListResponseDto ofEntity(Lesson lesson) {
         return LessonListResponseDto.builder()
                 .id(lesson.getId())
+                .level(lesson.getLevel())
                 .academyName(lesson.getAcademy() != null ? lesson.getAcademy().getAcademyName() : null)
                 .academyImageUrl(lesson.getAcademy() != null ? lesson.getAcademy().getProfileImageUrl() : null)
                 .keyword(lesson.getKeyword() != null ? lesson.getKeyword() : null)
                 .lessonName(lesson.getLessonName() != null ? lesson.getLessonName() : null)
-                .lessonInfo(lesson.getLessonInfo() != null ? lesson.getLessonInfo() : null)
                 .price(lesson.getPrice() != null ? lesson.getPrice() : null)
                 .build();
         }

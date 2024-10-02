@@ -33,6 +33,8 @@ public class PoolDetailResponseDto {
 
     private String maxDepth;
 
+    private String minDepth;
+
     private String facilities;
 
     private String region;
@@ -68,6 +70,7 @@ public class PoolDetailResponseDto {
                 .laneLength(pool.getLaneLength())
                 .laneCount(pool.getLaneCount())
                 .maxDepth(pool.getMaxDepth())
+                .minDepth(pool.getMinDepth())
                 .facilities(pool.getFacilities())
                 .region(pool.getRegion())
                 .poolImageDtoList(poolImageDtoList)

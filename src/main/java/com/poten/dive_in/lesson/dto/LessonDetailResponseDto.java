@@ -28,8 +28,6 @@ public class LessonDetailResponseDto {
 
     private String keyword;
 
-    private String lessonInfo;
-
     private String lessonDetail;
 
     private String lessonSchedule;
@@ -76,11 +74,10 @@ public class LessonDetailResponseDto {
         return LessonDetailResponseDto.builder()
                 .id(lesson.getId())
                 .lessonName(lesson.getLessonName())
-                .level(lesson.getLevel() != null ? lesson.getLevel().name() : null)
+                .level(lesson.getLevel() != null ? lesson.getLevel() : null)
                 .capacity(lesson.getCapacity() != null ? lesson.getCapacity() : null)
                 .price(lesson.getPrice() != null ? lesson.getPrice() : null)
                 .keyword(lesson.getKeyword() != null ? lesson.getKeyword() : null)
-                .lessonInfo(lesson.getLessonInfo() != null ? lesson.getLessonInfo() : null)
                 .lessonDetail(lesson.getLessonDetail() != null ? lesson.getLessonDetail() : null)
                 .lessonSchedule(lesson.getLessonSchedule() != null ? lesson.getLessonSchedule() : null)
                 .lessonStatus(lesson.getLessonStatus() != null ? lesson.getLessonStatus() : null)
