@@ -27,7 +27,7 @@ public class Lesson extends BaseTimeEntity {
 
     private String level;
 
-    private Integer capacity;
+    private String capacity;
 
     private String price;
 

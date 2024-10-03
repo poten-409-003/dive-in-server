@@ -1,5 +1,6 @@
 package com.poten.dive_in.lesson.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.poten.dive_in.lesson.entity.Lesson;
 import com.poten.dive_in.lesson.enums.LessonStatus;
 import jakarta.validation.constraints.NotEmpty;
@@ -16,7 +17,7 @@ public class LessonRequestDto {
 
     private String level;
 
-    private Integer capacity;
+    private String capacity;
 
     private String price;
 
@@ -32,8 +33,10 @@ public class LessonRequestDto {
 
     private Long poolId;
 
+    @JsonProperty("instructorIds")
     private List<Long> instructorIdList;
 
+    @JsonProperty("applyChannels")
     private List<LessonApplyChannelDto> applyChannelDtoList;
 
     public Lesson toEntity() {

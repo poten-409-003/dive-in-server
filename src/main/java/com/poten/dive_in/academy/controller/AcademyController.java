@@ -22,20 +22,20 @@ public class AcademyController {
         this.academyService = academyService;
     }
 
-    @PostMapping("/academy")
+    @PostMapping("/academies")
     public ResponseEntity<CommonResponse<AcademyResponseDto>> createAcademy(@Valid AcademyRequestDto academyRequestDto, @RequestParam(value = "image",required = false) MultipartFile file){
         AcademyResponseDto academyResponseDto = academyService.createAcademy(academyRequestDto,file);
         return new ResponseEntity<>(CommonResponse.success("업체 등록 성공하였습니다. ",academyResponseDto), HttpStatus.OK);
     }
 
-    @GetMapping("/academy")
+    @GetMapping("/academies")
     public ResponseEntity<CommonResponse<List<AcademyResponseDto>>> getAcademy(){
         List<AcademyResponseDto> academyResponseDtoList = academyService.getAcademyList();
         return new ResponseEntity<>(CommonResponse.success(null,academyResponseDtoList), HttpStatus.OK);
     }
 
 
-    @PutMapping("/academy/{id}")
+    @PutMapping("/academies/{id}")
     public ResponseEntity<CommonResponse<AcademyResponseDto>> updateAcademy(@PathVariable Long id, @ModelAttribute AcademyRequestDto academyRequestDto,
                                                                             @RequestParam(value = "image",required = false) MultipartFile file){
 
@@ -43,7 +43,7 @@ public class AcademyController {
         return new ResponseEntity<>(CommonResponse.success("업체 정보 수정에 성공하였습니다.",academyResponseDto), HttpStatus.OK);
     }
 
-    @DeleteMapping("/academy/{id}")
+    @DeleteMapping("/academies/{id}")
     public ResponseEntity<CommonResponse<Object>> deleteAcademy(@PathVariable Long id){
         academyService.deleteAcademy(id);
         return new ResponseEntity<>(CommonResponse.success("업체 삭제 성공하였습니다.",null), HttpStatus.OK);

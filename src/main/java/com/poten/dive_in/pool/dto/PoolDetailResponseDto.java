@@ -41,10 +41,10 @@ public class PoolDetailResponseDto {
 
     private String region;
 
-    @JsonProperty("pool_image")
+    @JsonProperty("poolImages")
     private List<PoolImageDto> poolImageDtoList;
 
-    @JsonProperty("lesson")
+    @JsonProperty("lessons")
     private List<LessonListResponseDto> lessonListResponseDtoList;
 
     public static PoolDetailResponseDto ofEntity(Pool pool){
