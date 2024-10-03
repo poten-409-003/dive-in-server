@@ -22,7 +22,7 @@ public class LessonDetailResponseDto {
 
     private String level;
 
-    private Integer capacity;
+    private String capacity;
 
     private String price;
 
@@ -40,13 +40,13 @@ public class LessonDetailResponseDto {
     @JsonProperty("pool")
     private PoolListResponseDto poolResponseDto;
 
-    @JsonProperty("instructor")
+    @JsonProperty("instructors")
     private List<LessonInstructorResponseDto> lessonInstructorResponseDtoList;
 
-    @JsonProperty("image")
+    @JsonProperty("images")
     private List<LessonImageDto> lessonImageDtoList;
 
-    @JsonProperty("applyChannel")
+    @JsonProperty("applyChannels")
     private List<LessonApplyChannelDto> lessonApplyChannelDtoList;
 
     public static LessonDetailResponseDto ofEntity(Lesson lesson) {

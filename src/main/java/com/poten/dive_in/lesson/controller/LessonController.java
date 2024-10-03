@@ -21,7 +21,7 @@ public class LessonController {
     private final LessonService lessonService;
 
 
-    @PostMapping("/lesson")
+    @PostMapping("/lessons")
     public ResponseEntity<CommonResponse<LessonDetailResponseDto>> createLesson(@Valid LessonRequestDto lessonRequestDto,
                                                                                 @RequestParam(value = "images",required = false) List<MultipartFile> multipartFileList){
 
@@ -30,13 +30,13 @@ public class LessonController {
 
     }
 
-    @GetMapping("/lesson")
+    @GetMapping("/lessons")
     public ResponseEntity<CommonResponse<List<LessonListResponseDto>>> getLessonList(){
         List<LessonListResponseDto> lessonResponseDtoList =lessonService.getLessonList();
         return new ResponseEntity<>(CommonResponse.success(null,lessonResponseDtoList), HttpStatus.OK);
     }
 
-    @GetMapping("/lesson/{id}")
+    @GetMapping("/lessons/{id}")
     public ResponseEntity<CommonResponse<LessonDetailResponseDto>> getLessonDetail(@PathVariable Long id){
         LessonDetailResponseDto lessonResponseDto =lessonService.getLessonDetail(id);
         return new ResponseEntity<>(CommonResponse.success(null,lessonResponseDto), HttpStatus.OK);
