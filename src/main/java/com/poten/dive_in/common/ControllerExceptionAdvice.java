@@ -1,8 +1,8 @@
 package com.poten.dive_in.common;
 
 import com.poten.dive_in.common.dto.CommonResponse;
+import io.jsonwebtoken.JwtException;
 import org.apache.coyote.BadRequestException;
-import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -12,9 +12,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.HttpClientErrorException;
 
-import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
@@ -46,7 +44,7 @@ public class ControllerExceptionAdvice {
         return new ResponseEntity<>(CommonResponse.error(e.getMessage()),HttpStatus.FORBIDDEN);
     }
 
-    // 유효성 검사 예외 처리
+    // DTO 유효성 검사 예외 처리
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<CommonResponse<Object>> handleValidationExceptions(MethodArgumentNotValidException e) {
 
