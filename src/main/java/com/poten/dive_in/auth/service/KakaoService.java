@@ -62,6 +62,8 @@ public class KakaoService {
 
     public KakaoAccountDto getKakaoInfo(String kakaoAccessToken){
 
+        log.info("액세스토큰: "+kakaoAccessToken);
+
         RestTemplate rt = new RestTemplate();
 
         HttpHeaders headers = new HttpHeaders();
@@ -102,6 +104,7 @@ public class KakaoService {
                     .build();
 
         } catch (Exception e){
+            log.error("JSON 파싱에 실패하였습니다.");
             e.printStackTrace();
         }
 
