@@ -23,11 +23,7 @@ public class KakaoService {
     @Value("${kakao.kakao_client_secret}")
     private String KAKAO_CLIENT_SECRET;
 
-    @Value("${kakao.kakao_redirect_uri}")
-    private String KAKAO_REDIRECT_URI;
-
-
-    public KakaoTokenDto getKakaoAccessToken(String code) {
+    public KakaoTokenDto getKakaoAccessToken(String code,String redirectUri) {
         RestTemplate rt = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
@@ -36,7 +32,7 @@ public class KakaoService {
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("grant_type","authorization_code");
         params.add("client_id", KAKAO_REST_API_KEY);
-        params.add("redirect_uri",KAKAO_REDIRECT_URI);
+        params.add("redirect_uri",redirectUri);
         params.add("code",code);
         params.add("client_secret",KAKAO_CLIENT_SECRET);
 

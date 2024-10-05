@@ -23,10 +23,10 @@ public class AuthController {
     private final KakaoService kakaoService;
 
     @GetMapping("/login/kakao")
-    public ResponseEntity<CommonResponse<Object>> login(@RequestParam String code, @RequestParam String redirect_uri){
+    public ResponseEntity<CommonResponse<Object>> login(@RequestParam String code, @RequestParam("redirect_uri") String redirectUri){
 
         // 카카오 API에 액세스 토큰 요청
-        KakaoTokenDto kakaoTokenDto = kakaoService.getKakaoAccessToken(code);
+        KakaoTokenDto kakaoTokenDto = kakaoService.getKakaoAccessToken(code,redirectUri);
 
         // 액세스 토큰으로 유저 정보 요청
         KakaoAccountDto kakaoAccountDto = kakaoService.getKakaoInfo(kakaoTokenDto.getAccessToken());
