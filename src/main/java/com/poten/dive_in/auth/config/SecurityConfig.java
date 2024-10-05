@@ -8,7 +8,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -29,10 +32,10 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http, JwtAuthenticationFilter jwtAuthenticationFilter) throws Exception {
         http
-                .csrf(csrf -> csrf.disable())  // CSRF 비활성화
-                .formLogin(formLogin -> formLogin.disable())  // Form 로그인 비활성화
-                .httpBasic(httpBasic -> httpBasic.disable())  // HTTP 기본 인증 비활성화
-                .logout((logout)->logout.disable())
+                .csrf(AbstractHttpConfigurer::disable)  // CSRF 비활성화
+                .formLogin(AbstractHttpConfigurer::disable)  // Form 로그인 비활성화
+                .httpBasic(AbstractHttpConfigurer::disable)  // HTTP 기본 인증 비활성화
+                .logout(AbstractHttpConfigurer::disable)
                 .sessionManagement(sessionManagement ->
                         sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
@@ -44,4 +47,11 @@ public class SecurityConfig {
 
         return http.build();
     }
+
+    // 기본 사용자 비활성화
+    @Bean
+    public UserDetailsService userDetailsService() {
+        return new InMemoryUserDetailsManager();
+    }
+
 }
