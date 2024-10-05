@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 
 @Getter @Builder
 @AllArgsConstructor @NoArgsConstructor
-public class MemberInfoDto {
+public class UserProfileDto {
     private Long id;
 
     private String email;
@@ -22,8 +22,8 @@ public class MemberInfoDto {
 
     private String socialType;
 
-    public static MemberInfoDto ofEntity(Member member){
-        return MemberInfoDto.builder()
+    public static UserProfileDto ofEntity(Member member){
+        return UserProfileDto.builder()
                 .id(member.getId())
                 .email(member.getEmail())
                 .nickname(member.getNickname())

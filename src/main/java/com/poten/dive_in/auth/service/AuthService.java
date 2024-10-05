@@ -2,7 +2,7 @@ package com.poten.dive_in.auth.service;
 
 import com.poten.dive_in.auth.dto.KakaoAccountDto;
 import com.poten.dive_in.auth.dto.LoginResponseDto;
-import com.poten.dive_in.auth.dto.MemberInfoDto;
+import com.poten.dive_in.auth.dto.UserProfileDto;
 import com.poten.dive_in.auth.enums.SocialType;
 import com.poten.dive_in.auth.jwt.JwtTokenProvider;
 import com.poten.dive_in.auth.entity.Member;
@@ -20,11 +20,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.swing.plaf.metal.MetalMenuBarUI;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 
 import static com.poten.dive_in.common.service.S3Service.extractFileName;
 
@@ -39,23 +37,18 @@ public class AuthService {
     private final S3Service s3Service;
 
     @Transactional(readOnly = true)
-    public MemberInfoDto getCurrentMemberInfo(String email){
+    public UserProfileDto getUserProfile(String email){
 
         Member member = memberRepository.findByEmail(email).orElseThrow(()-> new EntityNotFoundException("사용자가 존재하지 않습니다."));
-        return MemberInfoDto.ofEntity(member);
+        return UserProfileDto.ofEntity(member);
     }
 
     @Transactional
-    public MemberInfoDto updateCurrentMemberInfo(String email, MemberInfoDto memberInfoDto, MultipartFile file) {
+    public UserProfileDto updateUserProfile(String email, String nickname, MultipartFile file) {
 
         // 해당 email의 member가 존재하는지 확인
         Member member = memberRepository.findByEmail(email)
                 .orElseThrow(() -> new EntityNotFoundException("사용자가 존재하지 않습니다."));
-
-        // email의 member가 DTO의 email과 같은지 확인
-        if (!member.getEmail().equals(memberInfoDto.getEmail())) {
-            throw new EntityNotFoundException("수정 권한이 없습니다.");
-        }
 
         // 이미지 수정이 있는지 확인
         String profileImageUrl;
@@ -78,8 +71,8 @@ public class AuthService {
             profileImageUrl = member.getProfileImageUrl();
         }
 
-        member.updateMember(memberInfoDto, profileImageUrl);
-        return MemberInfoDto.ofEntity(member);
+        member.updateMember(nickname, profileImageUrl);
+        return UserProfileDto.ofEntity(member);
     }
 
 
@@ -144,7 +137,7 @@ public class AuthService {
     }
 
 
-    public void deleteCurrentMember(String email, HttpServletRequest request, HttpServletResponse response){
+    public void deleteUser(String email, HttpServletRequest request, HttpServletResponse response){
         Member member = memberRepository.findByEmail(email).orElseThrow(()-> new EntityNotFoundException("회원 정보가 없습니다."));
 
         String refreshToken = getJwtFromRequest(request, "refresh_token");

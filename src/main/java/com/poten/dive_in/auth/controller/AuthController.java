@@ -3,7 +3,7 @@ package com.poten.dive_in.auth.controller;
 import com.poten.dive_in.auth.dto.KakaoAccountDto;
 import com.poten.dive_in.auth.dto.KakaoTokenDto;
 import com.poten.dive_in.auth.dto.LoginResponseDto;
-import com.poten.dive_in.auth.dto.MemberInfoDto;
+import com.poten.dive_in.auth.dto.UserProfileDto;
 import com.poten.dive_in.auth.service.AuthService;
 import com.poten.dive_in.auth.service.KakaoService;
 import com.poten.dive_in.common.dto.CommonResponse;
@@ -24,7 +24,6 @@ public class AuthController {
 
     private final AuthService authService;
     private final KakaoService kakaoService;
-    private final FileDescriptorMetrics fileDescriptorMetrics;
 
     @GetMapping("/login/kakao")
     public ResponseEntity<CommonResponse<Object>> login(@RequestParam String code, @RequestParam("redirect_uri") String redirectUri){
@@ -46,21 +45,21 @@ public class AuthController {
         return new ResponseEntity<>(CommonResponse.success(null,null), HttpStatus.OK);
     }
 
-    @GetMapping("/me")
-    public ResponseEntity<CommonResponse<Object>> getCurrentMemberInfo(Principal principal){
-        MemberInfoDto memberInfoDto = authService.getCurrentMemberInfo(principal.getName());
-        return new ResponseEntity<>(CommonResponse.success(null,memberInfoDto), HttpStatus.OK);
+    @GetMapping("/user/profile")
+    public ResponseEntity<CommonResponse<Object>> getUserProfile(Principal principal){
+        UserProfileDto userProfileDto = authService.getUserProfile(principal.getName());
+        return new ResponseEntity<>(CommonResponse.success(null, userProfileDto), HttpStatus.OK);
     }
 
-    @PutMapping("/me")
-    public ResponseEntity<CommonResponse<Object>> updateCurrentMemberInfo(Principal principal, MemberInfoDto memberInfoDto, MultipartFile file){
-        MemberInfoDto updatedMemberInfoDto = authService.updateCurrentMemberInfo(principal.getName(),memberInfoDto,file);
-        return new ResponseEntity<>(CommonResponse.success(null,updatedMemberInfoDto), HttpStatus.OK);
+    @PutMapping("/user/profile")
+    public ResponseEntity<CommonResponse<Object>> updateUserProfile(Principal principal, @RequestParam("nickname") String nickname, @RequestParam("profileImage") MultipartFile file){
+        UserProfileDto updatedUserProfileDto = authService.updateUserProfile(principal.getName(),nickname,file);
+        return new ResponseEntity<>(CommonResponse.success(null, updatedUserProfileDto), HttpStatus.OK);
     }
 
-    @DeleteMapping("/me")
-    public ResponseEntity<CommonResponse<Object>> deleteCurrentMember(Principal principal,HttpServletRequest request,  HttpServletResponse response){
-        authService.deleteCurrentMember(principal.getName(), request, response);
+    @DeleteMapping("/user/profile")
+    public ResponseEntity<CommonResponse<Object>> deleteUserProfile(Principal principal,HttpServletRequest request,  HttpServletResponse response){
+        authService.deleteUser(principal.getName(), request, response);
         return new ResponseEntity<>(CommonResponse.success("회원 탈퇴가 완료되었습니다.",null), HttpStatus.OK);
     }
 
