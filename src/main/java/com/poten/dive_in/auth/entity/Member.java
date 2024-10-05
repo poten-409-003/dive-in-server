@@ -1,5 +1,6 @@
 package com.poten.dive_in.auth.entity;
 
+import com.poten.dive_in.auth.dto.MemberInfoDto;
 import com.poten.dive_in.common.entity.BaseTimeEntity;
 import com.poten.dive_in.auth.enums.Role;
 import com.poten.dive_in.auth.enums.SocialType;
@@ -31,4 +32,9 @@ public class Member extends BaseTimeEntity {
 
     private String profileImageUrl;
 
+    public void updateMember(MemberInfoDto memberInfoDto, String profileImageUrl){
+
+        this.profileImageUrl = memberInfoDto.getProfileImageUrl();
+        this.nickname = memberInfoDto.getNickname();
+    }
 }
