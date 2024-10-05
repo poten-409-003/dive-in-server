@@ -4,6 +4,7 @@ import com.poten.dive_in.auth.dto.KakaoAccountDto;
 import com.poten.dive_in.auth.dto.KakaoTokenDto;
 import com.poten.dive_in.auth.dto.LoginResponseDto;
 import com.poten.dive_in.auth.dto.UserProfileDto;
+
 import com.poten.dive_in.auth.service.AuthService;
 import com.poten.dive_in.auth.service.KakaoService;
 import com.poten.dive_in.common.dto.CommonResponse;
@@ -24,6 +25,7 @@ public class AuthController {
 
     private final AuthService authService;
     private final KakaoService kakaoService;
+    private final FileDescriptorMetrics fileDescriptorMetrics;
 
     @GetMapping("/login/kakao")
     public ResponseEntity<CommonResponse<Object>> login(@RequestParam String code, @RequestParam("redirect_uri") String redirectUri){
