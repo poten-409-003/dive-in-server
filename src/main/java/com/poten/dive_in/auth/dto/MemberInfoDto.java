@@ -1,6 +1,5 @@
 package com.poten.dive_in.auth.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.poten.dive_in.auth.entity.Member;
 import com.poten.dive_in.auth.enums.Role;
 import lombok.AllArgsConstructor;
@@ -10,7 +9,7 @@ import lombok.NoArgsConstructor;
 
 @Getter @Builder
 @AllArgsConstructor @NoArgsConstructor
-public class UserInfoResponseDto {
+public class MemberInfoDto {
     private Long id;
 
     private String email;
@@ -23,8 +22,8 @@ public class UserInfoResponseDto {
 
     private String socialType;
 
-    public static UserInfoResponseDto ofEntity(Member member){
-        return UserInfoResponseDto.builder()
+    public static MemberInfoDto ofEntity(Member member){
+        return MemberInfoDto.builder()
                 .id(member.getId())
                 .email(member.getEmail())
                 .nickname(member.getNickname())
