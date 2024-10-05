@@ -1,5 +1,7 @@
 package com.poten.dive_in.auth.service;
 
+import com.poten.dive_in.auth.dto.KakaoAccountDto;
+import com.poten.dive_in.auth.dto.UserInfoResponseDto;
 import com.poten.dive_in.auth.enums.SocialType;
 import com.poten.dive_in.auth.jwt.JwtTokenProvider;
 import com.poten.dive_in.auth.entity.Member;
@@ -7,6 +9,7 @@ import com.poten.dive_in.auth.entity.TokenManager;
 import com.poten.dive_in.auth.enums.Role;
 import com.poten.dive_in.auth.repository.MemberRepository;
 import com.poten.dive_in.auth.repository.TokenManagerRepository;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -25,8 +28,21 @@ public class AuthService {
     private final TokenManagerRepository tokenManagerRepository;
     private final HttpServletResponse httpServletResponse;
 
+    @Transactional(readOnly = true)
+    public UserInfoResponseDto getCurrentUserInfo(String email){
 
-    public void login(String email,String nickName, HttpServletResponse response){
+        Member member = memberRepository.findByEmail(email).orElseThrow(()-> new EntityNotFoundException("사용자가 존재하지 않습니다."));
+        return UserInfoResponseDto.ofEntity(member);
+    }
+
+
+
+    @Transactional
+    public UserInfoResponseDto login(KakaoAccountDto kakaoAccountDto){
+
+        String email = kakaoAccountDto.getEmail();
+
+        String nickname = kakaoAccountDto.getProfile().getNickname();
 
         // 이메일로 회원 조회
         Member member = memberRepository.findByEmail(email).orElseGet(() -> {
@@ -34,8 +50,8 @@ public class AuthService {
             // 이메일이 없을 경우 새로운 Member 생성
             Member newMember = Member.builder()
                     .email(email)
+                    .nickname(nickname)
                     .role(Role.ROLE_USER) // 디폴트 USER
-                    .nickName(nickName)
                     .socialType(SocialType.KAKAO)
                     .build();
             return memberRepository.save(newMember);
@@ -61,6 +77,7 @@ public class AuthService {
         // TokenManager 저장
         tokenManagerRepository.save(tokenManager);
 
+        return UserInfoResponseDto.ofEntity(member);
     }
 
     @Transactional

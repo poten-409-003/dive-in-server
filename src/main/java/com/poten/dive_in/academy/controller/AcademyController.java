@@ -2,7 +2,6 @@ package com.poten.dive_in.academy.controller;
 
 import com.poten.dive_in.academy.dto.AcademyRequestDto;
 import com.poten.dive_in.academy.dto.AcademyResponseDto;
-import com.poten.dive_in.academy.entity.Academy;
 import com.poten.dive_in.academy.service.AcademyService;
 import com.poten.dive_in.common.dto.CommonResponse;
 import jakarta.validation.Valid;

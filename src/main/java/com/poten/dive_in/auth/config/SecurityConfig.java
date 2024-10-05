@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -31,12 +32,12 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())  // CSRF 비활성화
                 .formLogin(formLogin -> formLogin.disable())  // Form 로그인 비활성화
                 .httpBasic(httpBasic -> httpBasic.disable())  // HTTP 기본 인증 비활성화
+                .logout((logout)->logout.disable())
                 .sessionManagement(sessionManagement ->
                         sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
-                // /pools/** 경로에만 인증 필요, 나머지는 필터 적용하지 않음
                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests
-                        .requestMatchers("/pools").hasRole("USER")
+                        .requestMatchers("/me").hasAnyRole("USER","ADMIN")
                         .anyRequest().permitAll()  // 나머지는 모두 허용
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
