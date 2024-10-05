@@ -40,7 +40,7 @@ public class SecurityConfig {
                         sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests
-                        .requestMatchers("/me").hasAnyRole("USER","ADMIN")
+                        .requestMatchers("/user/profile").hasAnyRole("USER","ADMIN")
                         .anyRequest().permitAll()  // 나머지는 모두 허용
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

@@ -12,7 +12,6 @@ import com.poten.dive_in.auth.repository.MemberRepository;
 import com.poten.dive_in.auth.repository.TokenManagerRepository;
 import com.poten.dive_in.common.service.S3Service;
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -77,7 +76,7 @@ public class AuthService {
 
 
     @Transactional
-    public LoginResponseDto login(KakaoAccountDto kakaoAccountDto){
+    public LoginResponseDto login(KakaoAccountDto kakaoAccountDto,HttpServletResponse response){
 
         String email = kakaoAccountDto.getEmail();
 
@@ -103,6 +102,10 @@ public class AuthService {
         String accessToken = jwtTokenProvider.createAccessToken(member.getId(),member.getEmail(), member.getRole());
         String refreshToken = jwtTokenProvider.createRefreshToken(member.getId(),member.getEmail(),member.getRole());
 
+        // 응답 헤더에 Access Token 및 Refresh Token 추가
+        response.setHeader("Authorization", "Bearer " + accessToken);
+        response.setHeader("X-Refresh-Token", refreshToken);
+
         LoginResponseDto loginResponseDto = LoginResponseDto.builder().accessToken(accessToken)
                 .refreshToken(refreshToken).build();
 
@@ -125,14 +128,12 @@ public class AuthService {
 
     @Transactional
     public void logOut(HttpServletRequest request, HttpServletResponse response) {
-        // 쿠키에서 refresh_token 추출
-        String refreshToken = getJwtFromRequest(request, "refresh_token");
+
+        String refreshToken = getJwtFromRequest(request, "X-Refresh-Token");
 
         if (refreshToken != null) {
             tokenManagerRepository.deleteByRefreshToken(refreshToken);
 
-            // 클라이언트의 쿠키 삭제
-            deleteCookies(response);
         }
     }
 
@@ -140,37 +141,18 @@ public class AuthService {
     public void deleteUser(String email, HttpServletRequest request, HttpServletResponse response){
         Member member = memberRepository.findByEmail(email).orElseThrow(()-> new EntityNotFoundException("회원 정보가 없습니다."));
 
-        String refreshToken = getJwtFromRequest(request, "refresh_token");
+        String refreshToken = getJwtFromRequest(request, "X-Refresh-Token");
         if (refreshToken != null) {
             tokenManagerRepository.deleteByRefreshToken(refreshToken);
-
-            // 클라이언트의 쿠키 삭제
-            deleteCookies(response);
         }
         memberRepository.delete(member);
     }
 
 
-    public void deleteCookies(HttpServletResponse response) {
-        // Access Token 쿠키 삭제
-        response.addHeader("Set-Cookie", "access_token=; Path=/; HttpOnly; Secure; SameSite=None; Max-Age=0;");
-
-        // Refresh Token 쿠키 삭제
-        response.addHeader("Set-Cookie", "refresh_token=; Path=/; HttpOnly; Secure; SameSite=None; Max-Age=0;");
-
-    }
 
 
-    private String getJwtFromRequest(HttpServletRequest request, String token_name) {
-        // 쿠키에서 JWT 토큰을 찾기
-        Cookie[] cookies = request.getCookies();
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if (cookie.getName().equals(token_name)) { // Access Token 쿠키에서 가져오기
-                    return cookie.getValue(); // 쿠키 값 반환
-                }
-            }
-        }
-        return null;
+    // Request에서 JWT 토큰을 추출하는 메서드
+    private String getJwtFromRequest(HttpServletRequest request, String tokenName) {
+        return request.getHeader(tokenName);
     }
 }

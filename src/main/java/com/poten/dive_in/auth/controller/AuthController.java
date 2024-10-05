@@ -8,7 +8,6 @@ import com.poten.dive_in.auth.dto.UserProfileDto;
 import com.poten.dive_in.auth.service.AuthService;
 import com.poten.dive_in.auth.service.KakaoService;
 import com.poten.dive_in.common.dto.CommonResponse;
-import io.micrometer.core.instrument.binder.system.FileDescriptorMetrics;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +27,7 @@ public class AuthController {
     private final FileDescriptorMetrics fileDescriptorMetrics;
 
     @GetMapping("/login/kakao")
-    public ResponseEntity<CommonResponse<Object>> login(@RequestParam String code, @RequestParam("redirect_uri") String redirectUri){
+    public ResponseEntity<CommonResponse<Object>> login(@RequestParam String code, @RequestParam("redirect_uri") String redirectUri, HttpServletResponse response){
 
         // 카카오 API에 액세스 토큰 요청
         KakaoTokenDto kakaoTokenDto = kakaoService.getKakaoAccessToken(code,redirectUri);
@@ -36,7 +35,7 @@ public class AuthController {
         // 액세스 토큰으로 유저 정보 요청
         KakaoAccountDto kakaoAccountDto = kakaoService.getKakaoInfo(kakaoTokenDto.getAccessToken());
 
-        LoginResponseDto loginResponseDto = authService.login(kakaoAccountDto);
+        LoginResponseDto loginResponseDto = authService.login(kakaoAccountDto,response);
 
         return new ResponseEntity<>(CommonResponse.success(null,loginResponseDto), HttpStatus.OK);
     }

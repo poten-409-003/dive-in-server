@@ -3,7 +3,6 @@ package com.poten.dive_in.auth.jwt;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.poten.dive_in.common.dto.CommonResponse;
 import io.jsonwebtoken.JwtException;
-import jakarta.servlet.http.Cookie;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -32,13 +31,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
 
         // Request에서 JWT 토큰을 추출
-        String token = getJwtFromRequest(request,"access_token");
+        String token = getJwtFromRequest(request,"Authorization");
 
         try {
             if (token != null) {
+
+                if(token.startsWith("Bearer ")){
+                    token = token.substring(7);
+                }
+
                 if (jwtTokenProvider.validateToken(token)) {
-                    // 토큰이 유효한 경우
-                    System.out.println(jwtTokenProvider.getExpirationFromToken(token));
 
                     String email = jwtTokenProvider.getEmailFromToken(token);
                     var authorities = Collections.singletonList(new SimpleGrantedAuthority(jwtTokenProvider.getRoleFromToken(token).name()));
@@ -50,7 +52,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                 } else {
                     // 토큰이 만료된 경우
-                    String refreshToken = getJwtFromRequest(request, "refresh_token");
+                    String refreshToken = getJwtFromRequest(request, "X-Refresh-Token");
                     if (refreshToken != null && jwtTokenProvider.validateToken(refreshToken)) {
                         // 새로운 Access Token 생성
                         String newAccessToken = jwtTokenProvider.createAccessToken(
@@ -59,11 +61,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                 jwtTokenProvider.getRoleFromToken(refreshToken)
                         );
 
-                        // 새 Access Token을 응답 헤더나 쿠키에 넣어 클라이언트에 전달
-                        Cookie newAccessTokenCookie = new Cookie("access_token", newAccessToken);
-                        newAccessTokenCookie.setPath("/");
-                        newAccessTokenCookie.setHttpOnly(true);
-                        response.addCookie(newAccessTokenCookie);
+                        // 새 Access Token을 응답 헤더에 추가
+                        response.setHeader("Authorization", "Bearer " + newAccessToken); // Authorization 헤더에 추가
 
                         setAuthenticationContext(newAccessToken, request);
 
@@ -86,17 +85,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     // Request에서 JWT 토큰을 추출하는 메서드
-    private String getJwtFromRequest(HttpServletRequest request, String token_name) {
-        // 쿠키에서 JWT 토큰을 찾기
-        Cookie[] cookies = request.getCookies();
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if (cookie.getName().equals(token_name)) { // Access Token 쿠키에서 가져오기
-                    return cookie.getValue(); // 쿠키 값 반환
-                }
-            }
-        }
-        return null;
+    private String getJwtFromRequest(HttpServletRequest request, String tokenName) {
+        return request.getHeader(tokenName);
     }
 
     // 에러 응답을 클라이언트에게 전송하는 메서드
