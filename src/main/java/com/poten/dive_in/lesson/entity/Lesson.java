@@ -33,6 +33,7 @@ public class Lesson extends BaseTimeEntity {
 
     private String keyword;
 
+    @Column(length = 3000)
     private String lessonDetail;
 
     private String lessonSchedule;
