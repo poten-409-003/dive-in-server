@@ -46,8 +46,8 @@ public class AuthController {
     }
 
     @GetMapping("/user/profile")
-    public ResponseEntity<CommonResponse<Object>> getUserProfile(Principal principal){
-        UserProfileDto userProfileDto = authService.getUserProfile(principal.getName());
+    public ResponseEntity<CommonResponse<Object>> getUserProfile(Principal principal, HttpServletRequest request){
+        UserProfileDto userProfileDto = authService.getUserProfile(principal.getName(), request);
         return new ResponseEntity<>(CommonResponse.success(null, userProfileDto), HttpStatus.OK);
     }
 

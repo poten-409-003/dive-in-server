@@ -32,13 +32,16 @@ public class AuthService {
     private final MemberRepository memberRepository;
     private final JwtTokenProvider jwtTokenProvider;
     private final TokenManagerRepository tokenManagerRepository;
-    private final HttpServletResponse httpServletResponse;
     private final S3Service s3Service;
 
     @Transactional(readOnly = true)
-    public UserProfileDto getUserProfile(String email){
-
+    public UserProfileDto getUserProfile(String email, HttpServletRequest request){
         Member member = memberRepository.findByEmail(email).orElseThrow(()-> new EntityNotFoundException("사용자가 존재하지 않습니다."));
+        String refreshToken = getJwtFromRequest(request, "X-Refresh-Token");
+        boolean tokenCheck= tokenManagerRepository.existsByRefreshToken(refreshToken);
+        if (!tokenCheck){
+            throw new EntityNotFoundException("매칭되는 리프레시 토큰이 없습니다.");
+        }
         return UserProfileDto.ofEntity(member);
     }
 
