@@ -8,4 +8,5 @@ import java.util.Optional;
 
 public interface TokenManagerRepository extends JpaRepository<TokenManager, Long> {
     int deleteByRefreshToken(String token);
+    int deleteByMemberId(Long id);
 }

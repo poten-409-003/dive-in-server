@@ -137,13 +137,13 @@ public class AuthService {
         }
     }
 
-
+    @Transactional
     public void deleteUser(String email, HttpServletRequest request, HttpServletResponse response){
         Member member = memberRepository.findByEmail(email).orElseThrow(()-> new EntityNotFoundException("회원 정보가 없습니다."));
 
         String refreshToken = getJwtFromRequest(request, "X-Refresh-Token");
         if (refreshToken != null) {
-            tokenManagerRepository.deleteByRefreshToken(refreshToken);
+            tokenManagerRepository.deleteByMemberId(member.getId());
         }
         memberRepository.delete(member);
     }
