@@ -24,7 +24,6 @@ public class AuthController {
 
     private final AuthService authService;
     private final KakaoService kakaoService;
-    private final FileDescriptorMetrics fileDescriptorMetrics;
 
     @GetMapping("/login/kakao")
     public ResponseEntity<CommonResponse<Object>> login(@RequestParam String code, @RequestParam("redirect_uri") String redirectUri, HttpServletResponse response){
