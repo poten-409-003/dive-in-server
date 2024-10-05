@@ -44,6 +44,8 @@ public class AuthService {
 
         String nickname = kakaoAccountDto.getProfile().getNickname();
 
+        String profileImageUrl = kakaoAccountDto.getProfile().getProfileImageUrl();
+
         // 이메일로 회원 조회
         Member member = memberRepository.findByEmail(email).orElseGet(() -> {
 
@@ -53,6 +55,7 @@ public class AuthService {
                     .nickname(nickname)
                     .role(Role.ROLE_USER) // 디폴트 USER
                     .socialType(SocialType.KAKAO)
+                    .profileImageUrl(profileImageUrl)
                     .build();
             return memberRepository.save(newMember);
         });
