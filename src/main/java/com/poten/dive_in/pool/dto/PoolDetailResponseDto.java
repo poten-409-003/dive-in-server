@@ -64,8 +64,6 @@ public class PoolDetailResponseDto {
                         .collect(Collectors.toList())
                 : new ArrayList<>();
 
-        log.info("PoolDetailResponseDTO의 poolImageDtoList: " + poolImageDtoList);
-        log.info("PoolDetailResponseDTO의 lessonListResponseDtoList: " + lessonListResponseDtoList);
 
         return PoolDetailResponseDto.builder()
                 .id(pool.getId())

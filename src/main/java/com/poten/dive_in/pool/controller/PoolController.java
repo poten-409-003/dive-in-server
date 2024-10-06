@@ -42,7 +42,6 @@ public class PoolController {
     public ResponseEntity<CommonResponse<PoolDetailResponseDto>> getPool(@PathVariable Long id) throws JsonProcessingException {
         PoolDetailResponseDto poolResponseDto = poolService.getPool(id);
         String responseData = objectMapper.writeValueAsString(poolResponseDto);
-        log.info("Pool 상세조회 응답: {}", responseData);
         return new ResponseEntity<>(CommonResponse.success(null, poolResponseDto),HttpStatus.OK);
     }
 
