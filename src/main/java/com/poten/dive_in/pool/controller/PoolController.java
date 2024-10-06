@@ -23,6 +23,7 @@ import java.util.List;
 public class PoolController {
 
     private final PoolService poolService;
+    private final ObjectMapper objectMapper;
 
     @PostMapping("/pools")
     public ResponseEntity<CommonResponse<PoolDetailResponseDto>> createPool(@Valid PoolRequestDto poolRequestDto, @RequestParam(value = "images",required = false)List<MultipartFile> multipartFileList){
@@ -40,7 +41,8 @@ public class PoolController {
     @GetMapping("/pools/{id}")
     public ResponseEntity<CommonResponse<PoolDetailResponseDto>> getPool(@PathVariable Long id) throws JsonProcessingException {
         PoolDetailResponseDto poolResponseDto = poolService.getPool(id);
-        log.info("Pool 상세조회: {}", new ObjectMapper().writeValueAsString(poolResponseDto));
+        String responseData = objectMapper.writeValueAsString(poolResponseDto);
+        log.info("Pool 상세조회 응답: {}", responseData);
         return new ResponseEntity<>(CommonResponse.success(null, poolResponseDto),HttpStatus.OK);
     }
 

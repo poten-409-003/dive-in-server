@@ -50,10 +50,10 @@ public class Pool extends BaseTimeEntity {
 
     private String region;
 
-    @OneToMany( mappedBy = "pool", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "pool", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PoolImage> imageList;
 
-    @OneToMany(mappedBy = "pool", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(fetch = FetchType.EAGER,mappedBy = "pool", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Lesson> lessonList;
 
     public void addLesson(Lesson lesson) {
