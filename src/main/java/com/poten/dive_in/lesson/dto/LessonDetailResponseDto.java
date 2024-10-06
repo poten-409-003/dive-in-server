@@ -8,12 +8,13 @@ import com.poten.dive_in.lesson.enums.LessonStatus;
 import com.poten.dive_in.pool.dto.PoolListResponseDto;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.ToString;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Getter @Builder
+@Getter @Builder @ToString
 public class LessonDetailResponseDto {
 
     private Long id;

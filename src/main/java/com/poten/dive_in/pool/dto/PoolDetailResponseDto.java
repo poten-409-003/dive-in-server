@@ -5,12 +5,15 @@ import com.poten.dive_in.lesson.dto.LessonListResponseDto;
 import com.poten.dive_in.pool.entity.Pool;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.ToString;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Getter @Builder
+@Slf4j
+@Getter @Builder @ToString
 public class PoolDetailResponseDto {
 
     private Long id;
@@ -60,6 +63,9 @@ public class PoolDetailResponseDto {
                         .map(LessonListResponseDto::ofEntity)
                         .collect(Collectors.toList())
                 : new ArrayList<>();
+
+        log.info("PoolDetailResponseDTO의 poolImageDtoList: " + poolImageDtoList);
+        log.info("PoolDetailResponseDTO의 lessonListResponseDtoList: " + lessonListResponseDtoList);
 
         return PoolDetailResponseDto.builder()
                 .id(pool.getId())

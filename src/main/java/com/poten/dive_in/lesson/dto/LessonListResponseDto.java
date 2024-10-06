@@ -3,8 +3,9 @@ package com.poten.dive_in.lesson.dto;
 import com.poten.dive_in.lesson.entity.Lesson;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.ToString;
 
-@Getter @Builder
+@Getter @Builder @ToString
 public class LessonListResponseDto {
     private Long id;
     private String academyName;

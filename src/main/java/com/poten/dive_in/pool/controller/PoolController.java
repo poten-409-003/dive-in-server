@@ -1,5 +1,7 @@
 package com.poten.dive_in.pool.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.poten.dive_in.common.dto.CommonResponse;
 import com.poten.dive_in.pool.dto.PoolListResponseDto;
 import com.poten.dive_in.pool.dto.PoolRequestDto;
@@ -7,6 +9,7 @@ import com.poten.dive_in.pool.dto.PoolDetailResponseDto;
 import com.poten.dive_in.pool.service.PoolService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
+@Slf4j
 @RequiredArgsConstructor
 @RestController
 public class PoolController {
@@ -34,8 +38,9 @@ public class PoolController {
 
     // 상세 조회
     @GetMapping("/pools/{id}")
-    public ResponseEntity<CommonResponse<PoolDetailResponseDto>> getPool(@PathVariable Long id){
+    public ResponseEntity<CommonResponse<PoolDetailResponseDto>> getPool(@PathVariable Long id) throws JsonProcessingException {
         PoolDetailResponseDto poolResponseDto = poolService.getPool(id);
+        log.info("Pool 상세조회: {}", new ObjectMapper().writeValueAsString(poolResponseDto));
         return new ResponseEntity<>(CommonResponse.success(null, poolResponseDto),HttpStatus.OK);
     }
 

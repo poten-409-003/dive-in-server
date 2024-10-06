@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.thymeleaf.standard.expression.Each;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,7 +50,7 @@ public class Pool extends BaseTimeEntity {
 
     private String region;
 
-    @OneToMany(mappedBy = "pool", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany( mappedBy = "pool", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PoolImage> imageList;
 
     @OneToMany(mappedBy = "pool", cascade = CascadeType.ALL, orphanRemoval = true)
