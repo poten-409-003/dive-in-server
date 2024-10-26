@@ -42,7 +42,7 @@ jobs:
   deploy:
     # needs를 통해 build job이 수행 성공시에 작업되도록 설정
     needs: build
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
     # Docker image pull & run (로컬에서 바로 실행)
     - name: Docker image pull and run locally
