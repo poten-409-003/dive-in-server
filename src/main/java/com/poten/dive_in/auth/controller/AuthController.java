@@ -52,7 +52,7 @@ public class AuthController {
     }
 
     @PutMapping("/user/profile")
-    public ResponseEntity<CommonResponse<Object>> updateUserProfile(Principal principal, @RequestParam("nickname") String nickname, @RequestParam("profileImage") MultipartFile file){
+    public ResponseEntity<CommonResponse<Object>> updateUserProfile(Principal principal, @RequestParam("nickname") String nickname, @RequestParam(value = "profileImage",required = false) MultipartFile file){
         UserProfileDto updatedUserProfileDto = authService.updateUserProfile(principal.getName(),nickname,file);
         return new ResponseEntity<>(CommonResponse.success(null, updatedUserProfileDto), HttpStatus.OK);
     }

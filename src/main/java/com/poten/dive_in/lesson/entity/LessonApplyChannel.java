@@ -16,7 +16,7 @@ public class LessonApplyChannel extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "lesson_link_id")
+    @Column(name = "lesson_apply_channel_id")
     private Long id;
 
     private String applyUrl;

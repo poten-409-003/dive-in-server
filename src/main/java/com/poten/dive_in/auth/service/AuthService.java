@@ -32,12 +32,10 @@ public class AuthService {
     private final MemberRepository memberRepository;
     private final JwtTokenProvider jwtTokenProvider;
     private final TokenManagerRepository tokenManagerRepository;
-    private final HttpServletResponse httpServletResponse;
     private final S3Service s3Service;
 
     @Transactional(readOnly = true)
     public UserProfileDto getUserProfile(String email){
-
         Member member = memberRepository.findByEmail(email).orElseThrow(()-> new EntityNotFoundException("사용자가 존재하지 않습니다."));
         return UserProfileDto.ofEntity(member);
     }
@@ -137,13 +135,13 @@ public class AuthService {
         }
     }
 
-
+    @Transactional
     public void deleteUser(String email, HttpServletRequest request, HttpServletResponse response){
         Member member = memberRepository.findByEmail(email).orElseThrow(()-> new EntityNotFoundException("회원 정보가 없습니다."));
 
         String refreshToken = getJwtFromRequest(request, "X-Refresh-Token");
         if (refreshToken != null) {
-            tokenManagerRepository.deleteByRefreshToken(refreshToken);
+            tokenManagerRepository.deleteByMemberId(member.getId());
         }
         memberRepository.delete(member);
     }
