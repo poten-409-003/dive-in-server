@@ -1,5 +1,6 @@
 package com.poten.dive_in.auth.jwt;
 
+import com.poten.dive_in.auth.entity.MemberRole;
 import com.poten.dive_in.auth.enums.Role;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
@@ -27,11 +28,11 @@ public class JwtTokenProvider {
     }
 
     // Refresh Token 생성
-    public String createRefreshToken(Long memberId,String email,Role role) {
+    public String createRefreshToken(Long memberId, String email,Role role) {
         return createToken(memberId,email,role, 10080L); //7일
     }
 
-    private String createToken(Long memberId,String email, Role role, long validityInMinutes){
+    private String createToken(Long memberId, String email, Role role, long validityInMinutes){
 
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime expiration_date = now.plusMinutes(validityInMinutes);

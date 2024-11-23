@@ -3,13 +3,17 @@ package com.poten.dive_in.auth.service;
 import com.poten.dive_in.auth.dto.KakaoAccountDto;
 import com.poten.dive_in.auth.dto.LoginResponseDto;
 import com.poten.dive_in.auth.dto.UserProfileDto;
+import com.poten.dive_in.auth.entity.MemberRole;
 import com.poten.dive_in.auth.enums.SocialType;
 import com.poten.dive_in.auth.jwt.JwtTokenProvider;
 import com.poten.dive_in.auth.entity.Member;
 import com.poten.dive_in.auth.entity.TokenManager;
 import com.poten.dive_in.auth.enums.Role;
 import com.poten.dive_in.auth.repository.MemberRepository;
+import com.poten.dive_in.auth.repository.MemberRoleRepository;
 import com.poten.dive_in.auth.repository.TokenManagerRepository;
+import com.poten.dive_in.cmmncode.entity.CmmnCd;
+import com.poten.dive_in.cmmncode.repository.CmmnCdRepository;
 import com.poten.dive_in.common.service.S3Service;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -32,6 +36,8 @@ public class AuthService {
     private final MemberRepository memberRepository;
     private final JwtTokenProvider jwtTokenProvider;
     private final TokenManagerRepository tokenManagerRepository;
+    private final MemberRoleRepository roleRepository;
+    private final CmmnCdRepository codeRepository;
     private final S3Service s3Service;
 
     @Transactional(readOnly = true)
@@ -81,6 +87,29 @@ public class AuthService {
         String nickname = kakaoAccountDto.getProfile().getNickname();
 
         String profileImageUrl = kakaoAccountDto.getProfile().getProfileImageUrl();
+        MemberRole role = roleRepository.findByRoleId(1L).orElseGet(() -> {
+            MemberRole newRole = MemberRole.builder()
+                        .id(1L)
+                        .name(Role.ROLE_USER)
+                        .explain("기본 회원")
+                        .useYn('Y')
+                        .build();
+            return roleRepository.save(newRole);
+        });
+
+        CmmnCd code = codeRepository.findByCode("KAKAO").orElseGet(() -> {
+           CmmnCd newCode = CmmnCd.builder()
+                   .grpNm("소셜로그인방법")
+                   .grp("social_login_cd")
+                   .code("KAKAO")
+                   .codeName("카카오")
+                   .useYn('Y')
+                   .build();
+           return codeRepository.save(newCode);
+        });
+
+
+
 
         // 이메일로 회원 조회
         Member member = memberRepository.findByEmail(email).orElseGet(() -> {
@@ -89,16 +118,17 @@ public class AuthService {
             Member newMember = Member.builder()
                     .email(email)
                     .nickname(nickname)
-                    .role(Role.ROLE_USER) // 디폴트 USER
-                    .socialType(SocialType.KAKAO)
+                    .role(role) // 디폴트 USER
+                    .socialCode(code)
                     .profileImageUrl(profileImageUrl)
+                    .useYn('Y')
                     .build();
             return memberRepository.save(newMember);
         });
 
         // AccessToken 및 Refresh Token 발급
-        String accessToken = jwtTokenProvider.createAccessToken(member.getId(),member.getEmail(), member.getRole());
-        String refreshToken = jwtTokenProvider.createRefreshToken(member.getId(),member.getEmail(),member.getRole());
+        String accessToken = jwtTokenProvider.createAccessToken(member.getId(),member.getEmail(), member.getRole().getName());
+        String refreshToken = jwtTokenProvider.createRefreshToken(member.getId(),member.getEmail(),member.getRole().getName());
 
         // 응답 헤더에 Access Token 및 Refresh Token 추가
         response.setHeader("Authorization", "Bearer " + accessToken);
