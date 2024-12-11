@@ -12,19 +12,22 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @AllArgsConstructor
 @Entity
+@Table(name = "swmm_cls_appl_cd")
 public class LessonApplyChannel extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "lesson_apply_channel_id")
+    @Column(name = "appl_id")
     private Long id;
 
+    @Column(name = "appl_url")
     private String applyUrl;
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "appl_ty_cd")
     private LessonChannelType applyUrlType;
 
     @ManyToOne
-    @JoinColumn(name = "lesson_id")
+    @JoinColumn(name = "cls_id")
     private Lesson lesson;
 }

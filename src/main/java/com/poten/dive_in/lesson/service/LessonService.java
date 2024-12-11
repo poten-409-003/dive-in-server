@@ -3,6 +3,7 @@ package com.poten.dive_in.lesson.service;
 import com.poten.dive_in.academy.entity.Academy;
 import com.poten.dive_in.academy.repository.AcademyRepository;
 import com.poten.dive_in.common.service.S3Service;
+import com.poten.dive_in.instructor.entity.InstrTeamMpng;
 import com.poten.dive_in.instructor.entity.Instructor;
 import com.poten.dive_in.instructor.repository.InstructorRepository;
 import com.poten.dive_in.lesson.dto.LessonListResponseDto;
@@ -62,6 +63,7 @@ public class LessonService {
                 academyRepository.findById(lessonRequestDto.getAcademyId())
                         .orElseThrow(() -> new EntityNotFoundException("등록되지 않은 업체입니다.")) : null;
 
+        InstrTeamMpng instrTeamMpng = lessonRequestDto
         // Pool 존재 여부 확인
         Pool pool = lessonRequestDto.getPoolId() != null ?
                 poolRepository.findById(lessonRequestDto.getPoolId())
@@ -81,7 +83,7 @@ public class LessonService {
         Lesson lesson = lessonRequestDto.toEntity();
 
 
-        if (academy != null) lesson.assignAcademy(academy);
+        if (academy != null) lesson.assignInstrTeam(academy);
 
         if (!instructors.isEmpty()) {
             List<LessonInstructor> lessonInstructorList = new ArrayList<>();

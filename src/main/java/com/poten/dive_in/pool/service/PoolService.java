@@ -91,8 +91,8 @@ public class PoolService {
             boolean repImage = (i == 0);
 
             PoolImage poolImage = PoolImage.builder()
-                    .imageUrl(uploadFileList.get(i))
-                    .repImage(repImage)
+                    .imgUrl(uploadFileList.get(i))
+                    .rprsImgYn(repImage ? "Y":"N")
                     .pool(pool)
                     .build();
             poolImageList.add(poolImage);
@@ -105,7 +105,7 @@ public class PoolService {
     private void deletePoolImagesFromS3(List<PoolImage> poolImageList) {
         if (poolImageList != null && !poolImageList.isEmpty()) {
             poolImageList.forEach(poolImage -> {
-                String fileName = extractFileName(poolImage.getImageUrl());
+                String fileName = extractFileName(poolImage.getImgUrl());
                 s3Service.deleteFile(fileName);
             });
         }

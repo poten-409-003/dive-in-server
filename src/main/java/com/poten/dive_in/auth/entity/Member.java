@@ -42,9 +42,21 @@ public class Member extends BaseTimeEntity {
 
     private Character useYn;
 
+//    @OneToMany(mappedBy = "member")
+//    private List<Post> posts;
+//
+//    @OneToMany(mappedBy = "member")
+//    private List<Cmnt> cmnts;
+//
+//    @OneToMany(mappedBy = "member")
+//    private List<CmntLike> cmntLikes;
+//
+//    @OneToMany(mappedBy = "member")
+//    private List<PostLike> postLikes;
 
     public void updateMember(String nickname, String profileImageUrl) {
         this.profileImageUrl = profileImageUrl;
         this.nickname = nickname;
     }
+
 }

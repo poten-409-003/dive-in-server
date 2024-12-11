@@ -27,8 +27,8 @@ public class UserProfileDto {
                 .id(member.getId())
                 .email(member.getEmail())
                 .nickname(member.getNickname())
-                .socialType(String.valueOf(member.getSocialType()))
-                .role(member.getRole())
+                .socialType(String.valueOf(member.getSocialCode().getCodeName()))
+                .role(member.getRole().getName())
                 .profileImageUrl(member.getProfileImageUrl())
                 .build();
     }

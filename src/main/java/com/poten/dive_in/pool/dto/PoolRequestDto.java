@@ -13,6 +13,7 @@ public class PoolRequestDto {
 
     private String poolAddress;
 
+    private String zipCode;
     private String operatingHours;
 
     private String closingDays;
@@ -33,23 +34,26 @@ public class PoolRequestDto {
 
     private String facilities;
 
+    private Integer viewCnt;
+
     private String region;
 
     public Pool toEntity(){
         return Pool.builder()
-                .poolName(this.poolName)
-                .poolAddress(this.poolAddress)
-                .operatingHours(this.operatingHours)
-                .closingDays(this.closingDays)
-                .latitude(this.latitude)
-                .longitude(this.longitude)
-                .contact(this.contact)
-                .laneLength(this.laneLength)
-                .laneCount(this.laneCount)
-                .maxDepth(this.maxDepth)
-                .minDepth(this.minDepth)
-                .facilities(this.facilities)
-                .region(this.region)
+                .poolNm(this.poolName)
+                .rdNmAddr(this.poolAddress)
+                .oprtHr(this.operatingHours)
+                .dyOfDay(this.closingDays)
+                .lttd(Double.valueOf(this.latitude) )
+                .hrdn(Double.valueOf(this.longitude))
+                .telno(this.contact)
+                .laneLngt(String.valueOf(this.laneLength))
+                .laneCnt(String.valueOf(this.laneCount))
+                .maxDpt(this.maxDepth)
+                .minDpt(this.minDepth)
+                .amntCd(this.facilities)
+//                .region(this.region)
+                .chcCnt(this.viewCnt)
                 .build();
     }
 }

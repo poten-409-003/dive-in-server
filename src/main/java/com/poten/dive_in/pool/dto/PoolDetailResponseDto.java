@@ -21,6 +21,7 @@ public class PoolDetailResponseDto {
     private String poolName;
 
     private String poolAddress;
+    private String zipCode; //우편번호
 
     private String operatingHours;
 
@@ -64,22 +65,25 @@ public class PoolDetailResponseDto {
                         .collect(Collectors.toList())
                 : new ArrayList<>();
 
+        String[] addrs = pool.getRdNmAddr().split(" ");
+        String region = addrs[0] + addrs[1];
 
         return PoolDetailResponseDto.builder()
-                .id(pool.getId())
-                .poolName(pool.getPoolName())
-                .poolAddress(pool.getPoolAddress())
-                .operatingHours(pool.getOperatingHours())
-                .closingDays(pool.getClosingDays())
-                .latitude(pool.getLatitude())
-                .longitude(pool.getLongitude())
-                .contact(pool.getContact())
-                .laneLength(pool.getLaneLength())
-                .laneCount(pool.getLaneCount())
-                .maxDepth(pool.getMaxDepth())
-                .minDepth(pool.getMinDepth())
-                .facilities(pool.getFacilities())
-                .region(pool.getRegion())
+                .id(pool.getPoolId())
+                .poolName(pool.getPoolNm())
+                .poolAddress(pool.getRdNmAddr())
+                .zipCode(pool.getZipCd())
+                .operatingHours(pool.getOprtHr())
+                .closingDays(pool.getDyOfDay())
+                .latitude(String.valueOf(pool.getLttd()))
+                .longitude(String.valueOf(pool.getHrdn()))
+                .contact(pool.getTelno())
+                .laneLength(Integer.valueOf(pool.getLaneLngt()))
+                .laneCount(Integer.valueOf(pool.getLaneCnt()))
+                .maxDepth(pool.getMaxDpt())
+                .minDepth(pool.getMinDpt())
+                .facilities(pool.getAmntCd())
+                .region(region)
                 .poolImageDtoList(poolImageDtoList)
                 .lessonListResponseDtoList(lessonListResponseDtoList)
                 .build();

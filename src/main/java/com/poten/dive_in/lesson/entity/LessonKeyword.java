@@ -1,29 +1,35 @@
 package com.poten.dive_in.lesson.entity;
 
-import com.poten.dive_in.common.entity.BaseTimeEntity;
+
+import com.poten.dive_in.cmmncode.entity.CmmnCd;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-@Builder @Getter
+@Builder
+@Getter
 @RequiredArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "swmm_cls_img")
-public class LessonImage extends BaseTimeEntity {
-
+@Table(name = "swmm_cls_kywd_cd")
+public class LessonKeyword {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "img_id")
+    @Column(name = "cls_kywd_id")
     private Long id;
 
-    private String imgUrl;
+    @ManyToOne
+    @JoinColumn(name = "cd_id")
+    @Column(name = "cls_kywd_cd")
+    private CmmnCd keyword;
 
     @ManyToOne
     @JoinColumn(name = "cls_id")
+    @Column(name = "cls_id")
     private Lesson lesson;
 
-    private String rprsImgYn; //대표이미지여부
+
+
 }
