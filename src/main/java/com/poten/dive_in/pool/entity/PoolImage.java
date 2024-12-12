@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 @AllArgsConstructor
 @RequiredArgsConstructor
 @Entity
+@Table(name="pool_img")
 public class PoolImage {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

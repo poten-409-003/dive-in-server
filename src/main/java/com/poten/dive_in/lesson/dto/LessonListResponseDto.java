@@ -1,9 +1,17 @@
 package com.poten.dive_in.lesson.dto;
 
-import com.poten.dive_in.lesson.entity.Lesson;
+import com.poten.dive_in.cmmncode.entity.CommonCode;
+import com.poten.dive_in.lesson.entity.LessonKeyword;
+import com.poten.dive_in.lesson.entity.SwimClass;
+import com.poten.dive_in.lesson.entity.SwimClassImage;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
 
 @Getter @Builder @ToString
 public class LessonListResponseDto {
@@ -15,15 +23,39 @@ public class LessonListResponseDto {
     private String level;
     private String price;
 
-    public static LessonListResponseDto ofEntity(Lesson lesson) {
+    public static LessonListResponseDto ofEntity(SwimClass swimClass) {
+        Set<LessonKeyword> lessonKeywords = swimClass.getKeywords();
+        String keywords = null;
+        if (lessonKeywords!= null && lessonKeywords.size() != 0) {
+            List<String> keywordList = new ArrayList<>();
+            for (LessonKeyword keyword : lessonKeywords) {
+                keywordList.add(keyword.getKeyword().getCodeName());
+            }
+            keywords = keywordList.toString();
+        }
+
+        String level = null;
+        if (swimClass.getLevel() != null) {
+            level = swimClass.getLevel().getCodeName();
+        }
+        String url = null;
+        if (swimClass.getImages() != null) {
+            for (SwimClassImage image : swimClass.getImages()) {
+                if (url == null) {
+                    url = image.getImageUrl();
+                } else if (image.getIsRepresentative() == "Y") {
+                    url = image.getImageUrl();
+                }
+            }
+        }
         return LessonListResponseDto.builder()
-                .id(lesson.getId())
-                .level(lesson.getLevel())
-                .academyName(lesson.getAcademy() != null ? lesson.getAcademy().getAcademyName() : null)
-                .academyImageUrl(lesson.getAcademy() != null ? lesson.getAcademy().getProfileImageUrl() : null)
-                .keyword(lesson.getKeyword() != null ? lesson.getKeyword() : null)
-                .lessonName(lesson.getLessonName() != null ? lesson.getLessonName() : null)
-                .price(lesson.getPrice() != null ? lesson.getPrice() : null)
+                .id(swimClass.getClassId())
+                .level(level)
+                .academyName(swimClass.getInstructorTeam() != null ? swimClass.getInstructorTeam().getName() : null)
+                .academyImageUrl(url)
+                .keyword(keywords)
+                .lessonName(swimClass.getName() != null ? swimClass.getName() : null)
+                .price(swimClass.getPrice() != null ? String.valueOf(swimClass.getPrice())  : null)
                 .build();
         }
 }

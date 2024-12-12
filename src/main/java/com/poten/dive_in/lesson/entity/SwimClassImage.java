@@ -12,18 +12,23 @@ import lombok.RequiredArgsConstructor;
 @AllArgsConstructor
 @Entity
 @Table(name = "swmm_cls_img")
-public class LessonImage extends BaseTimeEntity {
-
+public class SwimClassImage {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "img_id")
     private Long id;
 
-    private String imgUrl;
-
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cls_id")
-    private Lesson lesson;
+    private SwimClass swimClass; // 수영 수업 ID
 
-    private String rprsImgYn; //대표이미지여부
+    @Column(name = "rprs_img_yn")
+    private String isRepresentative; // 대표 이미지 여부
+
+    @Column(name = "img_url")
+    private String imageUrl; // 이미지 URL
+
+    public void assignSwimClass(SwimClass swimClass) {
+        this.swimClass = swimClass;
+    }
 }

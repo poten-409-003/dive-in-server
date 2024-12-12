@@ -9,6 +9,7 @@ import lombok.*;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(name = "user_role")
 public class MemberRole {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

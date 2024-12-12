@@ -1,7 +1,8 @@
 package com.poten.dive_in.pool.entity;
 
+import com.poten.dive_in.cmmncode.entity.CommonCode;
 import com.poten.dive_in.common.entity.BaseTimeEntity;
-import com.poten.dive_in.lesson.entity.Lesson;
+import com.poten.dive_in.lesson.entity.SwimClass;
 import com.poten.dive_in.pool.dto.PoolRequestDto;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -18,58 +19,90 @@ import java.util.List;
 @AllArgsConstructor
 @Entity
 @Table(name = "pool")
-public class Pool  extends BaseTimeEntity {
+public class Pool extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "pool_id") // 풀 ID
     private Long poolId;
 
-    private String poolNm;
-    private String rdNmAddr; //도로명주소
-    private String zipCd; //우편번호
-    private String oprtHr; //운영시간
-    private String dyOfDay; //휴무일
-    private Double lttd; //위도
-    private Double hrdn; //경도
-    private String telno; //연락처
-    private String laneLngt; //레인 길이
-    private String laneCnt; //레인 수
-    private Float minDpt; //최소수심
-    private Float maxDpt; //최대수심
-    private String amntCd; //편의시설 코드
-    private Integer chcCnt; //조회수
-    private String useYn; //사용여부
+    @Column(name = "pool_nm") // 수영장 이름
+    private String poolName;
+
+    @Column(name = "rd_nm_addr") // 도로명 주소
+    private String roadAddress;
+
+    @Column(name = "zip_cd") // 우편번호
+    private String zipCode;
+
+    @Column(name = "oprt_hr") // 운영 시간
+    private String operatingHours;
+
+    @Column(name = "dy_of_day") // 휴무일
+    private String dayOff;
+
+    @Column(name = "lttd") // 위도
+    private Double latitude;
+
+    @Column(name = "hrdn") // 경도
+    private Double longitude;
+
+    @Column(name = "telno") // 연락처
+    private String telephone;
+
+    @Column(name = "lane_lngt") // 레인 길이
+    private String laneLength;
+
+    @Column(name = "lane_cnt") // 레인 수
+    private String laneCount;
+
+    @Column(name = "min_dpt") // 최소 수심
+    private Float minimumDepth;
+
+    @Column(name = "max_dpt") // 최대 수심
+    private Float maximumDepth;
+
+    @JoinColumn(name = "amnt_cd", referencedColumnName = "cd") // 편의시설 코드
+    @ManyToOne
+    private CommonCode amenityCode;
+
+    @Column(name = "chc_cnt") // 조회수
+    private Integer viewCount;
+
+    @Column(name = "use_yn") // 사용 여부
+    private String isActive;
+
 
     @OneToMany(mappedBy = "pool", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PoolImage> imageList;
 
     @OneToMany(mappedBy = "pool", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Lesson> lessonList;
+    private List<SwimClass> swimClassList;
 
     public void addImage(List<PoolImage> poolImageList) {
         this.imageList = poolImageList;
     }
 
-    public void addLesson(Lesson lesson) {
-        if (!lessonList.contains(lesson)) {
-            lessonList.add(lesson);
+    public void addLesson(SwimClass swimClass) {
+        if (!swimClassList.contains(swimClass)) {
+            swimClassList.add(swimClass);
         }
     }
 
     public void updatePool(PoolRequestDto poolRequestDto) {
-        this.poolNm = poolRequestDto.getPoolName();
-        this.rdNmAddr = poolRequestDto.getPoolAddress();
-        this.zipCd = poolRequestDto.getZipCode();
-        this.oprtHr = poolRequestDto.getOperatingHours();
-        this.dyOfDay = poolRequestDto.getClosingDays();
-        this.lttd = Double.valueOf(poolRequestDto.getLatitude()) ;
-        this.hrdn = Double.valueOf(poolRequestDto.getLongitude());
-        this.telno = poolRequestDto.getContact();
-        this.laneLngt = String.valueOf(poolRequestDto.getLaneLength()) ;
-        this.laneCnt =  String.valueOf(poolRequestDto.getLaneCount());
-        this.maxDpt = poolRequestDto.getMaxDepth();
-        this.minDpt = poolRequestDto.getMinDepth();
-        this.amntCd = poolRequestDto.getFacilities();
-        this.chcCnt = poolRequestDto.getViewCnt();
+        this.poolName = poolRequestDto.getPoolName();
+        this.roadAddress = poolRequestDto.getPoolAddress();
+        this.zipCode = poolRequestDto.getZipCode();
+        this.operatingHours = poolRequestDto.getOperatingHours();
+        this.dayOff = poolRequestDto.getClosingDays();
+        this.latitude = Double.valueOf(poolRequestDto.getLatitude()) ;
+        this.longitude = Double.valueOf(poolRequestDto.getLongitude());
+        this.telephone = poolRequestDto.getContact();
+        this.laneLength = String.valueOf(poolRequestDto.getLaneLength()) ;
+        this.laneCount =  String.valueOf(poolRequestDto.getLaneCount());
+        this.maximumDepth = poolRequestDto.getMaxDepth();
+        this.minimumDepth = poolRequestDto.getMinDepth();
+//        this.amenityCode = poolRequestDto.getFacilities();
+        this.viewCount = poolRequestDto.getViewCnt();
 //        this.region = poolRequestDto.getRegion();
     }
 
@@ -82,6 +115,10 @@ public class Pool  extends BaseTimeEntity {
         }
     }
 
+
+    public void updateAmenityCode(CommonCode commonCode) {
+        this.amenityCode = commonCode;
+    }
 
 }
 

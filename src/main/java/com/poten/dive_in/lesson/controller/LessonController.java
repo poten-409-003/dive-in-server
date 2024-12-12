@@ -22,15 +22,15 @@ public class LessonController {
 
     private final LessonService lessonService;
 
-
-    @PostMapping("/lessons")
-    public ResponseEntity<CommonResponse<LessonDetailResponseDto>> createLesson(@Valid LessonRequestDto lessonRequestDto,
-                                                                                @RequestParam(value = "images",required = false) List<MultipartFile> multipartFileList){
-
-        LessonDetailResponseDto lessonResponseDto =lessonService.createLesson(lessonRequestDto, multipartFileList);
-        return new ResponseEntity<>(CommonResponse.success("수업 등록에 성공하였습니다.",lessonResponseDto), HttpStatus.OK);
-
-    }
+    /* TODO 수정 필요 */
+//    @PostMapping("/lessons")
+//    public ResponseEntity<CommonResponse<LessonDetailResponseDto>> createLesson(@Valid LessonRequestDto lessonRequestDto,
+//                                                                                @RequestParam(value = "images",required = false) List<MultipartFile> multipartFileList){
+//
+//        LessonDetailResponseDto lessonResponseDto =lessonService.createLesson(lessonRequestDto, multipartFileList);
+//        return new ResponseEntity<>(CommonResponse.success("수업 등록에 성공하였습니다.",lessonResponseDto), HttpStatus.OK);
+//
+//    }
 
     @GetMapping("/lessons")
     public ResponseEntity<CommonResponse<List<LessonListResponseDto>>> getLessonList(){

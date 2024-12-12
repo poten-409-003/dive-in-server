@@ -40,20 +40,19 @@ public class PoolRequestDto {
 
     public Pool toEntity(){
         return Pool.builder()
-                .poolNm(this.poolName)
-                .rdNmAddr(this.poolAddress)
-                .oprtHr(this.operatingHours)
-                .dyOfDay(this.closingDays)
-                .lttd(Double.valueOf(this.latitude) )
-                .hrdn(Double.valueOf(this.longitude))
-                .telno(this.contact)
-                .laneLngt(String.valueOf(this.laneLength))
-                .laneCnt(String.valueOf(this.laneCount))
-                .maxDpt(this.maxDepth)
-                .minDpt(this.minDepth)
-                .amntCd(this.facilities)
+                .poolName(this.poolName)
+                .roadAddress(this.poolAddress)
+                .operatingHours(this.operatingHours)
+                .dayOff(this.closingDays)
+                .latitude(Double.valueOf(this.latitude) )
+                .longitude(Double.valueOf(this.longitude))
+                .telephone(this.contact)
+                .laneLength(String.valueOf(this.laneLength))
+                .laneCount(String.valueOf(this.laneCount))
+                .maximumDepth(this.maxDepth)
+                .minimumDepth(this.minDepth)
 //                .region(this.region)
-                .chcCnt(this.viewCnt)
+                .viewCount(this.viewCnt)
                 .build();
     }
 }

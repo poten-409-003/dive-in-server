@@ -1,9 +1,9 @@
 package com.poten.dive_in.lesson.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.poten.dive_in.academy.dto.AcademyResponseDto;
 import com.poten.dive_in.instructor.dto.LessonInstructorResponseDto;
-import com.poten.dive_in.lesson.entity.Lesson;
+import com.poten.dive_in.lesson.entity.LessonKeyword;
+import com.poten.dive_in.lesson.entity.SwimClass;
 import com.poten.dive_in.lesson.enums.LessonStatus;
 import com.poten.dive_in.pool.dto.PoolListResponseDto;
 import lombok.Builder;
@@ -33,10 +33,10 @@ public class LessonDetailResponseDto {
 
     private String lessonSchedule;
 
-    private LessonStatus lessonStatus;
+    private String lessonStatus;
 
     @JsonProperty("academy")
-    private AcademyResponseDto academyResponseDto;
+    private CoachingTeamResponseDto coachingTeamResponseDto;
 
     @JsonProperty("pool")
     private PoolListResponseDto poolResponseDto;
@@ -50,44 +50,43 @@ public class LessonDetailResponseDto {
     @JsonProperty("applyChannels")
     private List<LessonApplyChannelDto> lessonApplyChannelDtoList;
 
-    public static LessonDetailResponseDto ofEntity(Lesson lesson) {
+    public static LessonDetailResponseDto ofEntity(SwimClass swimClass) {
 
         // Lesson 이미지 리스트 처리
-        List<LessonImageDto> lessonImageDtoList = (lesson.getImageList() != null) ?
-                lesson.getImageList().stream()
+        List<LessonImageDto> lessonImageDtoList = (swimClass.getImages() != null) ?
+                swimClass.getImages().stream()
                         .map(LessonImageDto::ofEntity)
                         .collect(Collectors.toList())
                 : new ArrayList<>();
 
         // 강사 리스트 처리
-        List<LessonInstructorResponseDto> lessonInstructorResponseDtoList = (lesson.getLessonInstructorList() != null) ?
-                lesson.getLessonInstructorList().stream()
-                        .map(LessonInstructorResponseDto::ofEntity)
-                        .collect(Collectors.toList())
-                : new ArrayList<>();
+        List<LessonInstructorResponseDto> lessonInstructorResponseDtoList = (swimClass.getInstructorTeam() != null &&
+                swimClass.getInstructorTeam().getInstructorTeamMappings() != null) ?
+                swimClass.getInstructorList() :
+                new ArrayList<>();
 
         // Apply Channel 리스트 처리
-        List<LessonApplyChannelDto> lessonApplyChannelList = (lesson.getApplyChannelList() != null) ?
-                lesson.getApplyChannelList().stream()
+        List<LessonApplyChannelDto> lessonApplyChannelList = (swimClass.getApplicationMethods() != null) ?
+                swimClass.getApplicationMethods().stream()
                         .map(LessonApplyChannelDto::ofEntity)
                         .toList() : new ArrayList<>();
 
         return LessonDetailResponseDto.builder()
-                .id(lesson.getId())
-                .lessonName(lesson.getLessonName())
-                .level(lesson.getLevel() != null ? lesson.getLevel() : null)
-                .capacity(lesson.getCapacity() != null ? lesson.getCapacity() : null)
-                .price(lesson.getPrice() != null ? lesson.getPrice() : null)
-                .keyword(lesson.getKeyword() != null ? lesson.getKeyword() : null)
-                .lessonDetail(lesson.getLessonDetail() != null ? lesson.getLessonDetail() : null)
-                .lessonSchedule(lesson.getLessonSchedule() != null ? lesson.getLessonSchedule() : null)
-                .lessonStatus(lesson.getLessonStatus() != null ? lesson.getLessonStatus() : null)
-                .academyResponseDto(lesson.getAcademy() != null ? AcademyResponseDto.ofEntity(lesson.getAcademy()) : null)
-                .poolResponseDto(lesson.getPool() != null ? PoolListResponseDto.ofEntity(lesson.getPool()) : null)
+                .id(swimClass.getClassId())
+                .lessonName(swimClass.getName())
+                .level(swimClass.getLevel() != null ? swimClass.getLevel().getCodeName() : null)
+                .capacity(swimClass.getParticipantCount() != null ? String.valueOf(swimClass.getParticipantCount()) : null)
+                .price(swimClass.getPrice() != null ? String.valueOf(swimClass.getPrice()) : null)
+                .keyword(swimClass.getKeywords() != null && swimClass.getKeywords().size() != 0? swimClass.getKeyword() : null)
+                .lessonDetail(swimClass.getIntroduction() != null ? swimClass.getIntroduction() : null)
+                .lessonSchedule(swimClass.getOperatingHours() != null ? swimClass.getOperatingHours() : null)
+                .lessonStatus(swimClass.getIsActive() != null ? swimClass.getIsActive() : null)
+                .coachingTeamResponseDto(swimClass.getInstructorTeam() != null ? CoachingTeamResponseDto.ofEntity(swimClass.getInstructorTeam()) : null)
+                .poolResponseDto(swimClass.getPool() != null ? PoolListResponseDto.ofEntity(swimClass.getPool()) : null)
+/*TODO instr_team_mpng 테이블 테스트 데이터 생성되면 수정*/
                 .lessonInstructorResponseDtoList(lessonInstructorResponseDtoList)
                 .lessonImageDtoList(lessonImageDtoList)
                 .lessonApplyChannelDtoList(lessonApplyChannelList)
                 .build();
-
     }
 }

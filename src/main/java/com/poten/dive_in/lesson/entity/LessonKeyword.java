@@ -1,7 +1,7 @@
 package com.poten.dive_in.lesson.entity;
 
 
-import com.poten.dive_in.cmmncode.entity.CmmnCd;
+import com.poten.dive_in.cmmncode.entity.CommonCode;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,15 +21,11 @@ public class LessonKeyword {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "cd_id")
-    @Column(name = "cls_kywd_cd")
-    private CmmnCd keyword;
+    @JoinColumn(name = "cls_kywd_cd", referencedColumnName = "cd")
+    private CommonCode keyword;
 
     @ManyToOne
     @JoinColumn(name = "cls_id")
-    @Column(name = "cls_id")
-    private Lesson lesson;
-
-
+    private SwimClass swimClass;
 
 }

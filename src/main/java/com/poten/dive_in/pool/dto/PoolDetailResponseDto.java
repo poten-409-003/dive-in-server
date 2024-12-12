@@ -59,30 +59,30 @@ public class PoolDetailResponseDto {
                         .collect(Collectors.toList())
                 : new ArrayList<>();
 
-        List<LessonListResponseDto> lessonListResponseDtoList = (pool.getLessonList() != null) ?
-                pool.getLessonList().stream()
+        List<LessonListResponseDto> lessonListResponseDtoList = (pool.getSwimClassList() != null) ?
+                pool.getSwimClassList().stream()
                         .map(LessonListResponseDto::ofEntity)
                         .collect(Collectors.toList())
                 : new ArrayList<>();
 
-        String[] addrs = pool.getRdNmAddr().split(" ");
+        String[] addrs = pool.getRoadAddress().split(" ");
         String region = addrs[0] + addrs[1];
 
         return PoolDetailResponseDto.builder()
                 .id(pool.getPoolId())
-                .poolName(pool.getPoolNm())
-                .poolAddress(pool.getRdNmAddr())
-                .zipCode(pool.getZipCd())
-                .operatingHours(pool.getOprtHr())
-                .closingDays(pool.getDyOfDay())
-                .latitude(String.valueOf(pool.getLttd()))
-                .longitude(String.valueOf(pool.getHrdn()))
-                .contact(pool.getTelno())
-                .laneLength(Integer.valueOf(pool.getLaneLngt()))
-                .laneCount(Integer.valueOf(pool.getLaneCnt()))
-                .maxDepth(pool.getMaxDpt())
-                .minDepth(pool.getMinDpt())
-                .facilities(pool.getAmntCd())
+                .poolName(pool.getPoolName())
+                .poolAddress(pool.getRoadAddress())
+                .zipCode(pool.getZipCode())
+                .operatingHours(pool.getOperatingHours())
+                .closingDays(pool.getDayOff())
+                .latitude(String.valueOf(pool.getLatitude()))
+                .longitude(String.valueOf(pool.getLongitude()))
+                .contact(pool.getTelephone())
+                .laneLength(Integer.parseInt(pool.getLaneLength().trim()))
+                .laneCount(Integer.parseInt(pool.getLaneCount().trim()))
+                .maxDepth(pool.getMaximumDepth())
+                .minDepth(pool.getMinimumDepth())
+                .facilities(pool.getAmenityCode().getCodeName())
                 .region(region)
                 .poolImageDtoList(poolImageDtoList)
                 .lessonListResponseDtoList(lessonListResponseDtoList)

@@ -1,9 +1,7 @@
 package com.poten.dive_in.auth.entity;
 
-import com.poten.dive_in.cmmncode.entity.CmmnCd;
+import com.poten.dive_in.cmmncode.entity.CommonCode;
 import com.poten.dive_in.common.entity.BaseTimeEntity;
-import com.poten.dive_in.auth.enums.Role;
-import com.poten.dive_in.auth.enums.SocialType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import lombok.*;
@@ -21,18 +19,16 @@ public class Member extends BaseTimeEntity {
 
 
     @JoinColumn(name = "role_id")
-    @Column(name = "role_id")
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     private MemberRole role;
 
     @Email
     @Column(unique = true)
     private String email;
 
-    @JoinColumn(name = "cd_id")
-    @Column(name = "socl_lgn_cd")
-    @OneToOne(fetch = FetchType.LAZY)
-    private CmmnCd socialCode;
+    @JoinColumn(name = "socl_lgn_cd", referencedColumnName = "cd_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    private CommonCode socialCode;
 
     @Column(name = "nckn")
     private String nickname;

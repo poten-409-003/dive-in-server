@@ -1,5 +1,6 @@
 package com.poten.dive_in.common.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
 import lombok.Getter;
@@ -15,8 +16,10 @@ import java.time.LocalDateTime;
 public class BaseTimeEntity {
 
     @CreatedDate
+    @Column(name="reg_dt")
     private LocalDateTime createdAt;
 
     @LastModifiedDate
+    @Column(name="mdfc_dt")
     private LocalDateTime updatedAt;
 }

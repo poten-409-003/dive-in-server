@@ -31,16 +31,16 @@ public class PoolListResponseDto {
 
         String imageUrl = pool.getImageList() != null && !pool.getImageList().isEmpty() ?
                 pool.getImageList().get(0).getImgUrl() : null;
-        String[] addrs = pool.getRdNmAddr().split(" ");
+        String[] addrs = pool.getRoadAddress().split(" ");
         String region = addrs[0] + addrs[1];
         return PoolListResponseDto.builder()
                 .id(pool.getPoolId())
-                .poolName(pool.getPoolNm())
-                .poolAddress(pool.getRdNmAddr())
+                .poolName(pool.getPoolName())
+                .poolAddress(pool.getRoadAddress())
                 .region(region)
                 .imageUrl(imageUrl)
-                .latitude(String.valueOf(pool.getLttd()))
-                .longitude(String.valueOf(pool.getHrdn()))
+                .latitude(String.valueOf(pool.getLatitude()))
+                .longitude(String.valueOf(pool.getLongitude()))
                 .build();
     }
 }
