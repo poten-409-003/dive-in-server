@@ -2,6 +2,7 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.3.4'
 	id 'io.spring.dependency-management' version '1.1.6'
+	id "com.ewerk.gradle.plugins.querydsl" version "1.0.10" // querydsl (1)
 }
 
 group = 'com.poten'
@@ -30,6 +31,12 @@ dependencies {
 
 	//	JPA
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+
+	// QueryDSL 설정 (2)
+	implementation "com.querydsl:querydsl-jpa:5.0.0:jakarta"
+	annotationProcessor "com.querydsl:querydsl-apt:5.0.0:jakarta"
+	annotationProcessor "jakarta.annotation:jakarta.annotation-api"
+	annotationProcessor "jakarta.persistence:jakarta.persistence-api"
 
 	//	PostgreSQL
 	runtimeOnly 'org.postgresql:postgresql'
@@ -60,3 +67,27 @@ dependencies {
 tasks.named('test') {
 	useJUnitPlatform()
 }
+
+// querydsl (3)
+// QueryDSL 설정
+def generated = 'src/main/generated'
+
+querydsl {
+	jpa = true
+	querydslSourcesDir = generated
+}
+sourceSets {
+	main.java.srcDir generated
+}
+
+compileQuerydsl{
+	options.annotationProcessorPath = configurations.querydsl
+}
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+	querydsl.extendsFrom compileClasspath
+}
+// QueryDSL END
