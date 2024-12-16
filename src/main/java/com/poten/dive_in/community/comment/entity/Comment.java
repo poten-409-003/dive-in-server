@@ -5,13 +5,12 @@ import com.poten.dive_in.auth.entity.Member;
 import com.poten.dive_in.common.entity.BaseTimeEntity;
 import com.poten.dive_in.community.post.entity.Post;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 
 @Getter
-@Setter
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor
 @Entity
 @Table(name = "cmnt")

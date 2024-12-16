@@ -5,13 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 
-public interface PostRepository extends JpaRepository<Post, Long> {
-
-    List<Post> findByIsActive(String isActive);
-
-
-    List<Post> findPopularPosts();
-
-    List<Post> findByMemberId(Long memberId);
+public interface PostRepository extends JpaRepository<Post, Long>, PostRepositoryImpl {
+    List<Post> findByCategoryCodeCd(String categoryCode);
 }
 

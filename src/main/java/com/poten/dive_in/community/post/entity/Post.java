@@ -15,6 +15,16 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
+@NamedEntityGraph(
+        name = "Post.detail",
+        attributeNodes = {
+                @NamedAttributeNode("member"),
+                @NamedAttributeNode("categoryCode"),
+                @NamedAttributeNode("comments"),
+                @NamedAttributeNode("images"),
+                @NamedAttributeNode("likes")
+        }
+)
 @Table(name = "post")
 public class Post extends BaseTimeEntity {
 
