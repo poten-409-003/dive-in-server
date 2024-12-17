@@ -35,11 +35,11 @@ public class Comment extends BaseTimeEntity {
     @Column(name = "group_nm")
     private Integer groupName;
 
-    @Column(name = "order")
+    @Column(name = "cmnt_order")
     private Integer orderNumber;
 
-    @Column(name = "class")
-    private Integer className;
+    @Column(name = "cmnt_class")
+    private Integer cmntClass;// 0: 댓글, 1: 대댓글
 
     @Column(name = "cntn")
     private String content;
@@ -49,5 +49,9 @@ public class Comment extends BaseTimeEntity {
 
     @Column(name = "use_yn")
     private String isActive;
+
+    public void assignContent(String content) {
+        this.content = content;
+    }
 }
 

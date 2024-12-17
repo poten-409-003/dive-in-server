@@ -14,6 +14,7 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@RequiredArgsConstructor
 @Entity
 @NamedEntityGraph(
         name = "Post.detail",
@@ -67,4 +68,8 @@ public class Post extends BaseTimeEntity {
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PostLike> likes;
+
+    public void adjustLikeCount(int increment) {
+        this.likeCount += increment;
+    }
 }

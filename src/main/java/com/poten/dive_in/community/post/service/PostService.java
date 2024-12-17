@@ -2,6 +2,7 @@ package com.poten.dive_in.community.post.service;
 
 
 import com.poten.dive_in.community.post.entity.Post;
+import com.poten.dive_in.community.post.entity.PostLike;
 import com.poten.dive_in.community.post.repository.PostRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -76,6 +77,8 @@ public class PostService {
     public List<Post> getPostsByUserId(Long userId) {
         return postRepository.findPostsByMemberId(userId);
     }
+
+
 }
 
 

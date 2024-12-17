@@ -8,6 +8,7 @@ import lombok.*;
 
 @Getter @Builder @NoArgsConstructor
 @AllArgsConstructor
+@RequiredArgsConstructor
 @Entity
 public class Member extends BaseTimeEntity {
 
