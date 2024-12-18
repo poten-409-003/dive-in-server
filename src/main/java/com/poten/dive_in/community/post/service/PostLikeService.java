@@ -23,22 +23,20 @@ public class PostLikeService {
     @Transactional
     public PostLike likePost(Long postId, Long memberId) {
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new IllegalArgumentException("Post not found"));
+                .orElseThrow(() -> new EntityNotFoundException("글이 존재하지 않습니다."));
 
-        // 이미 좋아요가 눌렸는지 확인
         if (postLikeRepository.existsByPostIdAndMemberId(postId, memberId)) {
-            throw new IllegalArgumentException("You have already liked this post");
+            throw new IllegalArgumentException("이미 좋아요를 눌렀습니다.");
         }
 
         Member member = memberRepository.findById(memberId).orElseThrow(()-> new EntityNotFoundException("해당 회원이 존재하지 않습니다."));
         PostLike postLike = PostLike.builder()
                 .post(post)
-                .member(member) // Member 객체는 실제로 데이터베이스에서 조회해야 할 수 있습니다.
+                .member(member)
                 .build();
 
         postLikeRepository.save(postLike);
 
-        // 좋아요 수 증가
         post.adjustLikeCount(1);
         postRepository.save(post);
 
@@ -48,10 +46,10 @@ public class PostLikeService {
     @Transactional
     public void unlikePost(Long postId, Long memberId) {
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new IllegalArgumentException("Post not found"));
+                .orElseThrow(() -> new IllegalArgumentException("글이 존재하지 않습니다."));
 
         PostLike postLike = postLikeRepository.findByPostIdAndMemberId(postId, memberId)
-                .orElseThrow(() -> new IllegalArgumentException("Like not found"));
+                .orElseThrow(() -> new IllegalArgumentException("좋아요를 누른 이력이 없습니다."));
 
         postLikeRepository.delete(postLike);
 

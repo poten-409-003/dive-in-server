@@ -44,23 +44,21 @@ public class PostController {
 
     @GetMapping("/list/{categoryType}/{pageNum}")
     public ResponseEntity<CommonResponse<List<PostListResponseDto>>> getAllPosts(@PathVariable String categoryType, @PathVariable Integer pageNum) {
-        List<PostListResponseDto> responseDTOs = postService.getAllPosts(categoryType);
-
-        return new ResponseEntity<>(CommonResponse.success("Posts retrieved successfully", responseDTOs), HttpStatus.OK);
+        List<PostListResponseDto> responseDTOs = postService.getAllPosts(categoryType, pageNum);
+        return new ResponseEntity<>(CommonResponse.success(null, responseDTOs), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<CommonResponse<PostDetailResponseDto>> getPostById(@PathVariable Long id) {
         PostDetailResponseDto responseDto = postService.getPostById(id);
-        return new ResponseEntity<>(CommonResponse.success("Post retrieved successfully", responseDto), HttpStatus.OK);
+        return new ResponseEntity<>(CommonResponse.success(null, responseDto), HttpStatus.OK);
     }
 
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<CommonResponse<List<PostListResponseDto>>> getPostsByUserId(@PathVariable Long userId) {
-        List<PostListResponseDto> responseDtos = postService.getPostsByUserId(userId);
-        return new ResponseEntity<>(CommonResponse.success("User posts retrieved successfully", responseDtos), HttpStatus.OK);
+    @GetMapping("/user/{memberId}/{pageNum}")
+    public ResponseEntity<CommonResponse<List<PostListResponseDto>>> getPostsByUserId(@PathVariable Long memberId, @PathVariable Integer pageNum) {
+        List<PostListResponseDto> responseDtos = postService.getPostsByUserId(memberId, pageNum);
+        return new ResponseEntity<>(CommonResponse.success(null, responseDtos), HttpStatus.OK);
     }
 
-    //내가 쓴 댓글의 글 목록 조회 ADD
 
 }

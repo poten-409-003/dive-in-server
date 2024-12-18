@@ -17,6 +17,9 @@ import com.poten.dive_in.community.post.repository.PostRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -111,23 +114,28 @@ public class PostService {
         return postRepository.save(newPost);
     }
 
-    public List<PostListResponseDto> getAllPosts(String categoryType) {
-        List<Post> posts = new ArrayList<>();
+    public List<PostListResponseDto> getAllPosts(String categoryType, int page) {
+        int pageSize = 20; // 한 페이지당 게시물 수
+        Page<Post> posts;
+        Pageable pageable = PageRequest.of(page, pageSize);
         if ("none".equals(categoryType)) {
-            posts = postRepository.findActivePosts();
+            posts = postRepository.findActivePosts(pageable);
 
         } else if ("popular".equals(categoryType)) {
-            posts = postRepository.findPopularPosts();
+            posts = postRepository.findPopularPosts(pageable);
         } else {
-            posts = postRepository.findByCategoryCodeCd(categoryType);
+            posts = postRepository.findByCategoryCodeCd(categoryType, pageable);
         }
         return posts.isEmpty() ? new ArrayList<>() : posts.stream()
                 .map(PostListResponseDto::ofEntity)
                 .collect(Collectors.toList());
     }
 
+    @Transactional
     public PostDetailResponseDto getPostById(Long id) {
         Post post = postRepository.findByIdWithDetail(id).orElseThrow(() -> new IllegalArgumentException("해당 글이 존재하지 않습니다."));
+        post.adjustViewCount();
+        postRepository.save(post);
         PostDetailResponseDto detailResponseDto = PostDetailResponseDto.ofEntity(post);
         Boolean pushLike = postLikeRepository.existsByPostIdAndMemberId(post.getId(), post.getMember().getId());
         detailResponseDto.assignIsLiked(pushLike);
@@ -135,8 +143,10 @@ public class PostService {
 
     }
 
-    public List<PostListResponseDto> getPostsByUserId(Long userId) {
-        List<Post> posts = postRepository.findPostsByMemberId(userId);
+    public List<PostListResponseDto> getPostsByUserId(Long userId, Integer page) {
+        int pageSize = 20; // 한 페이지당 게시물 수
+        Pageable pageable = PageRequest.of(page, pageSize);
+        Page<Post> posts = postRepository.findPostsByMemberId(pageable, userId);
         return posts.isEmpty() ? new ArrayList<>() : posts.stream()
                 .map(PostListResponseDto::ofEntity)
                 .collect(Collectors.toList());

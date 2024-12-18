@@ -8,7 +8,6 @@ import lombok.*;
 
 @Getter @Builder @NoArgsConstructor
 @AllArgsConstructor
-@RequiredArgsConstructor
 @Entity
 public class Member extends BaseTimeEntity {
 
@@ -38,6 +37,8 @@ public class Member extends BaseTimeEntity {
     private String profileImageUrl;
 
     private Character useYn;
+
+
 
 //    @OneToMany(mappedBy = "member")
 //    private List<Post> posts;

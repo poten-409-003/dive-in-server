@@ -17,15 +17,15 @@ public class PostLikeController {
 
     // 글 좋아요
     @PostMapping("/{id}/like")
-    public ResponseEntity<CommonResponse<PostLike>> likePost(@PathVariable Long id, @RequestParam Long memberId) {
+    public ResponseEntity<CommonResponse<Boolean>> likePost(@PathVariable Long id, @RequestParam Long memberId) {
         PostLike postLike = postLikeService.likePost(id, memberId);
-        return new ResponseEntity<>(CommonResponse.success("Post liked successfully", postLike), HttpStatus.OK);
+        return new ResponseEntity<>(CommonResponse.success(null, true), HttpStatus.OK);
     }
 
     // 글 좋아요 취소
     @DeleteMapping("/{id}/like")
     public ResponseEntity<CommonResponse<Boolean>> unlikePost(@PathVariable Long id, @RequestParam Long memberId) {
         postLikeService.unlikePost(id, memberId);
-        return new ResponseEntity<>(CommonResponse.success("Post like removed successfully", true), HttpStatus.OK);
+        return new ResponseEntity<>(CommonResponse.success(null, true), HttpStatus.OK);
     }
 }
