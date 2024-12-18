@@ -88,23 +88,23 @@ public class AuthService {
         String profileImageUrl = kakaoAccountDto.getProfile().getProfileImageUrl();
         MemberRole role = roleRepository.findById(1L).orElseGet(() -> {
             MemberRole newRole = MemberRole.builder()
-                        .id(1L)
-                        .name(Role.ROLE_USER)
-                        .explain("기본 회원")
-                        .useYn('Y')
-                        .build();
+                    .id(1L)
+                    .name(Role.ROLE_USER)
+                    .explain("일반 회원")
+                    .useYn('Y')
+                    .build();
             return roleRepository.save(newRole);
         });
 
-        CommonCode code = codeRepository.findByCode("KAKAO").orElseGet(() -> {
-           CommonCode newCode = CommonCode.builder()
-                   .grpNm("소셜로그인방법")
-                   .grp("social_login_cd")
-                   .code("KAKAO")
-                   .codeName("카카오")
-                   .useYn('Y')
-                   .build();
-           return codeRepository.save(newCode);
+        CommonCode code = codeRepository.findByCode("SL001").orElseGet(() -> {
+            CommonCode newCode = CommonCode.builder()
+                    .grpNm("소셜로그인방법")
+                    .grp("socl_lgn_cd")
+                    .code("SL001")
+                    .codeName("카카오")
+                    .useYn('Y')
+                    .build();
+            return codeRepository.save(newCode);
         });
 
 
