@@ -62,6 +62,9 @@ dependencies {
 
 	// OpenGraph
 	implementation 'org.jsoup:jsoup:1.14.3'
+
+	// 비속어 필터링
+	implementation 'io.github.vaneproject:badwordfiltering:1.0.0'
 }
 
 tasks.named('test') {

@@ -4,11 +4,15 @@ import com.poten.dive_in.auth.entity.Member;
 import com.poten.dive_in.cmmncode.entity.CommonCode;
 import com.poten.dive_in.common.entity.BaseTimeEntity;
 import com.poten.dive_in.community.comment.entity.Comment;
+import com.poten.dive_in.pool.entity.PoolImage;
 import jakarta.persistence.*;
 
 import lombok.*;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Getter
 @Builder
@@ -49,27 +53,39 @@ public class Post extends BaseTimeEntity {
     private String content;
 
     @Column(name = "cmnt_cnt")
-    private Integer commentCount;
+    private Integer commentCount=0;
 
     @Column(name = "like_cnt")
-    private Integer likeCount;
+    private Integer likeCount=0;
 
     @Column(name = "chc_cnt")
-    private Integer viewCount;
+    private Integer viewCount=0;
 
     @Column(name = "use_yn")
-    private String isActive;
+    private String isActive="Y";
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<PostImage> images;
+    private Set<PostImage> images;
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Comment> comments;
+    private Set<Comment> comments;
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<PostLike> likes;
+    private Set<PostLike> likes;
 
     public void adjustLikeCount(int increment) {
         this.likeCount += increment;
+    }
+    public void addImage(Set<PostImage> poolImageList) {
+        this.images = poolImageList;
+    }
+
+    public void replaceImageList(Set<PostImage> newPoolImageList){
+        if (this.images != null) {
+            this.images.clear();
+            this.images.addAll(newPoolImageList);
+        } else{
+            this.images = new HashSet<>(newPoolImageList);
+        }
     }
 }

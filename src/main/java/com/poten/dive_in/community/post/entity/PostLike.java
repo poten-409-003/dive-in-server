@@ -2,6 +2,7 @@ package com.poten.dive_in.community.post.entity;
 
 
 import com.poten.dive_in.auth.entity.Member;
+import com.poten.dive_in.common.entity.CreateTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -11,9 +12,10 @@ import java.time.LocalDateTime;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@EqualsAndHashCode(of = "id")
 @Entity
 @Table(name = "post_like")
-public class PostLike {
+public class PostLike extends CreateTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,9 +25,6 @@ public class PostLike {
     @ManyToOne
     @JoinColumn(name = "post_id", nullable = false)
     private Post post;
-
-    @Column(name = "reg_dt")
-    private LocalDateTime createdDate;
 
     @JoinColumn(name = "member_id", nullable = false)
     @ManyToOne(fetch = FetchType.LAZY)
