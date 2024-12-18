@@ -8,11 +8,8 @@ import com.poten.dive_in.community.post.repository.PostRepository;
 import com.poten.dive_in.community.post.repository.PostLikeRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -37,7 +34,6 @@ public class PostLikeService {
         PostLike postLike = PostLike.builder()
                 .post(post)
                 .member(member) // Member 객체는 실제로 데이터베이스에서 조회해야 할 수 있습니다.
-                .createdDate(LocalDateTime.now())
                 .build();
 
         postLikeRepository.save(postLike);

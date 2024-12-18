@@ -3,17 +3,17 @@ package com.poten.dive_in.community.post.controller;
 import com.poten.dive_in.common.dto.CommonResponse;
 import com.poten.dive_in.community.post.entity.PostLike;
 import com.poten.dive_in.community.post.service.PostLikeService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/community/posts")
+@RequiredArgsConstructor
 public class PostLikeController {
 
-    @Autowired
-    private PostLikeService postLikeService;
+    private final PostLikeService postLikeService;
 
     // 글 좋아요
     @PostMapping("/{id}/like")

@@ -23,7 +23,6 @@ import java.util.stream.Collectors;
 public class PostController {
 
     private final PostService postService;
-    private final CmmnCdService cmmnCdService;
 
     @PostMapping
     public ResponseEntity<CommonResponse<PostDetailResponseDto>> createPost(@RequestBody @Valid PostRequestDto requestDTO) {
@@ -43,8 +42,8 @@ public class PostController {
         return new ResponseEntity<>(CommonResponse.success("글 수정 완료", PostDetailResponseDto.ofEntity(post)), HttpStatus.OK); //200
     }
 
-    @GetMapping("/list/{categoryType}")
-    public ResponseEntity<CommonResponse<List<PostListResponseDto>>> getAllPosts(@PathVariable String categoryType) {
+    @GetMapping("/list/{categoryType}/{pageNum}")
+    public ResponseEntity<CommonResponse<List<PostListResponseDto>>> getAllPosts(@PathVariable String categoryType, @PathVariable Integer pageNum) {
         List<PostListResponseDto> responseDTOs = postService.getAllPosts(categoryType);
 
         return new ResponseEntity<>(CommonResponse.success("Posts retrieved successfully", responseDTOs), HttpStatus.OK);
@@ -58,20 +57,8 @@ public class PostController {
 
     @GetMapping("/user/{userId}")
     public ResponseEntity<CommonResponse<List<PostListResponseDto>>> getPostsByUserId(@PathVariable Long userId) {
-        List<Post> posts = postService.getPostsByUserId(userId);
-        List<PostListResponseDto> responseDTOs = posts.stream()
-                .map(post -> PostDetailResponseDto.builder()
-                        .postId(post.getId())
-                        .title(post.getTitle())
-                        .content(post.getContent())
-                        .images(post.getImages().stream().map(PostImage::getImageUrl).collect(Collectors.toList()))
-                        .likesCnt(post.getLikeCount())
-                        .cmmtCnt(post.getCommentCount())
-                        .writer(post.getMember().getNickname())
-                        .writerProfile(post.getMember().getProfileImageUrl())
-                        .build())
-                .collect(Collectors.toList());
-        return new ResponseEntity<>(CommonResponse.success("User posts retrieved successfully", responseDTOs), HttpStatus.OK);
+        List<PostListResponseDto> responseDtos = postService.getPostsByUserId(userId);
+        return new ResponseEntity<>(CommonResponse.success("User posts retrieved successfully", responseDtos), HttpStatus.OK);
     }
 
     //내가 쓴 댓글의 글 목록 조회 ADD

@@ -17,11 +17,11 @@ public class PostDetailResponseDto {
     private Long postId;
     private String title;
     private String content;
-    private List<PostImageDto> images; // 이미지 URL 리스트
-    private Integer likesCnt; // 좋아요 수
-    private Integer cmmtCnt; // 댓글 수
-    private String writer; // 작성자 이름
-    private String writerProfile; // 작성자 프로필 이미지 URL
+    private List<PostImageDto> images;
+    private Integer likesCnt;
+    private Integer cmmtCnt;
+    private String writer;
+    private String writerProfile;
     private String createdAt;
     private List<CommentResponseDTO> commentList;
     private Boolean isLiked;
@@ -52,5 +52,8 @@ public class PostDetailResponseDto {
                 .createdAt(DateTimeUtil.formatDateTimeToKorean(post.getCreatedAt()))
                 .commentList(commentResponseDTOList)
                 .build();
+    }
+    public void assignIsLiked(Boolean isliked) {
+        this.isLiked = isliked;
     }
 }

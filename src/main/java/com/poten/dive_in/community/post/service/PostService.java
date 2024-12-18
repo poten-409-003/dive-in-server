@@ -6,11 +6,13 @@ import com.poten.dive_in.auth.repository.MemberRepository;
 import com.poten.dive_in.cmmncode.entity.CommonCode;
 import com.poten.dive_in.cmmncode.repository.CmmnCdRepository;
 import com.poten.dive_in.common.service.S3Service;
+import com.poten.dive_in.community.post.dto.PostListResponseDto;
 import com.poten.dive_in.community.post.enums.CategoryType;
 import com.poten.dive_in.community.post.dto.PostRequestDto;
 import com.poten.dive_in.community.post.dto.PostDetailResponseDto;
 import com.poten.dive_in.community.post.entity.Post;
 import com.poten.dive_in.community.post.entity.PostImage;
+import com.poten.dive_in.community.post.repository.PostLikeRepository;
 import com.poten.dive_in.community.post.repository.PostRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -18,9 +20,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static com.poten.dive_in.common.service.S3Service.extractFileName;
 
@@ -31,6 +35,7 @@ public class PostService {
     private final PostRepository postRepository;
     private final CmmnCdRepository cmmnCdRepository;
     private final MemberRepository memberRepository;
+    private final PostLikeRepository postLikeRepository;
 
     @Transactional
     public PostDetailResponseDto createPost(PostRequestDto postRequestDTO) {
@@ -106,24 +111,35 @@ public class PostService {
         return postRepository.save(newPost);
     }
 
-    public List<Post> getAllPosts(String categoryType) {
+    public List<PostListResponseDto> getAllPosts(String categoryType) {
+        List<Post> posts = new ArrayList<>();
         if ("none".equals(categoryType)) {
-            return postRepository.findActivePosts();
+            posts = postRepository.findActivePosts();
+
         } else if ("popular".equals(categoryType)) {
-            return postRepository.findPopularPosts();
+            posts = postRepository.findPopularPosts();
         } else {
-            return postRepository.findByCategoryCodeCd(categoryType);
+            posts = postRepository.findByCategoryCodeCd(categoryType);
         }
+        return posts.isEmpty() ? new ArrayList<>() : posts.stream()
+                .map(PostListResponseDto::ofEntity)
+                .collect(Collectors.toList());
     }
 
     public PostDetailResponseDto getPostById(Long id) {
         Post post = postRepository.findByIdWithDetail(id).orElseThrow(() -> new IllegalArgumentException("해당 글이 존재하지 않습니다."));
-        return PostDetailResponseDto.ofEntity(post);
+        PostDetailResponseDto detailResponseDto = PostDetailResponseDto.ofEntity(post);
+        Boolean pushLike = postLikeRepository.existsByPostIdAndMemberId(post.getId(), post.getMember().getId());
+        detailResponseDto.assignIsLiked(pushLike);
+        return detailResponseDto;
 
     }
 
-    public List<Post> getPostsByUserId(Long userId) {
-        return postRepository.findPostsByMemberId(userId);
+    public List<PostListResponseDto> getPostsByUserId(Long userId) {
+        List<Post> posts = postRepository.findPostsByMemberId(userId);
+        return posts.isEmpty() ? new ArrayList<>() : posts.stream()
+                .map(PostListResponseDto::ofEntity)
+                .collect(Collectors.toList());
     }
 
     private Set<PostImage> uploadAndCreatePostImages(List<MultipartFile> multipartFileList, Post post) {
