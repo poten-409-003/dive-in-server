@@ -15,7 +15,7 @@ public class PostImageDto {
 
     public static PostImageDto ofEntity(PostImage postImage){
         return PostImageDto.builder()
-                .repImage(postImage.getIsRepresentative()=="Y"? true:false)
+                .repImage("Y".equals(postImage.getIsRepresentative()))
                 .imageUrl(postImage.getImageUrl())
                 .build();
 

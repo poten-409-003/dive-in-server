@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
 public class CommentLike extends CreateTimeEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @Column(name = "cmnt_like_id")
     private Long id;
 

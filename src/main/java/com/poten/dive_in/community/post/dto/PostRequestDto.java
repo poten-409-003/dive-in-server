@@ -20,6 +20,6 @@ public class PostRequestDto {
     @NotBlank(message = "본문은 필수입니다.")
     @Size(max = 2000, message = "2,000자 이하로만 작성할 수 있습니다.")
     private String content; // 본문
-    private List<MultipartFile> images; // 이미지 리스트
+//    private List<MultipartFile> images; // 이미지 리스트
     private Long memberId;
 }

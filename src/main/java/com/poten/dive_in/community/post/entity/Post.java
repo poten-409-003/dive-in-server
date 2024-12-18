@@ -33,7 +33,7 @@ import java.util.Set;
 public class Post extends BaseTimeEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @Column(name = "post_id")
     private Long id;
 
@@ -64,13 +64,13 @@ public class Post extends BaseTimeEntity {
     private String isActive="Y";
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<PostImage> images;
+    private Set<PostImage> images = new HashSet<>(); // 초기화 필요;
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Comment> comments;
+    private Set<Comment> comments = new HashSet<>(); // 초기화 필요;
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<PostLike> likes;
+    private Set<PostLike> likes =new HashSet<>(); // 초기화 필요;
 
     public void adjustViewCount() {
         this.viewCount += 1;
@@ -78,8 +78,17 @@ public class Post extends BaseTimeEntity {
     public void adjustLikeCount(int increment) {
         this.likeCount += increment;
     }
-    public void addImage(Set<PostImage> poolImageList) {
-        this.images = poolImageList;
+
+    public void adjustCommentCount(int increment) { this.commentCount += increment; }
+
+    public void updatePost(CommonCode code, String content, String title) {
+        this.categoryCode = code;
+        this.content = content;
+        this.title = title;
+    }
+
+    public void addImage(Set<PostImage> postImageList) {
+        this.images = postImageList;
     }
 
     public void replaceImageList(Set<PostImage> newPoolImageList){

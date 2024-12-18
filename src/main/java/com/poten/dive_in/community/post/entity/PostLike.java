@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
 public class PostLike extends CreateTimeEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @Column(name = "like_id")
     private Long id;
 

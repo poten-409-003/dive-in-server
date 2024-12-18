@@ -19,6 +19,7 @@ public class PostDetailResponseDto {
     private String content;
     private List<PostImageDto> images;
     private Integer likesCnt;
+    private Integer viewsCnt;
     private Integer cmmtCnt;
     private String writer;
     private String writerProfile;
@@ -46,6 +47,7 @@ public class PostDetailResponseDto {
                 .content(post.getContent())
                 .images(postImageDtoList)
                 .likesCnt(post.getLikeCount())
+                .viewsCnt(post.getViewCount())
                 .cmmtCnt(post.getCommentCount())
                 .writer(post.getMember().getNickname())
                 .writerProfile(post.getMember().getProfileImageUrl())

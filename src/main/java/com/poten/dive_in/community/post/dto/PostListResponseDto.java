@@ -2,8 +2,12 @@ package com.poten.dive_in.community.post.dto;
 
 import com.poten.dive_in.common.service.DateTimeUtil;
 import com.poten.dive_in.community.post.entity.Post;
+import com.poten.dive_in.community.post.entity.PostImage;
 import lombok.Builder;
 import lombok.Getter;
+
+import java.util.Optional;
+import java.util.Set;
 
 
 @Getter
@@ -15,13 +19,21 @@ public class PostListResponseDto {
     private PostImageDto image;
     private Integer likesCnt;
     private Integer cmmtCnt;
+    private Integer viewCnt;
     private String writer;
     private String writerProfile;
     private String createdAt;
 
     public static PostListResponseDto ofEntity(Post post){
-        PostImageDto postImageDto = (post.getImages() != null) ?
-                PostImageDto.ofEntity(post.getImages().stream().toList().get(0)) : null;
+        Set<PostImage> images = post.getImages();
+
+        PostImageDto postImageDto = (images != null && !images.isEmpty())
+                ? images.stream()
+                .filter(image -> "Y".equals(image.getIsRepresentative())) // isRepresentative가 "Y"인 필터링
+                .findFirst()
+                .map(PostImageDto::ofEntity)
+                .orElse(null)
+                : null;
 
         return PostListResponseDto.builder()
                 .postId(post.getId())
@@ -30,6 +42,7 @@ public class PostListResponseDto {
                 .image(postImageDto)
                 .likesCnt(post.getLikeCount())
                 .cmmtCnt(post.getCommentCount())
+                .viewCnt(post.getViewCount())
                 .writer(post.getMember().getNickname())
                 .writerProfile(post.getMember().getProfileImageUrl())
                 .createdAt(DateTimeUtil.formatDateTimeToKorean(post.getCreatedAt()))

@@ -43,11 +43,11 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
 
         Post result = queryFactory
                 .selectFrom(qPost)
-                .join(qPost.member, qMember).fetchJoin() // Member와의 fetch join
-                .join(qPost.categoryCode, qCommonCode).fetchJoin() // CategoryCode와의 fetch join
-                .join(qPost.comments, qComment).fetchJoin() // Comments와의 fetch join
-                .join(qPost.images, qPostImage).fetchJoin() // Images와의 fetch join
-                .join(qPost.likes, qPostLike).fetchJoin() // Likes와의 fetch join
+                .leftJoin(qPost.member, qMember).fetchJoin()
+                .leftJoin(qPost.categoryCode, qCommonCode).fetchJoin()
+                .leftJoin(qPost.comments, qComment).fetchJoin()
+                .leftJoin(qPost.images, qPostImage).fetchJoin()
+                .leftJoin(qPost.likes, qPostLike).fetchJoin()
                 .where(qPost.id.eq(id))
                 .fetchOne();
 

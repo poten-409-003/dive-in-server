@@ -15,12 +15,12 @@ import com.poten.dive_in.community.post.entity.PostImage;
 import com.poten.dive_in.community.post.repository.PostLikeRepository;
 import com.poten.dive_in.community.post.repository.PostRepository;
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
@@ -41,7 +41,7 @@ public class PostService {
     private final PostLikeRepository postLikeRepository;
 
     @Transactional
-    public PostDetailResponseDto createPost(PostRequestDto postRequestDTO) {
+    public PostDetailResponseDto createPost(PostRequestDto postRequestDTO, List<MultipartFile> multipartFileList) {
         Member member = memberRepository.findById(postRequestDTO.getMemberId()).orElseThrow(() -> new EntityNotFoundException("존재하지 않는 회원입니다."));
 
         String categoryName = CategoryType.findKoreanNameByInput(postRequestDTO.getCategoryType());
@@ -55,14 +55,25 @@ public class PostService {
                 .content(postRequestDTO.getContent())
                 .categoryCode(commonCode)
                 .member(member)
+                .likeCount(0)
+                .commentCount(0)
+                .viewCount(0)
+                .isActive("Y")
                 .build();
 
         // 이미지가 있는 경우만
-        List<MultipartFile> multipartFileList = postRequestDTO.getImages();
-        if (multipartFileList !=null && !multipartFileList.isEmpty()){
-            Set<PostImage> postImageList = uploadAndCreatePostImages(multipartFileList,post);
-
-            post.addImage(postImageList);
+        if (multipartFileList !=null && !multipartFileList.isEmpty()) {
+            boolean isNotEmpty = true;
+            for (MultipartFile file : multipartFileList) {
+                if (file.isEmpty()) {
+                    isNotEmpty = false;
+                    break;
+                }
+            }
+            if (isNotEmpty) {
+                Set<PostImage> postImageList = uploadAndCreatePostImages(multipartFileList,post);
+                post.addImage(postImageList);
+            }
         }
         Post savedPost = postRepository.save(post);
         return PostDetailResponseDto.ofEntity(savedPost);
@@ -80,9 +91,9 @@ public class PostService {
     }
 
     @Transactional
-    public Post updatePost(Long id, PostRequestDto requestDTO) {
-        Post existingPost = postRepository.findByIdWithMember(id)
-                .orElseThrow(() -> new IllegalArgumentException("해당 글이 존재하지 않습니다."));
+    public Post updatePost(Long id, PostRequestDto requestDTO, List<MultipartFile> multipartFileList) {
+        Post existingPost = postRepository.findByIdWithDetail(id)
+                .orElseThrow(() -> new EntityNotFoundException("해당 글이 존재하지 않습니다."));
 
         if (!existingPost.getMember().getId().equals(requestDTO.getMemberId())) {
             throw new IllegalArgumentException("자신의 글만 수정 가능합니다.");
@@ -90,30 +101,28 @@ public class PostService {
 
         CommonCode commonCode = cmmnCdRepository.findByCodeName(CategoryType.findKoreanNameByInput(requestDTO.getCategoryType())).orElseThrow(() -> new EntityNotFoundException("해당 카테고리가 존재하지 않습니다."));
 
-        // 새로운 Post 객체 생성
-        Post newPost = Post.builder()
-                .id(existingPost.getId())
-                .member(existingPost.getMember())
-                .title(requestDTO.getTitle())
-                .content(requestDTO.getContent())
-                .categoryCode(commonCode)
-                .commentCount(existingPost.getCommentCount())
-                .likeCount(existingPost.getLikeCount())
-                .viewCount(existingPost.getViewCount())
-                .isActive(existingPost.getIsActive())
-                .images(existingPost.getImages())
-                .build();
+        existingPost.updatePost(commonCode, requestDTO.getContent(), requestDTO.getTitle());
 
-        List<MultipartFile> multipartFileList = requestDTO.getImages();
         if (multipartFileList != null && !multipartFileList.isEmpty()) {
-            deletePostImagesFromS3(newPost.getImages());
-            Set<PostImage> postImageList = uploadAndCreatePostImages(multipartFileList, newPost);
-            newPost.replaceImageList(postImageList);
+            boolean isNotEmpty = true;
+            for (MultipartFile file : multipartFileList) {
+                if (file.isEmpty()) {
+                    isNotEmpty = false;
+                    break;
+                }
+            }
+            if (isNotEmpty) {
+                deletePostImagesFromS3(existingPost.getImages());
+                Set<PostImage> postImageList = uploadAndCreatePostImages(multipartFileList, existingPost);
+                existingPost.replaceImageList(postImageList);
+            }
+
         }
 
-        return postRepository.save(newPost);
+        return postRepository.save(existingPost);
     }
 
+    @Transactional(readOnly = true)
     public List<PostListResponseDto> getAllPosts(String categoryType, int page) {
         int pageSize = 20; // 한 페이지당 게시물 수
         Page<Post> posts;
@@ -124,7 +133,10 @@ public class PostService {
         } else if ("popular".equals(categoryType)) {
             posts = postRepository.findPopularPosts(pageable);
         } else {
-            posts = postRepository.findByCategoryCodeCd(categoryType, pageable);
+            String koreanName = CategoryType.findKoreanNameByInput(categoryType);
+            CommonCode code = cmmnCdRepository.findByCodeName(koreanName).orElseThrow(() -> new EntityNotFoundException("카테고리가 존재하지 않습니다."));
+
+            posts = postRepository.findByCategoryCodeCd(code.getCode(), pageable);
         }
         return posts.isEmpty() ? new ArrayList<>() : posts.stream()
                 .map(PostListResponseDto::ofEntity)
@@ -143,6 +155,7 @@ public class PostService {
 
     }
 
+    @Transactional(readOnly = true)
     public List<PostListResponseDto> getPostsByUserId(Long userId, Integer page) {
         int pageSize = 20; // 한 페이지당 게시물 수
         Pageable pageable = PageRequest.of(page, pageSize);
@@ -151,6 +164,7 @@ public class PostService {
                 .map(PostListResponseDto::ofEntity)
                 .collect(Collectors.toList());
     }
+
 
     private Set<PostImage> uploadAndCreatePostImages(List<MultipartFile> multipartFileList, Post post) {
         Set<PostImage> postImageList = new HashSet<>();

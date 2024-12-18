@@ -17,7 +17,7 @@ import lombok.*;
 public class Comment extends BaseTimeEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @Column(name = "cmnt_id")
     private Long id;
 

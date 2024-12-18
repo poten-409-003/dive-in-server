@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -25,8 +26,8 @@ public class PostController {
     private final PostService postService;
 
     @PostMapping
-    public ResponseEntity<CommonResponse<PostDetailResponseDto>> createPost(@RequestBody @Valid PostRequestDto requestDTO) {
-        PostDetailResponseDto postDetailResponseDto = postService.createPost(requestDTO);
+    public ResponseEntity<CommonResponse<PostDetailResponseDto>> createPost(@Valid PostRequestDto requestDTO, @RequestParam(value = "images",required = false)List<MultipartFile> multipartFileList) {
+        PostDetailResponseDto postDetailResponseDto = postService.createPost(requestDTO, multipartFileList);
         return new ResponseEntity<>(CommonResponse.success("글 등록 완료", postDetailResponseDto), HttpStatus.CREATED); //201
     }
 
@@ -37,8 +38,8 @@ public class PostController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<CommonResponse<PostDetailResponseDto>> updatePost(@PathVariable Long id, @RequestBody @Valid PostRequestDto requestDTO) {
-        Post post = postService.updatePost(id, requestDTO);
+    public ResponseEntity<CommonResponse<PostDetailResponseDto>> updatePost(@PathVariable Long id, @Valid PostRequestDto requestDTO, @RequestParam(value = "images",required = false)List<MultipartFile> multipartFileList) {
+        Post post = postService.updatePost(id, requestDTO, multipartFileList);
         return new ResponseEntity<>(CommonResponse.success("글 수정 완료", PostDetailResponseDto.ofEntity(post)), HttpStatus.OK); //200
     }
 

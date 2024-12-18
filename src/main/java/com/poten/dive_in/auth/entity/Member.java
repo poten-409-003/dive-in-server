@@ -16,8 +16,6 @@ public class Member extends BaseTimeEntity {
     @Column(name = "member_id")
     private Long id;
 
-
-
     @JoinColumn(name = "role_id")
     @ManyToOne(fetch = FetchType.LAZY)
     private MemberRole role;
@@ -26,7 +24,7 @@ public class Member extends BaseTimeEntity {
     @Column(unique = true)
     private String email;
 
-    @JoinColumn(name = "socl_lgn_cd", referencedColumnName = "cd_id")
+    @JoinColumn(name = "socl_lgn_cd", referencedColumnName = "cd")
     @ManyToOne(fetch = FetchType.LAZY)
     private CommonCode socialCode;
 
