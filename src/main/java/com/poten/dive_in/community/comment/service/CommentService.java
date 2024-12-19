@@ -9,6 +9,7 @@ import com.poten.dive_in.community.comment.repository.CommentRepository;
 import com.poten.dive_in.community.post.dto.PostListResponseDto;
 import com.poten.dive_in.community.post.entity.Post;
 import com.poten.dive_in.community.post.repository.PostRepository;
+import com.vane.badwordfiltering.BadWordFiltering;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -35,10 +36,11 @@ public class CommentService {
         Member member = memberRepository.findById(requestDTO.getMemberId()).orElseThrow(() -> new EntityNotFoundException("존재하지 않는 회원입니다."));
         Post post = postRepository.findById(requestDTO.getPostId()).orElseThrow(() -> new EntityNotFoundException("존재하지 않는 글입니다."));
         post.adjustCommentCount(1);
+        String filteredContent = badwordFiltering(requestDTO.getContent());
         Comment comment = Comment.builder()
                 .post(post)
                 .member(member)
-                .content(requestDTO.getContent())
+                .content(filteredContent)
                 .cmntClass(0) // 댓글로 설정
                 .orderNumber(0)
                 .likeCount(0)
@@ -65,11 +67,12 @@ public class CommentService {
         // 대댓글의 그룹 번호와 순서 번호 설정
         Integer groupName = parentComment.getGroupName();
         Integer orderNumber = commentRepository.countByGroupName(groupName).intValue();
+        String filteredContent = badwordFiltering(requestDTO.getContent());
 
         Comment reply = Comment.builder()
                 .member(member)
                 .post(post)
-                .content(requestDTO.getContent())
+                .content(filteredContent)
                 .groupName(groupName)
                 .orderNumber(orderNumber) // 순서 번호 설정
                 .cmntClass(1) // 대댓글로 설정
@@ -119,7 +122,9 @@ public class CommentService {
         if (!comment.getMember().getId().equals(requestDTO.getMemberId())) {
             throw new EntityNotFoundException("본인의 댓글만 수정할 수 있습니다.");
         }
-        comment.assignContent(requestDTO.getContent());
+        String filteredContent = badwordFiltering(requestDTO.getContent());
+
+        comment.assignContent(filteredContent);
         Comment updatedComment = commentRepository.save(comment);
 
         return CommentResponseDTO.ofEntity(updatedComment);
@@ -148,6 +153,14 @@ public class CommentService {
         return comments.stream()
                 .map(CommentResponseDTO::ofEntity)
                 .collect(Collectors.toList());
+    }
+
+    private String badwordFiltering(String original) {
+        BadWordFiltering badWordFiltering = new BadWordFiltering();
+        // 욕 사이의 공백, 숫자, 특수기호 제거
+        String cleanedInput = original.replaceAll("[\\s0-9!@#$%^&*()_+=-]", "");
+        String filtered = badWordFiltering.change(cleanedInput);
+        return filtered;
     }
 
 }

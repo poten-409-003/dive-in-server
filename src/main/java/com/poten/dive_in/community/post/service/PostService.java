@@ -14,6 +14,7 @@ import com.poten.dive_in.community.post.entity.Post;
 import com.poten.dive_in.community.post.entity.PostImage;
 import com.poten.dive_in.community.post.repository.PostLikeRepository;
 import com.poten.dive_in.community.post.repository.PostRepository;
+import com.vane.badwordfiltering.BadWordFiltering;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -49,10 +50,11 @@ public class PostService {
             throw new IllegalArgumentException("해당 카테고리가 존재하지 않습니다.");
         }
         CommonCode commonCode = cmmnCdRepository.findByCodeName(categoryName).orElseThrow(() -> new EntityNotFoundException("해당 카테고리가 공통코드에 존재하지 않습니다."));
-
+        String filteredTitle = badwordFiltering(postRequestDTO.getTitle());
+        String filteredContent = badwordFiltering(postRequestDTO.getContent());
         Post post = Post.builder()
-                .title(postRequestDTO.getTitle())
-                .content(postRequestDTO.getContent())
+                .title(filteredTitle)
+                .content(filteredContent)
                 .categoryCode(commonCode)
                 .member(member)
                 .likeCount(0)
@@ -101,7 +103,10 @@ public class PostService {
 
         CommonCode commonCode = cmmnCdRepository.findByCodeName(CategoryType.findKoreanNameByInput(requestDTO.getCategoryType())).orElseThrow(() -> new EntityNotFoundException("해당 카테고리가 존재하지 않습니다."));
 
-        existingPost.updatePost(commonCode, requestDTO.getContent(), requestDTO.getTitle());
+        String filteredTitle = badwordFiltering(requestDTO.getTitle());
+        String filteredContent = badwordFiltering(requestDTO.getContent());
+
+        existingPost.updatePost(commonCode, filteredContent, filteredTitle);
 
         if (multipartFileList != null && !multipartFileList.isEmpty()) {
             boolean isNotEmpty = true;
@@ -192,6 +197,14 @@ public class PostService {
                 s3Service.deleteFile(fileName);
             });
         }
+    }
+
+    private String badwordFiltering(String original) {
+        BadWordFiltering badWordFiltering = new BadWordFiltering();
+        // 욕 사이의 공백, 숫자, 특수기호 제거
+        String cleanedInput = original.replaceAll("[\\s0-9!@#$%^&*()_+=-]", "");
+        String filtered = badWordFiltering.change(cleanedInput);
+        return filtered;
     }
 
 }
