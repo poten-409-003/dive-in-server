@@ -11,21 +11,19 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/community/comment")
+@RequestMapping("/community/comments")
 @RequiredArgsConstructor
 public class CommentLikeController {
     private final CommentLikeService commentLikeService;
 
-    // 댓글 좋아요
     @PostMapping("/{id}/like")
-    public ResponseEntity<CommonResponse<CommentLike>> likePost(@PathVariable Long id, @RequestParam Long memberId) {
+    public ResponseEntity<CommonResponse<Boolean>> likePost(@PathVariable("id") Long id, @RequestParam Long memberId) {
         CommentLike commentLike = commentLikeService.likeComment(id, memberId);
-        return new ResponseEntity<>(CommonResponse.success(null, commentLike), HttpStatus.CREATED);
+        return new ResponseEntity<>(CommonResponse.success(null, true), HttpStatus.CREATED);
     }
 
-    // 댓글 좋아요 취소
     @DeleteMapping("/{id}/like")
-    public ResponseEntity<CommonResponse<Boolean>> unlikePost(@PathVariable Long id, @RequestParam Long memberId) {
+    public ResponseEntity<CommonResponse<Boolean>> unlikePost(@PathVariable("id") Long id, @RequestParam Long memberId) {
         commentLikeService.unlikeComment(id, memberId);
         return new ResponseEntity<>(CommonResponse.success(null, true), HttpStatus.OK);
     }

@@ -12,6 +12,7 @@ import lombok.*;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@EqualsAndHashCode(of = "id")
 @Entity
 @Table(name = "cmnt")
 public class Comment extends BaseTimeEntity {
@@ -57,6 +58,7 @@ public class Comment extends BaseTimeEntity {
         this.groupName = groupName;
     }
 
+    public void assignPost(Post post) { this.post = post;}
     public void adjustLikeCount(int increment) {
         this.likeCount += increment;
     }

@@ -28,45 +28,42 @@ public class CommentController {
     @PostMapping
     public ResponseEntity<CommonResponse<CommentResponseDTO>> createComment(@RequestBody @Valid CommentRequestDTO requestDTO) {
         CommentResponseDTO responseDTO = commentService.createComment(requestDTO);
-        return new ResponseEntity<>(CommonResponse.success("Comment created successfully", responseDTO), HttpStatus.CREATED);
-    }
-
-    @PostMapping("/{id}/reply")
-    public ResponseEntity<CommonResponse<CommentResponseDTO>> createReply(@PathVariable Long id, @RequestBody @Valid CommentRequestDTO requestDTO) {
-        CommentResponseDTO responseDTO = commentService.createReply(id, requestDTO);
-
         return new ResponseEntity<>(CommonResponse.success("댓글 작성 완료", responseDTO), HttpStatus.CREATED);
     }
 
+    @PostMapping("/{id}/reply")
+    public ResponseEntity<CommonResponse<CommentResponseDTO>> createReply(@PathVariable("id") Long id, @RequestBody @Valid CommentRequestDTO requestDTO) {
+        CommentResponseDTO responseDTO = commentService.createReply(id, requestDTO);
+
+        return new ResponseEntity<>(CommonResponse.success("대댓글 작성 완료", responseDTO), HttpStatus.CREATED);
+    }
+
     @DeleteMapping("/{id}")
-    public ResponseEntity<CommonResponse<Boolean>> deleteComment(@PathVariable Long id, @RequestParam Long memberId) {
+    public ResponseEntity<CommonResponse<Boolean>> deleteComment(@PathVariable("id") Long id, @RequestParam Long memberId) {
         commentService.deleteComment(id, memberId);
         return new ResponseEntity<>(CommonResponse.success("댓글 삭제 완료", true), HttpStatus.NO_CONTENT);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<CommonResponse<CommentResponseDTO>> updateComment(
-            @PathVariable Long id,
+            @PathVariable("id")  Long id,
             @RequestBody @Valid CommentRequestDTO requestDTO) {
         CommentResponseDTO responseDTO = commentService.updateComment(id, requestDTO);
 
-        return new ResponseEntity<>(CommonResponse.success("Comment updated successfully", responseDTO), HttpStatus.OK);
+        return new ResponseEntity<>(CommonResponse.success("댓글 수정 완료", responseDTO), HttpStatus.OK);
     }
 
-
-    // 특정 사용자가 댓글 단 글 목록 조회
     @GetMapping("/user/{memberId}/{pageNum}")
-    public ResponseEntity<CommonResponse<List<PostListResponseDto>>> getPostsAboutCommentsByMemberId(@PathVariable Long memberId, @PathVariable Integer pageNum) {
+    public ResponseEntity<CommonResponse<List<PostListResponseDto>>> getPostsAboutCommentsByMemberId(@PathVariable("memberId")  Long memberId, @PathVariable("pageNum") Integer pageNum) {
         List<PostListResponseDto> postListResponseDtos = commentService.getPostsAboutCommentByMemberId(memberId, pageNum);
         return new ResponseEntity<>(CommonResponse.success(null, postListResponseDtos), HttpStatus.OK);
 
     }
 
-    // 특정 댓글 조회
     @GetMapping("/{id}")
-    public ResponseEntity<CommonResponse<CommentResponseDTO>> getCommentById(@PathVariable Long id) {
-        CommentResponseDTO responseDTO = commentService.getCommentById(id);
-        return new ResponseEntity<>(CommonResponse.success(null, responseDTO), HttpStatus.OK);
+    public ResponseEntity<CommonResponse<List<CommentResponseDTO>>> getCommentById(@PathVariable("id") Long id) {
+        List<CommentResponseDTO> responseDTOs = commentService.getCommentById(id);
+        return new ResponseEntity<>(CommonResponse.success(null, responseDTOs), HttpStatus.OK);
     }
 
 

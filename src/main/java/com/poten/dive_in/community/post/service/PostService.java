@@ -124,7 +124,7 @@ public class PostService {
 
     @Transactional(readOnly = true)
     public List<PostListResponseDto> getAllPosts(String categoryType, int page) {
-        int pageSize = 20; // 한 페이지당 게시물 수
+        int pageSize = 10; // 한 페이지당 게시물 수
         Page<Post> posts;
         Pageable pageable = PageRequest.of(page, pageSize);
         if ("none".equals(categoryType)) {

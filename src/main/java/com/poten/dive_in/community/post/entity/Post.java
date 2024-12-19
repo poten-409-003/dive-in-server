@@ -9,10 +9,7 @@ import jakarta.persistence.*;
 
 import lombok.*;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Getter
 @Builder
@@ -67,7 +64,7 @@ public class Post extends BaseTimeEntity {
     private Set<PostImage> images = new HashSet<>(); // 초기화 필요;
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Comment> comments = new HashSet<>(); // 초기화 필요;
+    private List<Comment> comments = new ArrayList<>(); // 초기화 필요;
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<PostLike> likes =new HashSet<>(); // 초기화 필요;
@@ -91,12 +88,26 @@ public class Post extends BaseTimeEntity {
         this.images = postImageList;
     }
 
-    public void replaceImageList(Set<PostImage> newPoolImageList){
+    public void replaceImageList(Set<PostImage> newPostImageList){
         if (this.images != null) {
             this.images.clear();
-            this.images.addAll(newPoolImageList);
+            this.images.addAll(newPostImageList);
         } else{
-            this.images = new HashSet<>(newPoolImageList);
+            this.images = new HashSet<>(newPostImageList);
         }
+    }
+
+    public void replaceCommentList(Set<Comment> commentList) {
+        if (this.comments != null) {
+            this.comments.clear();
+            this.comments.addAll(commentList);
+        } else {
+            this.comments = new ArrayList<>(commentList);
+        }
+    }
+    public void sortComments() {
+        this.comments.sort(Comparator.comparing(Comment::getGroupName)
+                .thenComparing(Comment::getCmntClass)
+                .thenComparing(Comment::getOrderNumber));
     }
 }
