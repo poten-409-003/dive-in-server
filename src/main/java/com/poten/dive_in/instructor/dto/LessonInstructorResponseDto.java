@@ -1,8 +1,6 @@
 package com.poten.dive_in.instructor.dto;
 
 import com.poten.dive_in.instructor.entity.Instructor;
-import com.poten.dive_in.lesson.entity.Lesson;
-import com.poten.dive_in.lesson.entity.LessonInstructor;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -15,12 +13,12 @@ public class LessonInstructorResponseDto {
     private String instructorName;
     private String instructorInfo;
 
-    public static LessonInstructorResponseDto ofEntity(LessonInstructor lessonInstructor) {
+    public static LessonInstructorResponseDto ofEntity(Instructor instructor) {
         return LessonInstructorResponseDto.builder()
-                .id(lessonInstructor.getId())
-                .instructorId(lessonInstructor.getInstructor().getId())
-                .instructorName(lessonInstructor.getInstructor().getInstructorName())
-                .instructorInfo(lessonInstructor.getInstructor().getInstructorInfo())
+                .id(instructor.getId())
+                .instructorId(instructor.getId())
+                .instructorName(instructor.getName())
+                .instructorInfo(instructor.getDescription())
                 .build();
     }
 

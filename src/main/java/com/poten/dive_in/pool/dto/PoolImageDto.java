@@ -14,8 +14,8 @@ public class PoolImageDto {
 
     public static PoolImageDto ofEntity(PoolImage poolImage){
         return PoolImageDto.builder()
-                .repImage(poolImage.getRepImage())
-                .imageUrl(poolImage.getImageUrl())
+                .repImage(poolImage.getRprsImgYn()=="Y"? true:false)
+                .imageUrl(poolImage.getImgUrl())
                 .build();
 
     }

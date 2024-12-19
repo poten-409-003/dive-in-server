@@ -1,8 +1,7 @@
 package com.poten.dive_in.auth.entity;
 
+import com.poten.dive_in.cmmncode.entity.CommonCode;
 import com.poten.dive_in.common.entity.BaseTimeEntity;
-import com.poten.dive_in.auth.enums.Role;
-import com.poten.dive_in.auth.enums.SocialType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import lombok.*;
@@ -17,23 +16,43 @@ public class Member extends BaseTimeEntity {
     @Column(name = "member_id")
     private Long id;
 
-    @Enumerated(EnumType.STRING)
-    private SocialType socialType;
-
-    @Enumerated(EnumType.STRING)
-    private Role role;
+    @JoinColumn(name = "role_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    private MemberRole role;
 
     @Email
     @Column(unique = true)
     private String email;
 
+    @JoinColumn(name = "socl_lgn_cd", referencedColumnName = "cd")
+    @ManyToOne(fetch = FetchType.LAZY)
+    private CommonCode socialCode;
+
+    @Column(name = "nckn")
     private String nickname;
 
+    @Column(name = "prfl_img_url")
     private String profileImageUrl;
 
+    private Character useYn;
+
+
+
+//    @OneToMany(mappedBy = "member")
+//    private List<Post> posts;
+//
+//    @OneToMany(mappedBy = "member")
+//    private List<Cmnt> cmnts;
+//
+//    @OneToMany(mappedBy = "member")
+//    private List<CmntLike> cmntLikes;
+//
+//    @OneToMany(mappedBy = "member")
+//    private List<PostLike> postLikes;
 
     public void updateMember(String nickname, String profileImageUrl) {
         this.profileImageUrl = profileImageUrl;
         this.nickname = nickname;
     }
+
 }

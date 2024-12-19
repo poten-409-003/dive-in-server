@@ -1,5 +1,7 @@
 package com.poten.dive_in.pool.service;
 
+import com.poten.dive_in.cmmncode.entity.CommonCode;
+import com.poten.dive_in.cmmncode.repository.CmmnCdRepository;
 import com.poten.dive_in.common.service.S3Service;
 import com.poten.dive_in.pool.dto.PoolListResponseDto;
 import com.poten.dive_in.pool.dto.PoolRequestDto;
@@ -25,12 +27,15 @@ public class PoolService {
 
     private final S3Service s3Service;
     private final PoolRepository poolRepository;
+    private final CmmnCdRepository cmmnCdRepository;
 
     @Transactional
     public PoolDetailResponseDto createPool(PoolRequestDto poolRequestDto, List<MultipartFile> multipartFileList){
 
+        CommonCode commonCode = cmmnCdRepository.findByCodeName(poolRequestDto.getFacilities()).orElseThrow(() -> new EntityNotFoundException("존재하지 않는 편의시설입니다."));
         // DTO -> 엔티티 변환
         Pool pool = poolRequestDto.toEntity();
+        pool.updateAmenityCode(commonCode);
 
         // 이미지가 있는 경우만
         if (multipartFileList !=null && !multipartFileList.isEmpty()){
@@ -64,7 +69,10 @@ public class PoolService {
         Pool pool = poolRepository.findById(poolId).orElseThrow(() -> new EntityNotFoundException("존재하지 않는 수영장입니다."));
 
         pool.updatePool(poolRequestDto);
-
+        if (poolRequestDto.getFacilities() != null) {
+            CommonCode commonCode = cmmnCdRepository.findByCodeName(poolRequestDto.getFacilities()).orElseThrow(() -> new EntityNotFoundException("존재하지 않는 편의시설입니다."));
+            pool.updateAmenityCode(commonCode);
+        }
         if (multipartFileList != null && !multipartFileList.isEmpty()) {
             deletePoolImagesFromS3(pool.getImageList());
             List<PoolImage> poolImageList = uploadAndCreatePoolImages(multipartFileList, pool);
@@ -91,8 +99,8 @@ public class PoolService {
             boolean repImage = (i == 0);
 
             PoolImage poolImage = PoolImage.builder()
-                    .imageUrl(uploadFileList.get(i))
-                    .repImage(repImage)
+                    .imgUrl(uploadFileList.get(i))
+                    .rprsImgYn(repImage ? "Y":"N")
                     .pool(pool)
                     .build();
             poolImageList.add(poolImage);
@@ -105,7 +113,7 @@ public class PoolService {
     private void deletePoolImagesFromS3(List<PoolImage> poolImageList) {
         if (poolImageList != null && !poolImageList.isEmpty()) {
             poolImageList.forEach(poolImage -> {
-                String fileName = extractFileName(poolImage.getImageUrl());
+                String fileName = extractFileName(poolImage.getImgUrl());
                 s3Service.deleteFile(fileName);
             });
         }

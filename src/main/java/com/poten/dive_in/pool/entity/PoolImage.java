@@ -11,17 +11,32 @@ import lombok.RequiredArgsConstructor;
 @AllArgsConstructor
 @RequiredArgsConstructor
 @Entity
-public class PoolImage extends BaseTimeEntity {
+@Table(name="pool_img")
+public class PoolImage {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "pool_image_id")
-    private Long id;
-
-    private Boolean repImage;
-
-    private String imageUrl;
+    private Integer imgId;
 
     @ManyToOne
     @JoinColumn(name = "pool_id" )
     private Pool pool;
+
+    private String rprsImgYn; //대표이미지 여부
+    private String imgUrl;
+
 }
+
+//public class PoolImage extends BaseTimeEntity {
+//    @Id
+//    @GeneratedValue(strategy = GenerationType.IDENTITY)
+//    @Column(name = "pool_image_id")
+//    private Long id;
+//
+//    private Boolean repImage; //대표이미지 여부
+//
+//    private String imageUrl;
+//
+//    @ManyToOne
+//    @JoinColumn(name = "pool_id" )
+//    private Pool pool;
+//}

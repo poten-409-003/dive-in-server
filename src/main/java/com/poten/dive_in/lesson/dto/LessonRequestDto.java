@@ -1,7 +1,7 @@
 package com.poten.dive_in.lesson.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.poten.dive_in.lesson.entity.Lesson;
+import com.poten.dive_in.lesson.entity.SwimClass;
 import com.poten.dive_in.lesson.enums.LessonStatus;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Builder;
@@ -29,7 +29,8 @@ public class LessonRequestDto {
 
     private LessonStatus lessonStatus;
 
-    private Long academyId;
+//    private Long academyId;
+    private Long coachTeamId;
 
     private Long poolId;
 
@@ -39,18 +40,16 @@ public class LessonRequestDto {
     @JsonProperty("applyChannels")
     private List<LessonApplyChannelDto> applyChannelDtoList;
 
-    public Lesson toEntity() {
-        return Lesson.builder()
-                .lessonName(this.lessonName)
-                .level(this.level)
-                .capacity(this.capacity)
-                .price(this.price)
-                .keyword(this.keyword)
-                .lessonDetail(this.lessonDetail)
-                .lessonSchedule(this.lessonSchedule)
-                .lessonStatus(this.lessonStatus)
-                .build();
-    }
-
+//    public SwimClass toEntity() {
+//
+//        return SwimClass.builder()
+//                .name(this.lessonName)
+//                .participantCount(Integer.valueOf(this.capacity)) // capacity에서 변경
+//                .price(Integer.valueOf(this.price)) // price
+//                .introduction(this.lessonDetail) // lessonDetail에서 변경
+//                .operatingHours(this.lessonSchedule) // lessonSchedule에서 변경
+//                .lessonStatus(this.lessonStatus)
+//                .build();
+//    }
 
 }
