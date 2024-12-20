@@ -6,8 +6,6 @@ import com.poten.dive_in.community.comment.entity.Comment;
 import com.poten.dive_in.community.comment.entity.CommentLike;
 import com.poten.dive_in.community.comment.repository.CommentLikeRepository;
 import com.poten.dive_in.community.comment.repository.CommentRepository;
-import com.poten.dive_in.community.post.entity.Post;
-import com.poten.dive_in.community.post.entity.PostLike;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -31,7 +29,7 @@ public class CommentLikeService {
             throw new IllegalArgumentException("이미 좋아요를 눌렀습니다.");
         }
 
-        Member member = memberRepository.findById(memberId).orElseThrow(()-> new EntityNotFoundException("해당 회원이 존재하지 않습니다."));
+        Member member = memberRepository.findById(memberId).orElseThrow(() -> new EntityNotFoundException("해당 회원이 존재하지 않습니다."));
 
         CommentLike commentLike = CommentLike.builder()
                 .comment(comment)

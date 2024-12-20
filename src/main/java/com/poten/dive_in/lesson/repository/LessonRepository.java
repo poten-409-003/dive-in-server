@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 import java.util.Optional;
 
-public interface LessonRepository extends JpaRepository<SwimClass,Long> {
+public interface LessonRepository extends JpaRepository<SwimClass, Long> {
 
     @EntityGraph(value = "SwimClass.detail", type = EntityGraph.EntityGraphType.LOAD)
     List<SwimClass> findAll();

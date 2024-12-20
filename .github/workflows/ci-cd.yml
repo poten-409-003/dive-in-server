@@ -31,7 +31,7 @@ jobs:
       run: chmod +x ./gradlew
     # 빌드
     - name: Build with Gradle
-      run: ./gradlew clean compileQuerydsl build
+      run: ./gradlew clean build
     # 빌드한 jar 파일을 도커 이미지로 빌드하고 도커 허브에 푸시
     - name: Build and push Docker image
       run: |

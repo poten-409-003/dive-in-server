@@ -1,10 +1,8 @@
 package com.poten.dive_in.community.comment.controller;
 
 import com.poten.dive_in.common.dto.CommonResponse;
-import com.poten.dive_in.community.comment.entity.Comment;
 import com.poten.dive_in.community.comment.entity.CommentLike;
 import com.poten.dive_in.community.comment.service.CommentLikeService;
-import com.poten.dive_in.community.post.entity.PostLike;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

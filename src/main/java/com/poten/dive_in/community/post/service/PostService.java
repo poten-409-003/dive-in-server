@@ -6,12 +6,12 @@ import com.poten.dive_in.auth.repository.MemberRepository;
 import com.poten.dive_in.cmmncode.entity.CommonCode;
 import com.poten.dive_in.cmmncode.repository.CmmnCdRepository;
 import com.poten.dive_in.common.service.S3Service;
-import com.poten.dive_in.community.post.dto.PostListResponseDto;
-import com.poten.dive_in.community.post.enums.CategoryType;
-import com.poten.dive_in.community.post.dto.PostRequestDto;
 import com.poten.dive_in.community.post.dto.PostDetailResponseDto;
+import com.poten.dive_in.community.post.dto.PostListResponseDto;
+import com.poten.dive_in.community.post.dto.PostRequestDto;
 import com.poten.dive_in.community.post.entity.Post;
 import com.poten.dive_in.community.post.entity.PostImage;
+import com.poten.dive_in.community.post.enums.CategoryType;
 import com.poten.dive_in.community.post.repository.PostLikeRepository;
 import com.poten.dive_in.community.post.repository.PostRepository;
 import com.vane.badwordfiltering.BadWordFiltering;
@@ -64,7 +64,7 @@ public class PostService {
                 .build();
 
         // 이미지가 있는 경우만
-        if (multipartFileList !=null && !multipartFileList.isEmpty()) {
+        if (multipartFileList != null && !multipartFileList.isEmpty()) {
             boolean isNotEmpty = true;
             for (MultipartFile file : multipartFileList) {
                 if (file.isEmpty()) {
@@ -73,7 +73,7 @@ public class PostService {
                 }
             }
             if (isNotEmpty) {
-                Set<PostImage> postImageList = uploadAndCreatePostImages(multipartFileList,post);
+                Set<PostImage> postImageList = uploadAndCreatePostImages(multipartFileList, post);
                 post.addImage(postImageList);
             }
         }

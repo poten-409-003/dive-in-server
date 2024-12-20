@@ -2,12 +2,8 @@ package com.poten.dive_in.community.comment.dto;
 
 import com.poten.dive_in.common.service.DateTimeUtil;
 import com.poten.dive_in.community.comment.entity.Comment;
-import com.poten.dive_in.community.post.dto.PostImageDto;
-import com.poten.dive_in.community.post.entity.PostImage;
-import jakarta.persistence.Column;
 import lombok.Builder;
 import lombok.Getter;
-import org.joda.time.format.DateTimeFormatter;
 
 @Getter
 @Builder
@@ -22,7 +18,7 @@ public class CommentResponseDTO {
     private Integer likeCnt; // 좋아요 수
     private String createdAt; // 생성 날짜
 
-    public static CommentResponseDTO ofEntity(Comment comment){
+    public static CommentResponseDTO ofEntity(Comment comment) {
         return CommentResponseDTO.builder()
                 .cmmtId(comment.getId())
                 .content(comment.getContent())

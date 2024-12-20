@@ -1,12 +1,10 @@
 package com.poten.dive_in.auth.jwt;
 
-import com.poten.dive_in.auth.entity.MemberRole;
 import com.poten.dive_in.auth.enums.Role;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
-
 
 import java.security.Key;
 import java.time.LocalDateTime;
@@ -23,22 +21,22 @@ public class JwtTokenProvider {
     }
 
     // Access Token 생성
-    public String createAccessToken(Long memberId, String email, Role role){
-        return createToken(memberId,email, role,1L);
+    public String createAccessToken(Long memberId, String email, Role role) {
+        return createToken(memberId, email, role, 1L);
     }
 
     // Refresh Token 생성
-    public String createRefreshToken(Long memberId, String email,Role role) {
-        return createToken(memberId,email,role, 10080L); //7일
+    public String createRefreshToken(Long memberId, String email, Role role) {
+        return createToken(memberId, email, role, 10080L); //7일
     }
 
-    private String createToken(Long memberId, String email, Role role, long validityInMinutes){
+    private String createToken(Long memberId, String email, Role role, long validityInMinutes) {
 
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime expiration_date = now.plusMinutes(validityInMinutes);
 
         Claims claims = Jwts.claims().setSubject(memberId.toString());
-        claims.put("email",email);
+        claims.put("email", email);
 
         if (role != null) {
             claims.put("role", role); // 권한 정보 추가
@@ -54,8 +52,8 @@ public class JwtTokenProvider {
 
 
     //JWT 토큰에서 member_id 추출
-    public Long getMemberIdFromToken(String token){
-        String memberIdString =  Jwts.parserBuilder()
+    public Long getMemberIdFromToken(String token) {
+        String memberIdString = Jwts.parserBuilder()
                 .setSigningKey(secretKey)
                 .build()
                 .parseClaimsJws(token)
@@ -114,7 +112,7 @@ public class JwtTokenProvider {
                 .getBody();
 
         Date expiration_date = claims.getExpiration();
-        return LocalDateTime.ofInstant(expiration_date.toInstant(),ZoneId.systemDefault());
+        return LocalDateTime.ofInstant(expiration_date.toInstant(), ZoneId.systemDefault());
     }
 
 

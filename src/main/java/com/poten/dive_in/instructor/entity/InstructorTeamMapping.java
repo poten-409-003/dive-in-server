@@ -7,9 +7,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-import java.util.List;
-
-@Getter @Builder
+@Getter
+@Builder
 @AllArgsConstructor
 @RequiredArgsConstructor
 @Entity

@@ -12,7 +12,9 @@ public interface CommentRepositoryCustom {
     Optional<Comment> findByIdWithMember(Long id);
 
     Optional<Comment> findByIdWithMemberAndPost(Long id);
+
     Page<Post> findDistinctPostsByMemberId(Long memberId, Pageable pageable);
+
     List<Comment> findCommentsById(Long id);
 
 

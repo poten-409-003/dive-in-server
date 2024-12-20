@@ -1,16 +1,11 @@
 package com.poten.dive_in.pool.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.poten.dive_in.lesson.dto.LessonListResponseDto;
 import com.poten.dive_in.pool.entity.Pool;
 import lombok.Builder;
 import lombok.Getter;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-
-@Getter @Builder
+@Getter
+@Builder
 public class PoolListResponseDto {
     private Long id;
 
@@ -27,7 +22,7 @@ public class PoolListResponseDto {
 
     private String longitude;
 
-    public static PoolListResponseDto ofEntity(Pool pool){
+    public static PoolListResponseDto ofEntity(Pool pool) {
 
         String imageUrl = pool.getImageList() != null && !pool.getImageList().isEmpty() ?
                 pool.getImageList().get(0).getImgUrl() : null;

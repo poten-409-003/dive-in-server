@@ -54,11 +54,15 @@ public class Comment extends BaseTimeEntity {
     public void assignContent(String content) {
         this.content = content;
     }
+
     public void assignGroupName(Integer groupName) {
         this.groupName = groupName;
     }
 
-    public void assignPost(Post post) { this.post = post;}
+    public void assignPost(Post post) {
+        this.post = post;
+    }
+
     public void adjustLikeCount(int increment) {
         this.likeCount += increment;
     }

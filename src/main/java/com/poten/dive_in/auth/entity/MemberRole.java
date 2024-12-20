@@ -2,7 +2,10 @@ package com.poten.dive_in.auth.entity;
 
 import com.poten.dive_in.auth.enums.Role;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Builder

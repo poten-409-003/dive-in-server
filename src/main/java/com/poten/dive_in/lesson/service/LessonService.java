@@ -2,14 +2,12 @@ package com.poten.dive_in.lesson.service;
 
 import com.poten.dive_in.common.service.S3Service;
 import com.poten.dive_in.instructor.repository.InstructorRepository;
-import com.poten.dive_in.lesson.dto.LessonListResponseDto;
-import com.poten.dive_in.lesson.dto.LessonRequestDto;
 import com.poten.dive_in.lesson.dto.LessonDetailResponseDto;
+import com.poten.dive_in.lesson.dto.LessonListResponseDto;
 import com.poten.dive_in.lesson.entity.SwimClass;
 import com.poten.dive_in.lesson.entity.SwimClassImage;
 import com.poten.dive_in.lesson.repository.CoachingTeamRepository;
 import com.poten.dive_in.lesson.repository.LessonRepository;
-import com.poten.dive_in.pool.entity.Pool;
 import com.poten.dive_in.pool.repository.PoolRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +17,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static com.poten.dive_in.common.service.S3Service.extractFileName;
 
@@ -37,19 +34,19 @@ public class LessonService {
 
 
     @Transactional(readOnly = true)
-    public List<LessonListResponseDto> getLessonList(){
+    public List<LessonListResponseDto> getLessonList() {
         List<SwimClass> swimClassList = lessonRepository.findAll();
         return swimClassList.stream().map(LessonListResponseDto::ofEntity).toList();
     }
 
     @Transactional(readOnly = true)
-    public LessonDetailResponseDto getLessonDetail(Long lessonId){
+    public LessonDetailResponseDto getLessonDetail(Long lessonId) {
         SwimClass swimClass = lessonRepository.findById(lessonId)
-                .orElseThrow(()->new EntityNotFoundException("존재하지 않는 수업입니다."));
+                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 수업입니다."));
         return LessonDetailResponseDto.ofEntity(swimClass);
     }
 
-        /* TODO 수정 필요 */
+    /* TODO 수정 필요 */
 //    @Transactional
 //    public LessonDetailResponseDto createLesson(LessonRequestDto lessonRequestDto, List<MultipartFile> multipartFileList){
 //
@@ -133,7 +130,7 @@ public class LessonService {
             SwimClassImage lessonImage = SwimClassImage.builder()
                     .imageUrl(uploadFileList.get(i))
                     .swimClass(swimClass)
-                    .isRepresentative(i==0?"Y":"N")
+                    .isRepresentative(i == 0 ? "Y" : "N")
                     .build();
             lessonImageList.add(lessonImage);
         }

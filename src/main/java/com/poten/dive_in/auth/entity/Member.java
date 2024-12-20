@@ -4,9 +4,14 @@ import com.poten.dive_in.cmmncode.entity.CommonCode;
 import com.poten.dive_in.common.entity.BaseTimeEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-@Getter @Builder @NoArgsConstructor
+@Getter
+@Builder
+@NoArgsConstructor
 @AllArgsConstructor
 @Entity
 public class Member extends BaseTimeEntity {
@@ -35,7 +40,6 @@ public class Member extends BaseTimeEntity {
     private String profileImageUrl;
 
     private Character useYn;
-
 
 
 //    @OneToMany(mappedBy = "member")

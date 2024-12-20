@@ -5,7 +5,8 @@ import lombok.Builder;
 import lombok.Getter;
 
 
-@Getter @Builder
+@Getter
+@Builder
 public class LessonInstructorResponseDto {
 
     private Long id;

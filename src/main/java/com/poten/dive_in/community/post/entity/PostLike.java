@@ -6,8 +6,6 @@ import com.poten.dive_in.common.entity.CreateTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDateTime;
-
 @Getter
 @Builder
 @AllArgsConstructor

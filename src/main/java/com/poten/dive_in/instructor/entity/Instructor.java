@@ -1,6 +1,5 @@
 package com.poten.dive_in.instructor.entity;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.poten.dive_in.auth.entity.Member;
 import com.poten.dive_in.common.entity.BaseTimeEntity;
 import jakarta.persistence.*;
@@ -9,7 +8,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Getter

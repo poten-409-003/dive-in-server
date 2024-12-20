@@ -4,8 +4,8 @@ import com.poten.dive_in.auth.entity.Member;
 import com.poten.dive_in.auth.repository.MemberRepository;
 import com.poten.dive_in.community.post.entity.Post;
 import com.poten.dive_in.community.post.entity.PostLike;
-import com.poten.dive_in.community.post.repository.PostRepository;
 import com.poten.dive_in.community.post.repository.PostLikeRepository;
+import com.poten.dive_in.community.post.repository.PostRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -29,7 +29,7 @@ public class PostLikeService {
             throw new IllegalArgumentException("이미 좋아요를 눌렀습니다.");
         }
 
-        Member member = memberRepository.findById(memberId).orElseThrow(()-> new EntityNotFoundException("해당 회원이 존재하지 않습니다."));
+        Member member = memberRepository.findById(memberId).orElseThrow(() -> new EntityNotFoundException("해당 회원이 존재하지 않습니다."));
         PostLike postLike = PostLike.builder()
                 .post(post)
                 .member(member)

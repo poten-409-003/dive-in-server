@@ -5,16 +5,18 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
 
-@Getter @Builder @ToString
+@Getter
+@Builder
+@ToString
 public class PoolImageDto {
 
     private Boolean repImage;
 
     private String imageUrl;
 
-    public static PoolImageDto ofEntity(PoolImage poolImage){
+    public static PoolImageDto ofEntity(PoolImage poolImage) {
         return PoolImageDto.builder()
-                .repImage(poolImage.getRprsImgYn()=="Y"? true:false)
+                .repImage(poolImage.getRprsImgYn() == "Y" ? true : false)
                 .imageUrl(poolImage.getImgUrl())
                 .build();
 

@@ -3,20 +3,15 @@ package com.poten.dive_in.community.comment.controller;
 import com.poten.dive_in.common.dto.CommonResponse;
 import com.poten.dive_in.community.comment.dto.CommentRequestDTO;
 import com.poten.dive_in.community.comment.dto.CommentResponseDTO;
-import com.poten.dive_in.community.comment.entity.Comment;
 import com.poten.dive_in.community.comment.service.CommentService;
 import com.poten.dive_in.community.post.dto.PostListResponseDto;
-import com.poten.dive_in.community.post.entity.Post;
-import com.poten.dive_in.auth.entity.Member;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
@@ -46,7 +41,7 @@ public class CommentController {
 
     @PutMapping("/{id}")
     public ResponseEntity<CommonResponse<CommentResponseDTO>> updateComment(
-            @PathVariable("id")  Long id,
+            @PathVariable("id") Long id,
             @RequestBody @Valid CommentRequestDTO requestDTO) {
         CommentResponseDTO responseDTO = commentService.updateComment(id, requestDTO);
 
@@ -54,7 +49,7 @@ public class CommentController {
     }
 
     @GetMapping("/user/{memberId}/{pageNum}")
-    public ResponseEntity<CommonResponse<List<PostListResponseDto>>> getPostsAboutCommentsByMemberId(@PathVariable("memberId")  Long memberId, @PathVariable("pageNum") Integer pageNum) {
+    public ResponseEntity<CommonResponse<List<PostListResponseDto>>> getPostsAboutCommentsByMemberId(@PathVariable("memberId") Long memberId, @PathVariable("pageNum") Integer pageNum) {
         List<PostListResponseDto> postListResponseDtos = commentService.getPostsAboutCommentByMemberId(memberId, pageNum);
         return new ResponseEntity<>(CommonResponse.success(null, postListResponseDtos), HttpStatus.OK);
 
