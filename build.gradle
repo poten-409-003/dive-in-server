@@ -73,3 +73,11 @@ test {
 clean {
     delete file('src/main/generated')
 }
+
+tasks.test {
+    testLogging {
+        showExceptions = true
+        exceptionFormat "full"
+        showStackTraces true
+    }
+}
