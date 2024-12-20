@@ -49,25 +49,25 @@ public class Post extends BaseTimeEntity {
     private String content;
 
     @Column(name = "cmnt_cnt")
-    private Integer commentCount=0;
+    private Integer commentCount;
 
     @Column(name = "like_cnt")
-    private Integer likeCount=0;
+    private Integer likeCount;
 
     @Column(name = "chc_cnt")
-    private Integer viewCount=0;
+    private Integer viewCount;
 
     @Column(name = "use_yn")
-    private String isActive="Y";
+    private String isActive;
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<PostImage> images = new HashSet<>(); // 초기화 필요;
+    private Set<PostImage> images;
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Comment> comments = new ArrayList<>(); // 초기화 필요;
+    private List<Comment> comments;
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<PostLike> likes =new HashSet<>(); // 초기화 필요;
+    private Set<PostLike> likes;
 
     public void adjustViewCount() {
         this.viewCount += 1;

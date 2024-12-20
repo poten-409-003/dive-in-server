@@ -31,7 +31,7 @@ public class Comment extends BaseTimeEntity {
     private Post post;
 
     @Column(name = "cmnt_seq")
-    private Integer commentSequence = 0;
+    private Integer commentSequence;
 
     @Column(name = "group_nm")
     private Integer groupName; //댓글의Id를 groupName으로
@@ -46,10 +46,10 @@ public class Comment extends BaseTimeEntity {
     private String content;
 
     @Column(name = "like_cnt")
-    private Integer likeCount=0;
+    private Integer likeCount;
 
     @Column(name = "use_yn")
-    private String isActive="Y";
+    private String isActive;
 
     public void assignContent(String content) {
         this.content = content;
