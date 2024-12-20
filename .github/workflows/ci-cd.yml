@@ -29,12 +29,9 @@ jobs:
     # Gradle 권한 부여
     - name: Grant permission for gradlew
       run: chmod +x ./gradlew
-    # QClass 생성
-    - name: Generate Querydsl QClasses
-      run: ./gradlew compileQuerydsl
     # 빌드
     - name: Build with Gradle
-      run: ./gradlew clean build
+      run: ./gradlew clean compileQuerydsl build
     # 빌드한 jar 파일을 도커 이미지로 빌드하고 도커 허브에 푸시
     - name: Build and push Docker image
       run: |
