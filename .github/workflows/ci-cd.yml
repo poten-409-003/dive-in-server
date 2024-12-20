@@ -29,6 +29,9 @@ jobs:
     # Gradle 권한 부여
     - name: Grant permission for gradlew
       run: chmod +x ./gradlew
+    # QClass 생성
+    - name: Generate Querydsl QClasses
+      run: ./gradlew compileQuerydsl
     # 빌드
     - name: Build with Gradle
       run: ./gradlew clean build
