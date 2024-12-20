@@ -58,5 +58,10 @@ public class PostController {
         return new ResponseEntity<>(CommonResponse.success(null, responseDtos), HttpStatus.OK);
     }
 
+    @GetMapping("/search/{pageNum}")
+    public ResponseEntity<CommonResponse<List<PostListResponseDto>>> searchPosts(@RequestParam String query, @PathVariable("pageNum") Integer pageNum) {
+        List<PostListResponseDto> responseDtos = postService.searchPosts(query, pageNum);
+        return new ResponseEntity<>(CommonResponse.success(null, responseDtos), HttpStatus.OK);
+    }
 
 }

@@ -28,7 +28,7 @@ public class PostListResponseDto {
 
         PostImageDto postImageDto = (images != null && !images.isEmpty())
                 ? images.stream()
-                .filter(image -> "Y".equals(image.getIsRepresentative())) // isRepresentative가 "Y"인 필터링
+                .filter(image -> "Y".equals(image.getIsRepresentative()))
                 .findFirst()
                 .map(PostImageDto::ofEntity)
                 .orElse(null)
@@ -37,7 +37,7 @@ public class PostListResponseDto {
         return PostListResponseDto.builder()
                 .postId(post.getId())
                 .title(post.getTitle())
-                .content(post.getContent())
+                .content(truncateContent(post.getContent()))
                 .image(postImageDto)
                 .likesCnt(post.getLikeCount())
                 .cmmtCnt(post.getCommentCount())
@@ -46,5 +46,12 @@ public class PostListResponseDto {
                 .writerProfile(post.getMember().getProfileImageUrl())
                 .createdAt(DateTimeUtil.formatDateTimeToKorean(post.getCreatedAt()))
                 .build();
+    }
+
+    private static String truncateContent(String content) {
+        if (content != null && content.length() > 30) {
+            return content.substring(0, 30) + "...";
+        }
+        return content;
     }
 }

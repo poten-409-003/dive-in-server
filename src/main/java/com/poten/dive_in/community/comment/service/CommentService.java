@@ -159,8 +159,11 @@ public class CommentService {
         BadWordFiltering badWordFiltering = new BadWordFiltering();
         // 욕 사이의 공백, 숫자, 특수기호 제거
         String cleanedInput = original.replaceAll("[\\s0-9!@#$%^&*()_+=-]", "");
-        String filtered = badWordFiltering.change(cleanedInput);
-        return filtered;
+        if (badWordFiltering.check(cleanedInput)) {
+            return badWordFiltering.change(cleanedInput);
+        }
+        return original;
     }
+
 
 }

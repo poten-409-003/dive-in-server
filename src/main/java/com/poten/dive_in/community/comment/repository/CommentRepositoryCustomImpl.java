@@ -53,10 +53,9 @@ public class CommentRepositoryCustomImpl implements CommentRepositoryCustom {
         QPost qPost = QPost.post;
         QPostImage qPostImage = QPostImage.postImage;
 
-        // 중복을 제거한 게시글 목록을 가져오기 위한 쿼리
         List<Post> posts = queryFactory
                 .select(qComment.post)
-                .distinct() // 중복 제거
+                .distinct()
                 .from(qComment)
                 .join(qComment.post, qPost)
                 .where(qComment.member.id.eq(memberId))

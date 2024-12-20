@@ -43,24 +43,10 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
         QPostImage qPostImage = QPostImage.postImage;
         QPostLike qPostLike = QPostLike.postLike;
 
-//        Post result = queryFactory
-//                .selectFrom(qPost)
-//                .leftJoin(qPost.member, qMember).fetchJoin()
-//                .leftJoin(qPost.categoryCode, qCommonCode).fetchJoin()
-//                .leftJoin(qPost.comments, qComment).fetchJoin()
-//                .leftJoin(qPost.images, qPostImage).fetchJoin()
-//                .leftJoin(qPost.likes, qPostLike).fetchJoin()
-//                .where(qPost.id.eq(id))
-//                .orderBy(qComment.groupName.asc(),
-//                        qComment.cmntClass.asc(),
-//                        qComment.orderNumber.asc()
-//                )
-//                .fetchOne();
-        // 서브쿼리로 중복된 댓글을 가져옴
         List<Comment> comments = queryFactory
                 .selectFrom(qComment)
                 .where(qComment.post.id.eq(id))
-                .distinct() // 중복 제거
+                .distinct()
                 .fetch();
 
         Post result = queryFactory
@@ -74,8 +60,8 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
 
         // 댓글 설정 및 정렬
         if (result != null) {
-            result.replaceCommentList(new HashSet<>(comments)); // Set으로 중복 제거
-            result.sortComments(); // 댓글 정렬
+            result.replaceCommentList(new HashSet<>(comments));
+            result.sortComments();
         }
 
         return Optional.ofNullable(result);
@@ -85,7 +71,8 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
         QPost qPost = QPost.post;
         List<Post> posts = queryFactory
                 .selectFrom(qPost)
-                .where(qPost.isActive.eq("Y")) // 예시: 활성 상태가 "Y"인 경우
+                .where(qPost.isActive.eq("Y"))
+                .orderBy(qPost.createdAt.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
@@ -98,27 +85,22 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
         return new PageImpl<>(posts, pageable, total);
     }
 
-    public Page<Post> findPopularPosts(Pageable pageable) {
+    public List<Post> findPopularPosts(Pageable pageable) {
         QPost qPost = QPost.post;
-        List<Post> posts = queryFactory
+        return queryFactory
                 .selectFrom(qPost)
                 .where(qPost.viewCount.goe(10))
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
+                .orderBy(qPost.viewCount.desc(), qPost.createdAt.desc())
+                .limit(10)
                 .fetch();
-
-        long total = queryFactory
-                .selectFrom(qPost)
-                .stream().count();
-
-        return new PageImpl<>(posts, pageable, total);
     }
 
     public Page<Post> findByCategoryCodeCd(String categoryType, Pageable pageable) {
         QPost qPost = QPost.post;
         List<Post> posts = queryFactory
                 .selectFrom(qPost)
-                .where(qPost.categoryCode.code.eq(categoryType)) // 예시: 카테고리 코드
+                .where(qPost.categoryCode.code.eq(categoryType))
+                .orderBy(qPost.createdAt.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
@@ -136,7 +118,8 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
         QPost qPost = QPost.post;
         List<Post> posts = queryFactory
                 .selectFrom(qPost)
-                .where(qPost.member.id.eq(memberId)) // 회원 ID로 필터링
+                .where(qPost.member.id.eq(memberId))
+                .orderBy(qPost.createdAt.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
@@ -148,28 +131,29 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
 
         return new PageImpl<>(posts, pageable, total);
     }
-//    public List<Post> findActivePosts() {
-//        QPost qPost = QPost.post;
-//        return queryFactory.selectFrom(qPost)
-//                .where(qPost.isActive.eq("Y"))
-//                .orderBy(qPost.createdAt.desc())
-//                .fetch();
-//    }
-//
-//    public List<Post> findPopularPosts() {
-//        QPost qPost = QPost.post;
-//        return queryFactory.selectFrom(qPost)
-//                .where(qPost.viewCount.goe(10))
-//                .orderBy(qPost.createdAt.desc())
-//                .fetch();
-//    }
-//
-//    public List<Post> findPostsByMemberId(Long memberId) {
-//        QPost qPost = QPost.post;
-//        return queryFactory.selectFrom(qPost)
-//                .where(qPost.member.id.eq(memberId))
-//                .orderBy(qPost.createdAt.desc())
-//                .fetch();
-//    }
+
+    public Page<Post> searchPosts(String query, Pageable pageable) {
+        QPost qPost = QPost.post;
+        List<Post> posts = queryFactory
+                .selectFrom(qPost)
+                .where(qPost.title.containsIgnoreCase(query)
+                        .or(qPost.content.containsIgnoreCase(query))
+                        .or(qPost.categoryCode.codeName.containsIgnoreCase(query))
+                        .or(qPost.member.nickname.containsIgnoreCase(query)))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .orderBy(qPost.createdAt.desc())
+                .fetch();
+
+        long total = queryFactory
+                .selectFrom(qPost)
+                .where(qPost.title.containsIgnoreCase(query)
+                        .or(qPost.content.containsIgnoreCase(query))
+                        .or(qPost.categoryCode.codeName.containsIgnoreCase(query))
+                        .or(qPost.member.nickname.containsIgnoreCase(query)))
+                .stream().count();
+
+        return new PageImpl<>(posts, pageable, total);
+    }
 }
 
