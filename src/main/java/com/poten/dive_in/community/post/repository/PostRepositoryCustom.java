@@ -9,9 +9,13 @@ import java.util.Optional;
 
 public interface PostRepositoryCustom {
     Optional<Post> findByIdWithMember(Long id);
+
     Optional<Post> findByIdWithDetail(Long id);
+
     Page<Post> findActivePosts(Pageable pageable);
+
     Page<Post> findPopularPosts(Pageable pageable);
+
     Page<Post> findByCategoryCodeCd(String categoryType, Pageable pageable);
 
     Page<Post> findPostsByMemberId(Pageable pageable, Long memberId);

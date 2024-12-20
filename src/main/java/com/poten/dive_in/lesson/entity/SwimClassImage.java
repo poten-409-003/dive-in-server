@@ -1,13 +1,13 @@
 package com.poten.dive_in.lesson.entity;
 
-import com.poten.dive_in.common.entity.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-@Builder @Getter
+@Builder
+@Getter
 @RequiredArgsConstructor
 @AllArgsConstructor
 @Entity

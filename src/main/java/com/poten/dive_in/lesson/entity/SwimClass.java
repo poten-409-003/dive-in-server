@@ -10,12 +10,10 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-
-import java.util.List;
-
 import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -26,14 +24,14 @@ import java.util.Set;
 @NamedEntityGraph(
         name = "SwimClass.detail",
         attributeNodes = {
-            @NamedAttributeNode("instructorTeam"),
-            @NamedAttributeNode("pool"),
-            @NamedAttributeNode("level"),
-            @NamedAttributeNode("images"),
-            @NamedAttributeNode("qualifications"),
-            @NamedAttributeNode("refunds"),
-            @NamedAttributeNode("keywords"),
-            @NamedAttributeNode("applicationMethods")
+                @NamedAttributeNode("instructorTeam"),
+                @NamedAttributeNode("pool"),
+                @NamedAttributeNode("level"),
+                @NamedAttributeNode("images"),
+                @NamedAttributeNode("qualifications"),
+                @NamedAttributeNode("refunds"),
+                @NamedAttributeNode("keywords"),
+                @NamedAttributeNode("applicationMethods")
         }
 )
 @Table(name = "swmm_cls")
@@ -168,7 +166,7 @@ public class SwimClass extends BaseTimeEntity {
     public String getKeyword() {
 
         String keywords = null;
-        if (this.keywords!= null && this.keywords.size() != 0) {
+        if (this.keywords != null && this.keywords.size() != 0) {
             List<String> keywordList = new ArrayList<>();
             for (LessonKeyword keyword : this.keywords) {
                 keywordList.add(keyword.getKeyword().getCodeName());

@@ -17,7 +17,7 @@ public class CoachingTeamResponseDto {
     private String profileImageUrl;
 
     /* TODO 수정 필요 */
-    public static CoachingTeamResponseDto ofEntity(CoachingTeam coachingTeam){
+    public static CoachingTeamResponseDto ofEntity(CoachingTeam coachingTeam) {
         return CoachingTeamResponseDto.builder()
                 .id(coachingTeam.getId())
                 .academyInfo(coachingTeam.getDescription())

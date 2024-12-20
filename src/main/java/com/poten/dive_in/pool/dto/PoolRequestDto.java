@@ -5,7 +5,8 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
 
-@Getter @Setter
+@Getter
+@Setter
 public class PoolRequestDto {
 
     @NotBlank(message = "수영장 이름은 필수입니다.")
@@ -38,13 +39,13 @@ public class PoolRequestDto {
 
     private String region;
 
-    public Pool toEntity(){
+    public Pool toEntity() {
         return Pool.builder()
                 .poolName(this.poolName)
                 .roadAddress(this.poolAddress)
                 .operatingHours(this.operatingHours)
                 .dayOff(this.closingDays)
-                .latitude(Double.valueOf(this.latitude) )
+                .latitude(Double.valueOf(this.latitude))
                 .longitude(Double.valueOf(this.longitude))
                 .telephone(this.contact)
                 .laneLength(String.valueOf(this.laneLength))

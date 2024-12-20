@@ -7,5 +7,6 @@ import java.util.Optional;
 
 public interface CmmnCdRepository extends JpaRepository<CommonCode, Long> {
     Optional<CommonCode> findByCode(String code);
+
     Optional<CommonCode> findByCodeName(String codeName);
 }

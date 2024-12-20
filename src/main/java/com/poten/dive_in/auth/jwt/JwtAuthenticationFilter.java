@@ -3,16 +3,15 @@ package com.poten.dive_in.auth.jwt;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.poten.dive_in.common.dto.CommonResponse;
 import io.jsonwebtoken.JwtException;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.web.filter.OncePerRequestFilter;
-
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -31,12 +30,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
 
         // Request에서 JWT 토큰을 추출
-        String token = getJwtFromRequest(request,"Authorization");
+        String token = getJwtFromRequest(request, "Authorization");
 
         try {
             if (token != null) {
 
-                if(token.startsWith("Bearer ")){
+                if (token.startsWith("Bearer ")) {
                     token = token.substring(7);
                 }
 
@@ -109,7 +108,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
         SecurityContextHolder.getContext().setAuthentication(authentication);
     }
-
 
 
 }

@@ -6,7 +6,6 @@ import com.poten.dive_in.community.post.entity.PostImage;
 import lombok.Builder;
 import lombok.Getter;
 
-import java.util.Optional;
 import java.util.Set;
 
 
@@ -24,7 +23,7 @@ public class PostListResponseDto {
     private String writerProfile;
     private String createdAt;
 
-    public static PostListResponseDto ofEntity(Post post){
+    public static PostListResponseDto ofEntity(Post post) {
         Set<PostImage> images = post.getImages();
 
         PostImageDto postImageDto = (images != null && !images.isEmpty())

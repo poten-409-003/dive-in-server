@@ -1,24 +1,24 @@
 package com.poten.dive_in.pool.entity;
 
-import com.poten.dive_in.common.entity.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-@Getter @Builder
+@Getter
+@Builder
 @AllArgsConstructor
 @RequiredArgsConstructor
 @Entity
-@Table(name="pool_img")
+@Table(name = "pool_img")
 public class PoolImage {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer imgId;
 
     @ManyToOne
-    @JoinColumn(name = "pool_id" )
+    @JoinColumn(name = "pool_id")
     private Pool pool;
 
     private String rprsImgYn; //대표이미지 여부

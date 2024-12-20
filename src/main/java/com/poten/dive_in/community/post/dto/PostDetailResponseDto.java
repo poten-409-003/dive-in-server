@@ -3,7 +3,6 @@ package com.poten.dive_in.community.post.dto;
 import com.poten.dive_in.common.service.DateTimeUtil;
 import com.poten.dive_in.community.comment.dto.CommentResponseDTO;
 import com.poten.dive_in.community.post.entity.Post;
-import com.poten.dive_in.community.post.entity.PostLike;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -27,7 +26,7 @@ public class PostDetailResponseDto {
     private List<CommentResponseDTO> commentList;
     private Boolean isLiked;
 
-    public static PostDetailResponseDto ofEntity(Post post){
+    public static PostDetailResponseDto ofEntity(Post post) {
 
         List<PostImageDto> postImageDtoList = (post.getImages() != null) ?
                 post.getImages().stream()
@@ -55,6 +54,7 @@ public class PostDetailResponseDto {
                 .commentList(commentResponseDTOList)
                 .build();
     }
+
     public void assignIsLiked(Boolean isliked) {
         this.isLiked = isliked;
     }

@@ -3,11 +3,11 @@ package com.poten.dive_in.auth.service;
 import com.poten.dive_in.auth.dto.KakaoAccountDto;
 import com.poten.dive_in.auth.dto.LoginResponseDto;
 import com.poten.dive_in.auth.dto.UserProfileDto;
-import com.poten.dive_in.auth.entity.MemberRole;
-import com.poten.dive_in.auth.jwt.JwtTokenProvider;
 import com.poten.dive_in.auth.entity.Member;
+import com.poten.dive_in.auth.entity.MemberRole;
 import com.poten.dive_in.auth.entity.TokenManager;
 import com.poten.dive_in.auth.enums.Role;
+import com.poten.dive_in.auth.jwt.JwtTokenProvider;
 import com.poten.dive_in.auth.repository.MemberRepository;
 import com.poten.dive_in.auth.repository.MemberRoleRepository;
 import com.poten.dive_in.auth.repository.TokenManagerRepository;
@@ -40,8 +40,8 @@ public class AuthService {
     private final S3Service s3Service;
 
     @Transactional(readOnly = true)
-    public UserProfileDto getUserProfile(String email){
-        Member member = memberRepository.findByEmail(email).orElseThrow(()-> new EntityNotFoundException("사용자가 존재하지 않습니다."));
+    public UserProfileDto getUserProfile(String email) {
+        Member member = memberRepository.findByEmail(email).orElseThrow(() -> new EntityNotFoundException("사용자가 존재하지 않습니다."));
         return UserProfileDto.ofEntity(member);
     }
 
@@ -79,7 +79,7 @@ public class AuthService {
 
 
     @Transactional
-    public LoginResponseDto login(KakaoAccountDto kakaoAccountDto,HttpServletResponse response){
+    public LoginResponseDto login(KakaoAccountDto kakaoAccountDto, HttpServletResponse response) {
 
         String email = kakaoAccountDto.getEmail();
 
@@ -108,8 +108,6 @@ public class AuthService {
         });
 
 
-
-
         // 이메일로 회원 조회
         Member member = memberRepository.findByEmail(email).orElseGet(() -> {
 
@@ -126,8 +124,8 @@ public class AuthService {
         });
 
         // AccessToken 및 Refresh Token 발급
-        String accessToken = jwtTokenProvider.createAccessToken(member.getId(),member.getEmail(), member.getRole().getName());
-        String refreshToken = jwtTokenProvider.createRefreshToken(member.getId(),member.getEmail(),member.getRole().getName());
+        String accessToken = jwtTokenProvider.createAccessToken(member.getId(), member.getEmail(), member.getRole().getName());
+        String refreshToken = jwtTokenProvider.createRefreshToken(member.getId(), member.getEmail(), member.getRole().getName());
 
         // 응답 헤더에 Access Token 및 Refresh Token 추가
         response.setHeader("Authorization", "Bearer " + accessToken);
@@ -165,8 +163,8 @@ public class AuthService {
     }
 
     @Transactional
-    public void deleteUser(String email, HttpServletRequest request, HttpServletResponse response){
-        Member member = memberRepository.findByEmail(email).orElseThrow(()-> new EntityNotFoundException("회원 정보가 없습니다."));
+    public void deleteUser(String email, HttpServletRequest request, HttpServletResponse response) {
+        Member member = memberRepository.findByEmail(email).orElseThrow(() -> new EntityNotFoundException("회원 정보가 없습니다."));
 
         String refreshToken = getJwtFromRequest(request, "X-Refresh-Token");
         if (refreshToken != null) {
@@ -174,8 +172,6 @@ public class AuthService {
         }
         memberRepository.delete(member);
     }
-
-
 
 
     // Request에서 JWT 토큰을 추출하는 메서드

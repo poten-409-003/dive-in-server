@@ -1,6 +1,5 @@
 package com.poten.dive_in.lesson.dto;
 
-import com.poten.dive_in.cmmncode.entity.CommonCode;
 import com.poten.dive_in.lesson.entity.LessonKeyword;
 import com.poten.dive_in.lesson.entity.SwimClass;
 import com.poten.dive_in.lesson.entity.SwimClassImage;
@@ -9,11 +8,12 @@ import lombok.Getter;
 import lombok.ToString;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-@Getter @Builder @ToString
+@Getter
+@Builder
+@ToString
 public class LessonListResponseDto {
     private Long id;
     private String academyName;
@@ -26,7 +26,7 @@ public class LessonListResponseDto {
     public static LessonListResponseDto ofEntity(SwimClass swimClass) {
         Set<LessonKeyword> lessonKeywords = swimClass.getKeywords();
         String keywords = null;
-        if (lessonKeywords!= null && lessonKeywords.size() != 0) {
+        if (lessonKeywords != null && lessonKeywords.size() != 0) {
             List<String> keywordList = new ArrayList<>();
             for (LessonKeyword keyword : lessonKeywords) {
                 keywordList.add(keyword.getKeyword().getCodeName());
@@ -55,7 +55,7 @@ public class LessonListResponseDto {
                 .academyImageUrl(url)
                 .keyword(keywords)
                 .lessonName(swimClass.getName() != null ? swimClass.getName() : null)
-                .price(swimClass.getPrice() != null ? String.valueOf(swimClass.getPrice())  : null)
+                .price(swimClass.getPrice() != null ? String.valueOf(swimClass.getPrice()) : null)
                 .build();
-        }
+    }
 }

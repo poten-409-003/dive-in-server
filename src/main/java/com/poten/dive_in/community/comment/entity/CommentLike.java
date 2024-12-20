@@ -3,11 +3,11 @@ package com.poten.dive_in.community.comment.entity;
 
 import com.poten.dive_in.auth.entity.Member;
 import com.poten.dive_in.common.entity.CreateTimeEntity;
-import com.poten.dive_in.community.post.entity.Post;
 import jakarta.persistence.*;
-import lombok.*;
-
-import java.time.LocalDateTime;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
 @Builder

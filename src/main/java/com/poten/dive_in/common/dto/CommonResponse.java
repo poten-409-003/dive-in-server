@@ -13,7 +13,7 @@ public class CommonResponse<T> {
     private String message;
     private T data;
 
-    public static<T> CommonResponse<T> success(final String message){
+    public static <T> CommonResponse<T> success(final String message) {
         return CommonResponse.<T>builder()
                 .data(null)
                 .success(true)
@@ -21,7 +21,7 @@ public class CommonResponse<T> {
                 .build();
     }
 
-    public static<T> CommonResponse<T> success(final String message, final T data){
+    public static <T> CommonResponse<T> success(final String message, final T data) {
         return CommonResponse.<T>builder()
                 .data(data)
                 .success(true)
@@ -29,7 +29,7 @@ public class CommonResponse<T> {
                 .build();
     }
 
-    public static<T> CommonResponse<T> error(final String message){
+    public static <T> CommonResponse<T> error(final String message) {
         return CommonResponse.<T>builder()
                 .data(null)
                 .success(false)
@@ -37,7 +37,7 @@ public class CommonResponse<T> {
                 .build();
     }
 
-    public static<T> CommonResponse<T> error(final String message,T data){
+    public static <T> CommonResponse<T> error(final String message, T data) {
         return CommonResponse.<T>builder()
                 .data(data)
                 .success(false)

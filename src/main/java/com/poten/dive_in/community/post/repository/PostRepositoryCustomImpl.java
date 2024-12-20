@@ -14,11 +14,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 public class PostRepositoryCustomImpl implements PostRepositoryCustom {
@@ -43,7 +41,7 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
         QCommonCode qCommonCode = QCommonCode.commonCode;
         QComment qComment = QComment.comment;
         QPostImage qPostImage = QPostImage.postImage;
-        QPostLike  qPostLike = QPostLike.postLike;
+        QPostLike qPostLike = QPostLike.postLike;
 
 //        Post result = queryFactory
 //                .selectFrom(qPost)

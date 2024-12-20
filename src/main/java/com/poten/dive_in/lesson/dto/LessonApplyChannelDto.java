@@ -1,7 +1,6 @@
 package com.poten.dive_in.lesson.dto;
 
 import com.poten.dive_in.lesson.entity.ApplicationMethod;
-import com.poten.dive_in.lesson.entity.SwimClass;
 import lombok.Builder;
 import lombok.Getter;
 

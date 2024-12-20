@@ -13,7 +13,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Slf4j
-@Getter @Builder @ToString
+@Getter
+@Builder
+@ToString
 public class PoolDetailResponseDto {
 
     private Long id;
@@ -51,7 +53,7 @@ public class PoolDetailResponseDto {
     @JsonProperty("lessons")
     private List<LessonListResponseDto> lessonListResponseDtoList;
 
-    public static PoolDetailResponseDto ofEntity(Pool pool){
+    public static PoolDetailResponseDto ofEntity(Pool pool) {
 
         List<PoolImageDto> poolImageDtoList = (pool.getImageList() != null) ?
                 pool.getImageList().stream()
@@ -87,6 +89,6 @@ public class PoolDetailResponseDto {
                 .poolImageDtoList(poolImageDtoList)
                 .lessonListResponseDtoList(lessonListResponseDtoList)
                 .build();
-        }
     }
+}
 

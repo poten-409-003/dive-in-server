@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
-@Table(name="CmmnCd")
+@Table(name = "CmmnCd")
 public class CommonCode extends BaseTimeEntity {
 
     @Id

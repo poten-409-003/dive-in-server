@@ -4,10 +4,11 @@ import com.poten.dive_in.auth.entity.Member;
 import com.poten.dive_in.cmmncode.entity.CommonCode;
 import com.poten.dive_in.common.entity.BaseTimeEntity;
 import com.poten.dive_in.community.comment.entity.Comment;
-import com.poten.dive_in.pool.entity.PoolImage;
 import jakarta.persistence.*;
-
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.util.*;
 
@@ -72,11 +73,14 @@ public class Post extends BaseTimeEntity {
     public void adjustViewCount() {
         this.viewCount += 1;
     }
+
     public void adjustLikeCount(int increment) {
         this.likeCount += increment;
     }
 
-    public void adjustCommentCount(int increment) { this.commentCount += increment; }
+    public void adjustCommentCount(int increment) {
+        this.commentCount += increment;
+    }
 
     public void updatePost(CommonCode code, String content, String title) {
         this.categoryCode = code;
@@ -88,11 +92,11 @@ public class Post extends BaseTimeEntity {
         this.images = postImageList;
     }
 
-    public void replaceImageList(Set<PostImage> newPostImageList){
+    public void replaceImageList(Set<PostImage> newPostImageList) {
         if (this.images != null) {
             this.images.clear();
             this.images.addAll(newPostImageList);
-        } else{
+        } else {
             this.images = new HashSet<>(newPostImageList);
         }
     }
@@ -105,6 +109,7 @@ public class Post extends BaseTimeEntity {
             this.comments = new ArrayList<>(commentList);
         }
     }
+
     public void sortComments() {
         this.comments.sort(Comparator.comparing(Comment::getGroupName)
                 .thenComparing(Comment::getCmntClass)

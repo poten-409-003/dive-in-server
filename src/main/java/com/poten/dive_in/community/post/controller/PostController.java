@@ -1,12 +1,10 @@
 package com.poten.dive_in.community.post.controller;
 
-import com.poten.dive_in.cmmncode.service.CmmnCdService;
 import com.poten.dive_in.common.dto.CommonResponse;
+import com.poten.dive_in.community.post.dto.PostDetailResponseDto;
 import com.poten.dive_in.community.post.dto.PostListResponseDto;
 import com.poten.dive_in.community.post.dto.PostRequestDto;
-import com.poten.dive_in.community.post.dto.PostDetailResponseDto;
 import com.poten.dive_in.community.post.entity.Post;
-import com.poten.dive_in.community.post.entity.PostImage;
 import com.poten.dive_in.community.post.service.PostService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +14,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
@@ -26,7 +23,7 @@ public class PostController {
     private final PostService postService;
 
     @PostMapping
-    public ResponseEntity<CommonResponse<PostDetailResponseDto>> createPost(@Valid PostRequestDto requestDTO, @RequestParam(value = "images",required = false)List<MultipartFile> multipartFileList) {
+    public ResponseEntity<CommonResponse<PostDetailResponseDto>> createPost(@Valid PostRequestDto requestDTO, @RequestParam(value = "images", required = false) List<MultipartFile> multipartFileList) {
         PostDetailResponseDto postDetailResponseDto = postService.createPost(requestDTO, multipartFileList);
         return new ResponseEntity<>(CommonResponse.success("글 등록 완료", postDetailResponseDto), HttpStatus.CREATED); //201
     }
@@ -38,7 +35,7 @@ public class PostController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<CommonResponse<PostDetailResponseDto>> updatePost(@PathVariable("id") Long id, @Valid PostRequestDto requestDTO, @RequestParam(value = "images",required = false)List<MultipartFile> multipartFileList) {
+    public ResponseEntity<CommonResponse<PostDetailResponseDto>> updatePost(@PathVariable("id") Long id, @Valid PostRequestDto requestDTO, @RequestParam(value = "images", required = false) List<MultipartFile> multipartFileList) {
         Post post = postService.updatePost(id, requestDTO, multipartFileList);
         return new ResponseEntity<>(CommonResponse.success("글 수정 완료", PostDetailResponseDto.ofEntity(post)), HttpStatus.OK); //200
     }

@@ -94,11 +94,11 @@ public class Pool extends BaseTimeEntity {
         this.zipCode = poolRequestDto.getZipCode();
         this.operatingHours = poolRequestDto.getOperatingHours();
         this.dayOff = poolRequestDto.getClosingDays();
-        this.latitude = Double.valueOf(poolRequestDto.getLatitude()) ;
+        this.latitude = Double.valueOf(poolRequestDto.getLatitude());
         this.longitude = Double.valueOf(poolRequestDto.getLongitude());
         this.telephone = poolRequestDto.getContact();
-        this.laneLength = String.valueOf(poolRequestDto.getLaneLength()) ;
-        this.laneCount =  String.valueOf(poolRequestDto.getLaneCount());
+        this.laneLength = String.valueOf(poolRequestDto.getLaneLength());
+        this.laneCount = String.valueOf(poolRequestDto.getLaneCount());
         this.maximumDepth = poolRequestDto.getMaxDepth();
         this.minimumDepth = poolRequestDto.getMinDepth();
 //        this.amenityCode = poolRequestDto.getFacilities();
@@ -106,11 +106,11 @@ public class Pool extends BaseTimeEntity {
 //        this.region = poolRequestDto.getRegion();
     }
 
-    public void replaceImageList(List<PoolImage> newPoolImageList){
+    public void replaceImageList(List<PoolImage> newPoolImageList) {
         if (this.imageList != null) {
             this.imageList.clear();
             this.imageList.addAll(newPoolImageList);
-        } else{
+        } else {
             this.imageList = new ArrayList<>(newPoolImageList);
         }
     }

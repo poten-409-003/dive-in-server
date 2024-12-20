@@ -1,7 +1,6 @@
 package com.poten.dive_in.lesson.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.poten.dive_in.lesson.entity.SwimClass;
 import com.poten.dive_in.lesson.enums.LessonStatus;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Builder;
@@ -9,7 +8,8 @@ import lombok.Getter;
 
 import java.util.List;
 
-@Getter @Builder
+@Getter
+@Builder
 public class LessonRequestDto {
 
     @NotEmpty(message = "수업명은 필수입니다.")
@@ -29,7 +29,7 @@ public class LessonRequestDto {
 
     private LessonStatus lessonStatus;
 
-//    private Long academyId;
+    //    private Long academyId;
     private Long coachTeamId;
 
     private Long poolId;

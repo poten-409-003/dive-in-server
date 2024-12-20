@@ -2,9 +2,7 @@ package com.poten.dive_in.lesson.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.poten.dive_in.instructor.dto.LessonInstructorResponseDto;
-import com.poten.dive_in.lesson.entity.LessonKeyword;
 import com.poten.dive_in.lesson.entity.SwimClass;
-import com.poten.dive_in.lesson.enums.LessonStatus;
 import com.poten.dive_in.pool.dto.PoolListResponseDto;
 import lombok.Builder;
 import lombok.Getter;
@@ -14,7 +12,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Getter @Builder @ToString
+@Getter
+@Builder
+@ToString
 public class LessonDetailResponseDto {
 
     private Long id;
@@ -77,7 +77,7 @@ public class LessonDetailResponseDto {
                 .level(swimClass.getLevel() != null ? swimClass.getLevel().getCodeName() : null)
                 .capacity(swimClass.getParticipantCount() != null ? String.valueOf(swimClass.getParticipantCount()) : null)
                 .price(swimClass.getPrice() != null ? String.valueOf(swimClass.getPrice()) : null)
-                .keyword(swimClass.getKeywords() != null && swimClass.getKeywords().size() != 0? swimClass.getKeyword() : null)
+                .keyword(swimClass.getKeywords() != null && swimClass.getKeywords().size() != 0 ? swimClass.getKeyword() : null)
                 .lessonDetail(swimClass.getIntroduction() != null ? swimClass.getIntroduction() : null)
                 .lessonSchedule(swimClass.getOperatingHours() != null ? swimClass.getOperatingHours() : null)
                 .lessonStatus(swimClass.getIsActive() != null ? swimClass.getIsActive() : null)

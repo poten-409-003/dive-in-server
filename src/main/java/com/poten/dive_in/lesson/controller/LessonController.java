@@ -1,17 +1,16 @@
 package com.poten.dive_in.lesson.controller;
 
 import com.poten.dive_in.common.dto.CommonResponse;
-import com.poten.dive_in.lesson.dto.LessonListResponseDto;
-import com.poten.dive_in.lesson.dto.LessonRequestDto;
 import com.poten.dive_in.lesson.dto.LessonDetailResponseDto;
+import com.poten.dive_in.lesson.dto.LessonListResponseDto;
 import com.poten.dive_in.lesson.service.LessonService;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
@@ -33,15 +32,15 @@ public class LessonController {
 //    }
 
     @GetMapping("/lessons")
-    public ResponseEntity<CommonResponse<List<LessonListResponseDto>>> getLessonList(){
-        List<LessonListResponseDto> lessonResponseDtoList =lessonService.getLessonList();
-        return new ResponseEntity<>(CommonResponse.success(null,lessonResponseDtoList), HttpStatus.OK);
+    public ResponseEntity<CommonResponse<List<LessonListResponseDto>>> getLessonList() {
+        List<LessonListResponseDto> lessonResponseDtoList = lessonService.getLessonList();
+        return new ResponseEntity<>(CommonResponse.success(null, lessonResponseDtoList), HttpStatus.OK);
     }
 
     @GetMapping("/lessons/{id}")
-    public ResponseEntity<CommonResponse<LessonDetailResponseDto>> getLessonDetail(@PathVariable Long id){
-        LessonDetailResponseDto lessonResponseDto =lessonService.getLessonDetail(id);
-        return new ResponseEntity<>(CommonResponse.success(null,lessonResponseDto), HttpStatus.OK);
+    public ResponseEntity<CommonResponse<LessonDetailResponseDto>> getLessonDetail(@PathVariable Long id) {
+        LessonDetailResponseDto lessonResponseDto = lessonService.getLessonDetail(id);
+        return new ResponseEntity<>(CommonResponse.success(null, lessonResponseDto), HttpStatus.OK);
     }
 
 }

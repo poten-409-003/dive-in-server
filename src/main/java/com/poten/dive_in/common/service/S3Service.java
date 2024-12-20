@@ -27,14 +27,14 @@ public class S3Service {
     private final AmazonS3 s3Client;
 
     // 여러 개 파일 업로드
-    public List<String> uploadFile(List<MultipartFile> multipartFiles){
-        if(multipartFiles==null || multipartFiles.isEmpty()){
+    public List<String> uploadFile(List<MultipartFile> multipartFiles) {
+        if (multipartFiles == null || multipartFiles.isEmpty()) {
             throw new IllegalStateException("업로드 할 파일이 없습니다");
         }
 
         List<String> fileUrlList = new ArrayList<>();
-        multipartFiles.forEach(file->{
-            if(file.isEmpty()){
+        multipartFiles.forEach(file -> {
+            if (file.isEmpty()) {
                 throw new IllegalStateException("빈 파일은 업로드 할 수 없습니다.");
             }
 
@@ -44,10 +44,10 @@ public class S3Service {
             objectMetadata.setContentType(file.getContentType());
 
 
-            try(InputStream inputStream = file.getInputStream()){
-                s3Client.putObject(new PutObjectRequest(bucket, fileName,inputStream,objectMetadata)
+            try (InputStream inputStream = file.getInputStream()) {
+                s3Client.putObject(new PutObjectRequest(bucket, fileName, inputStream, objectMetadata)
                         .withCannedAcl(CannedAccessControlList.PublicRead));
-            } catch (IOException e){
+            } catch (IOException e) {
                 throw new S3UploadException("파일 업로드에 실패하였습니다.", e);
             }
 
@@ -59,33 +59,33 @@ public class S3Service {
     }
 
     // 파일 삭제
-    public void deleteFile(String fileName){
-        try{
-            s3Client.deleteObject(new DeleteObjectRequest(bucket,fileName));
-        }catch (Exception e){
+    public void deleteFile(String fileName) {
+        try {
+            s3Client.deleteObject(new DeleteObjectRequest(bucket, fileName));
+        } catch (Exception e) {
             throw new RuntimeException("파일 삭제 실패했습니다.");
         }
     }
 
-    private String createFileName(String fileName){
+    private String createFileName(String fileName) {
         return UUID.randomUUID().toString().concat(getFileExtension(fileName));
     }
 
     // 파일 유효성 검사
-    private String getFileExtension(String fileName){
-        if(fileName.isBlank()){
+    private String getFileExtension(String fileName) {
+        if (fileName.isBlank()) {
             throw new IllegalArgumentException("파일 이름이 비어있습니다.");
         }
-        List<String> fileValidate = List.of(".jpg",".jpeg",".png",".webp");
+        List<String> fileValidate = List.of(".jpg", ".jpeg", ".png", ".webp");
 
         String fileExtension = fileName.substring(fileName.lastIndexOf(".")).toLowerCase();
-        if(!fileValidate.contains(fileExtension)){
-            throw new IllegalArgumentException(fileExtension +"는 지원하지 않는 파일 확장자입니다.");
+        if (!fileValidate.contains(fileExtension)) {
+            throw new IllegalArgumentException(fileExtension + "는 지원하지 않는 파일 확장자입니다.");
         }
         return fileExtension;
     }
 
-    public static String extractFileName(String imageUrl){
+    public static String extractFileName(String imageUrl) {
         return imageUrl.substring(imageUrl.lastIndexOf(".com/") + 5);
     }
 }

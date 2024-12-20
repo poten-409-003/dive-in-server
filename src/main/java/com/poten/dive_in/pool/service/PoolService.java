@@ -3,9 +3,9 @@ package com.poten.dive_in.pool.service;
 import com.poten.dive_in.cmmncode.entity.CommonCode;
 import com.poten.dive_in.cmmncode.repository.CmmnCdRepository;
 import com.poten.dive_in.common.service.S3Service;
+import com.poten.dive_in.pool.dto.PoolDetailResponseDto;
 import com.poten.dive_in.pool.dto.PoolListResponseDto;
 import com.poten.dive_in.pool.dto.PoolRequestDto;
-import com.poten.dive_in.pool.dto.PoolDetailResponseDto;
 import com.poten.dive_in.pool.entity.Pool;
 import com.poten.dive_in.pool.entity.PoolImage;
 import com.poten.dive_in.pool.repository.PoolRepository;
@@ -30,7 +30,7 @@ public class PoolService {
     private final CmmnCdRepository cmmnCdRepository;
 
     @Transactional
-    public PoolDetailResponseDto createPool(PoolRequestDto poolRequestDto, List<MultipartFile> multipartFileList){
+    public PoolDetailResponseDto createPool(PoolRequestDto poolRequestDto, List<MultipartFile> multipartFileList) {
 
         CommonCode commonCode = cmmnCdRepository.findByCodeName(poolRequestDto.getFacilities()).orElseThrow(() -> new EntityNotFoundException("존재하지 않는 편의시설입니다."));
         // DTO -> 엔티티 변환
@@ -38,9 +38,9 @@ public class PoolService {
         pool.updateAmenityCode(commonCode);
 
         // 이미지가 있는 경우만
-        if (multipartFileList !=null && !multipartFileList.isEmpty()){
+        if (multipartFileList != null && !multipartFileList.isEmpty()) {
 
-            List<PoolImage> poolImageList = uploadAndCreatePoolImages(multipartFileList,pool);
+            List<PoolImage> poolImageList = uploadAndCreatePoolImages(multipartFileList, pool);
 
             pool.addImage(poolImageList);
         }
@@ -58,8 +58,8 @@ public class PoolService {
     }
 
     @Transactional(readOnly = true)
-    public PoolDetailResponseDto getPool(Long poolId){
-        Pool pool = poolRepository.findById(poolId).orElseThrow(()-> new EntityNotFoundException("존재하지 않는 수영장입니다."));
+    public PoolDetailResponseDto getPool(Long poolId) {
+        Pool pool = poolRepository.findById(poolId).orElseThrow(() -> new EntityNotFoundException("존재하지 않는 수영장입니다."));
         return PoolDetailResponseDto.ofEntity(pool);
     }
 
@@ -83,7 +83,7 @@ public class PoolService {
     }
 
     @Transactional
-    public void deletePool(Long poolId){
+    public void deletePool(Long poolId) {
         Pool pool = poolRepository.findById(poolId).orElseThrow(() -> new EntityNotFoundException("존재하지 않는 수영장입니다."));
 
         deletePoolImagesFromS3(pool.getImageList());
@@ -100,7 +100,7 @@ public class PoolService {
 
             PoolImage poolImage = PoolImage.builder()
                     .imgUrl(uploadFileList.get(i))
-                    .rprsImgYn(repImage ? "Y":"N")
+                    .rprsImgYn(repImage ? "Y" : "N")
                     .pool(pool)
                     .build();
             poolImageList.add(poolImage);
