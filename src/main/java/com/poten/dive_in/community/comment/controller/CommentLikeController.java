@@ -15,13 +15,13 @@ public class CommentLikeController {
     private final CommentLikeService commentLikeService;
 
     @PostMapping("/{id}/like")
-    public ResponseEntity<CommonResponse<Boolean>> likePost(@PathVariable("id") Long id, @RequestParam Long memberId) {
+    public ResponseEntity<CommonResponse<Boolean>> likePost(@PathVariable("id") Long id, @RequestParam("memberId") Long memberId) {
         CommentLike commentLike = commentLikeService.likeComment(id, memberId);
         return new ResponseEntity<>(CommonResponse.success(null, true), HttpStatus.CREATED);
     }
 
     @DeleteMapping("/{id}/like")
-    public ResponseEntity<CommonResponse<Boolean>> unlikePost(@PathVariable("id") Long id, @RequestParam Long memberId) {
+    public ResponseEntity<CommonResponse<Boolean>> unlikePost(@PathVariable("id") Long id, @RequestParam("memberId") Long memberId) {
         commentLikeService.unlikeComment(id, memberId);
         return new ResponseEntity<>(CommonResponse.success(null, true), HttpStatus.OK);
     }

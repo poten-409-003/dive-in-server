@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
+@Table(name = "token_mngr")
 public class TokenManager extends BaseTimeEntity {
 
     @Id

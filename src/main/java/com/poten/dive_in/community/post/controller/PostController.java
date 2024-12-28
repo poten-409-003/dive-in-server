@@ -29,7 +29,7 @@ public class PostController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<CommonResponse<Boolean>> deletePost(@PathVariable("id") Long id, @RequestParam Long memberId) {
+    public ResponseEntity<CommonResponse<Boolean>> deletePost(@PathVariable("id") Long id, @RequestParam("memberId") Long memberId) {
         postService.deletePost(id, memberId);
         return new ResponseEntity<>(CommonResponse.success("글 삭제 완료", true), HttpStatus.NO_CONTENT); //204
     }
