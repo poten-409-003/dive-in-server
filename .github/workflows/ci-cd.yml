@@ -23,20 +23,52 @@ jobs:
         with:
           java-version: '17'
           distribution: 'zulu'
-      # NCP ACG GitHub Actions ip add
-      - name: Setting NCP CLI & Credentials
+      # Bearer Token 발급
+      - name: Get NCP Bearer Token
+        id: get_token
         run: |
-          cd ~
-          wget --tries=5 --timeout=3000 https://www.ncloud.com/api/support/download/5/65
-          unzip 65
-          mkdir ~/.ncloud
-          echo -e "[DEFAULT]\nncloud_access_key_id = ${{ secrets.NCP_ACCESS_KEY }}\nncloud_secret_access_key = ${{ secrets.NCP_SECRET_KEY }}\nncloud_api_url = ${{ secrets.NCP_API_URL }}" >> ~/.ncloud/configure
+          TOKEN_RESPONSE=$(curl -X POST "https://api.ncloud.com/v2/common/token" \
+          -H "Content-Type: application/json" \
+          -d '{
+            "accessKey": "${{ secrets.NCP_ACCESS_KEY }}",
+            "secretKey": "${{ secrets.NCP_SECRET_KEY }}"
+          }')
+          echo "Bearer Token: $(echo $TOKEN_RESPONSE | jq -r '.token')"
+          echo "NCP_ACCESS_TOKEN=$(echo $TOKEN_RESPONSE | jq -r '.token')" >> $GITHUB_ENV
+
+      # Add GitHub Action IP to Security group
       - name: Add Github Action Ip to Security group
         run: |
-          chmod -R 777 ~/cli_linux
-          cd ~/cli_linux
-          ./ncloud vserver addAccessControlGroupInboundRule --regionCode KR --vpcNo ${{ secrets.NCP_VPC_NO }} --accessControlGroupNo ${{ secrets.NCP_DB_AGC_NO }} --accessControlGroupRuleList "protocolTypeCode='TCP', ipBlock='${{ steps.ip.outputs.ipv4 }}/32', portRange='${{ secrets.NCP_DB_PORT }}'"
-          ./ncloud vserver addAccessControlGroupInboundRule --regionCode KR --vpcNo ${{ secrets.NCP_VPC_NO }} --accessControlGroupNo ${{ secrets.NCP_WEB_AGC_NO }} --accessControlGroupRuleList "protocolTypeCode='TCP', ipBlock='${{ steps.ip.outputs.ipv4 }}/32', portRange='${{ secrets.NCP_SSH_PORT }}'"
+          curl -X POST "https://api.ncloud.com/v2/compute/vserver/acg/addAccessControlGroupInboundRule" \
+          -H "Content-Type: application/json" \
+          -H "Authorization: Bearer ${{ env.NCP_ACCESS_TOKEN }}" \
+          -d '{
+            "regionCode": "KR",
+            "vpcNo": "${{ secrets.NCP_VPC_NO }}",
+            "accessControlGroupNo": "${{ secrets.NCP_DB_AGC_NO }}",
+            "accessControlGroupRuleList": [
+              {
+                "protocolTypeCode": "TCP",
+                "ipBlock": "${{ steps.ip.outputs.ipv4 }}/32",
+                "portRange": "${{ secrets.NCP_DB_PORT }}"
+              }
+            ]
+          }'
+          curl -X POST "https://api.ncloud.com/v2/compute/vserver/acg/addAccessControlGroupInboundRule" \
+          -H "Content-Type: application/json" \
+          -H "Authorization: Bearer ${{ env.NCP_ACCESS_TOKEN }}" \
+          -d '{
+            "regionCode": "KR",
+            "vpcNo": "${{ secrets.NCP_VPC_NO }}",
+            "accessControlGroupNo": "${{ secrets.NCP_WEB_AGC_NO }}",
+            "accessControlGroupRuleList": [
+              {
+                "protocolTypeCode": "TCP",
+                "ipBlock": "${{ steps.ip.outputs.ipv4 }}/32",
+                "portRange": "${{ secrets.NCP_SSH_PORT }}"
+              }
+            ]
+          }'
       # Application YML 파일 생성
       - name: Make application.yml
         run: |
@@ -63,15 +95,6 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
-      # Docker image pull & run (로컬에서 바로 실행)
-      - name: Docker image pull and run locally
-        run: |
-          docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
-          docker network create web-network || true
-          docker stop diveincontainer || true
-          docker rm -f diveincontainer || true
-          docker pull ${{ secrets.DOCKER_USERNAME }}/dive-in
-          docker run -d -p 8080:8080 --network web-network --name diveincontainer ${{ secrets.DOCKER_USERNAME }}/dive-in
       # NCP 서버에 SSH 접속하여 Docker 이미지 실행
       - name: Deploy to NCP Server
         uses: appleboy/ssh-action@v0.1.6
@@ -87,10 +110,36 @@ jobs:
             docker rm -f diveincontainer || true
             docker pull ${{ secrets.DOCKER_USERNAME }}/dive-in
             docker run -d -p 8080:8080 --network web-network --name diveincontainer ${{ secrets.DOCKER_USERNAME }}/dive-in
-      - name: Remove Github Action Ip to Security group
+      # Remove Github Action Ip from Security group
+      - name: Remove Github Action Ip from Security group
         run: |
-          chmod -R 777 ~/cli_linux
-          cd ~/cli_linux
-          ./ncloud vserver removeAccessControlGroupInboundRule --regionCode KR --vpcNo ${{ secrets.NCP_VPC_NO }} --accessControlGroupNo ${{ secrets.NCP_DB_AGC_NO }} --accessControlGroupRuleList "protocolTypeCode='TCP', ipBlock='${{ steps.ip.outputs.ipv4 }}/32', portRange='${{ secrets.NCP_DB_PORT }}'"
-          ./ncloud vserver removeAccessControlGroupInboundRule --regionCode KR --vpcNo ${{ secrets.NCP_VPC_NO }} --accessControlGroupNo ${{ secrets.NCP_WEB_AGC_NO }} --accessControlGroupRuleList "protocolTypeCode='TCP', ipBlock='${{ steps.ip.outputs.ipv4 }}/32', portRange='${{ secrets.NCP_SSH_PORT }}'"
-
+          curl -X POST "https://api.ncloud.com/v2/compute/vserver/acg/removeAccessControlGroupInboundRule" \
+          -H "Content-Type: application/json" \
+          -H "Authorization: Bearer ${{ env.NCP_ACCESS_TOKEN }}" \
+          -d '{
+            "regionCode": "KR",
+            "vpcNo": "${{ secrets.NCP_VPC_NO }}",
+            "accessControlGroupNo": "${{ secrets.NCP_DB_AGC_NO }}",
+            "accessControlGroupRuleList": [
+              {
+                "protocolTypeCode": "TCP",
+                "ipBlock": "${{ steps.ip.outputs.ipv4 }}/32",
+                "portRange": "${{ secrets.NCP_DB_PORT }}"
+              }
+            ]
+          }'
+          curl -X POST "https://api.ncloud.com/v2/compute/vserver/acg/removeAccessControlGroupInboundRule" \
+          -H "Content-Type: application/json" \
+          -H "Authorization: Bearer ${{ env.NCP_ACCESS_TOKEN }}" \
+          -d '{
+            "regionCode": "KR",
+            "vpcNo": "${{ secrets.NCP_VPC_NO }}",
+            "accessControlGroupNo": "${{ secrets.NCP_WEB_AGC_NO }}",
+            "accessControlGroupRuleList": [
+              {
+                "protocolTypeCode": "TCP",
+                "ipBlock": "${{ steps.ip.outputs.ipv4 }}/32",
+                "portRange": "${{ secrets.NCP_SSH_PORT }}"
+              }
+            ]
+          }'
