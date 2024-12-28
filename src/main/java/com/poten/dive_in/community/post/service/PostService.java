@@ -49,7 +49,13 @@ public class PostService {
         if (categoryName == null) {
             throw new IllegalArgumentException("해당 카테고리가 존재하지 않습니다.");
         }
+        if ("수영대회".equals(categoryName)) {
+            if (member.getRole().getId() == 1) {
+                throw new IllegalArgumentException("글 작성 권한이 없습니다.");
+            }
+        }
         CommonCode commonCode = cmmnCdRepository.findByCodeName(categoryName).orElseThrow(() -> new EntityNotFoundException("해당 카테고리가 공통코드에 존재하지 않습니다."));
+
         String filteredTitle = badwordFiltering(postRequestDTO.getTitle());
         String filteredContent = badwordFiltering(postRequestDTO.getContent());
         Post post = Post.builder()
@@ -85,10 +91,17 @@ public class PostService {
     public void deletePost(Long id, Long memberId) {
         Post post = postRepository.findByIdWithMember(id)
                 .orElseThrow(() -> new IllegalArgumentException("Post not found"));
-        // 작성자 확인
-        if (!post.getMember().getId().equals(memberId)) {
+        Member member = post.getMember();
+        if ("수영대회".equals(post.getCategoryCode().getCodeName())) {
+            if (member.getRole().getId() == 1) {
+                throw new IllegalArgumentException("글 삭제 권한이 없습니다.");
+            }
+        }
+
+        if (!member.getId().equals(memberId)) {
             throw new IllegalArgumentException("자신의 글만 삭제 가능합니다.");
         }
+
         postRepository.delete(post);
     }
 
@@ -96,8 +109,13 @@ public class PostService {
     public Post updatePost(Long id, PostRequestDto requestDTO, List<MultipartFile> multipartFileList) {
         Post existingPost = postRepository.findByIdWithDetail(id)
                 .orElseThrow(() -> new EntityNotFoundException("해당 글이 존재하지 않습니다."));
-
-        if (!existingPost.getMember().getId().equals(requestDTO.getMemberId())) {
+        Member member = existingPost.getMember();
+        if ("수영대회".equals(existingPost.getCategoryCode().getCodeName())) {
+            if (member.getRole().getId() == 1) {
+                throw new IllegalArgumentException("글 수정 권한이 없습니다.");
+            }
+        }
+        if (!member.getId().equals(requestDTO.getMemberId())) {
             throw new IllegalArgumentException("자신의 글만 수정 가능합니다.");
         }
 
@@ -129,14 +147,18 @@ public class PostService {
 
     @Transactional(readOnly = true)
     public List<PostListResponseDto> getAllPosts(String categoryType, int page) {
-        int pageSize = 10; // 한 페이지당 게시물 수
+        int sizePerPage = 10;
         Page<Post> posts;
-        Pageable pageable = PageRequest.of(page, pageSize);
+
+        Pageable pageable = PageRequest.of(page, sizePerPage);
         if ("none".equals(categoryType)) {
             posts = postRepository.findActivePosts(pageable);
 
         } else if ("popular".equals(categoryType)) {
-            posts = postRepository.findPopularPosts(pageable);
+            List<Post> popularPosts = postRepository.findPopularPosts(pageable);
+            return popularPosts.isEmpty() ? new ArrayList<>() : popularPosts.stream()
+                    .map(PostListResponseDto::ofEntity)
+                    .collect(Collectors.toList());
         } else {
             String koreanName = CategoryType.findKoreanNameByInput(categoryType);
             CommonCode code = cmmnCdRepository.findByCodeName(koreanName).orElseThrow(() -> new EntityNotFoundException("카테고리가 존재하지 않습니다."));
@@ -162,7 +184,7 @@ public class PostService {
 
     @Transactional(readOnly = true)
     public List<PostListResponseDto> getPostsByUserId(Long userId, Integer page) {
-        int pageSize = 20; // 한 페이지당 게시물 수
+        int pageSize = 10;
         Pageable pageable = PageRequest.of(page, pageSize);
         Page<Post> posts = postRepository.findPostsByMemberId(pageable, userId);
         return posts.isEmpty() ? new ArrayList<>() : posts.stream()
@@ -176,7 +198,7 @@ public class PostService {
         List<String> uploadFileList = s3Service.uploadFile(multipartFileList);
 
         for (int i = 0; i < uploadFileList.size(); i++) {
-            boolean repImage = (i == 0); // 첫 번째 이미지를 대표 이미지로 설정
+            boolean repImage = (i == 0);
 
             PostImage postImage = PostImage.builder()
                     .imageUrl(uploadFileList.get(i))
@@ -203,10 +225,24 @@ public class PostService {
         BadWordFiltering badWordFiltering = new BadWordFiltering();
         // 욕 사이의 공백, 숫자, 특수기호 제거
         String cleanedInput = original.replaceAll("[\\s0-9!@#$%^&*()_+=-]", "");
-        String filtered = badWordFiltering.change(cleanedInput);
-        return filtered;
+        if (badWordFiltering.check(cleanedInput)) {
+            return badWordFiltering.change(cleanedInput);
+        }
+        return original;
     }
 
+    @Transactional(readOnly = true)
+    public List<PostListResponseDto> searchPosts(String query, Integer page) {
+        int sizePerPage = 10;
+        if (query == null || query.trim().isEmpty()) {
+            return List.of();
+        }
+
+        Pageable pageable = PageRequest.of(page, sizePerPage);
+        Page<Post> posts = postRepository.searchPosts(query, pageable);
+
+        return posts.stream()
+                .map(PostListResponseDto::ofEntity)
+                .collect(Collectors.toList());
+    }
 }
-
-

@@ -16,8 +16,8 @@ import lombok.*;
 public class PostLike extends CreateTimeEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    @Column(name = "like_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "post_like_id")
     private Long id;
 
     @ManyToOne

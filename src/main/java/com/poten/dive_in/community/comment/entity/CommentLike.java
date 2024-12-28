@@ -18,7 +18,7 @@ import lombok.NoArgsConstructor;
 public class CommentLike extends CreateTimeEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "cmnt_like_id")
     private Long id;
 

@@ -29,7 +29,7 @@ public class PostController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<CommonResponse<Boolean>> deletePost(@PathVariable("id") Long id, @RequestParam Long memberId) {
+    public ResponseEntity<CommonResponse<Boolean>> deletePost(@PathVariable("id") Long id, @RequestParam("memberId") Long memberId) {
         postService.deletePost(id, memberId);
         return new ResponseEntity<>(CommonResponse.success("글 삭제 완료", true), HttpStatus.NO_CONTENT); //204
     }
@@ -58,5 +58,10 @@ public class PostController {
         return new ResponseEntity<>(CommonResponse.success(null, responseDtos), HttpStatus.OK);
     }
 
+    @GetMapping("/search/{pageNum}")
+    public ResponseEntity<CommonResponse<List<PostListResponseDto>>> searchPosts(@RequestParam String query, @PathVariable("pageNum") Integer pageNum) {
+        List<PostListResponseDto> responseDtos = postService.searchPosts(query, pageNum);
+        return new ResponseEntity<>(CommonResponse.success(null, responseDtos), HttpStatus.OK);
+    }
 
 }
