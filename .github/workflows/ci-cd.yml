@@ -27,7 +27,7 @@ jobs:
       - name: Setting NCP CLI & Credentials
         run: |
           cd ~
-          wget --timeout=30000 --tries=5 https://www.ncloud.com/api/support/download/5/65
+          wget --timeout=30000 --tries=5 --verbose https://www.ncloud.com/api/support/download/5/65
           unzip 65
           mkdir ~/.ncloud
           echo -e "[DEFAULT]\nncloud_access_key_id = ${{ secrets.NCP_ACCESS_KEY }}\nncloud_secret_access_key = ${{ secrets.NCP_SECRET_KEY }}\nncloud_api_url = ${{ secrets.NCP_API_URL }}" >> ~/.ncloud/configure
@@ -77,7 +77,7 @@ jobs:
         with:
           host: ${{ secrets.NCP_WEB_SERVER_IP }}  # NCP 서버 IP
           username: ${{ secrets.NCP_SSH_USERNAME }}  # SSH 사용자 이름
-          key: ${{ secrets.NCP_SSH_PRIVATE_KEY }}  # PEM 형식의 SSH 키 사용
+          key: ${{ secrets.NCP_WEB_SSH_PRIVATE_KEY }}  # PEM 형식의 SSH 키 사용
           port: ${{ secrets.NCP_SSH_PORT }}  # SSH 포트
           script: |
             docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
