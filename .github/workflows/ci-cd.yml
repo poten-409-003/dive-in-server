@@ -78,10 +78,11 @@ jobs:
           script: |
             docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
             docker network create web-network || true
+            docker stop diveincontainer || true
+            docker rm -f diveincontainer || true
             cd dive-in-project
             docker pull ${{ secrets.DOCKER_USERNAME }}/dive-in
             docker-compose up -d --force-recreate
-
       # IP를 보안 그룹에서 제거
       - name: Remove Github Action IP from Security group
         run: |
