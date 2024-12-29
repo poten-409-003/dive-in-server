@@ -78,7 +78,7 @@ jobs:
           script: |
             docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
             docker network create web-network || true
-            cd /dive-in-project
+            cd dive-in-project
             docker pull ${{ secrets.DOCKER_USERNAME }}/dive-in
             docker-compose up -d --force-recreate
 
