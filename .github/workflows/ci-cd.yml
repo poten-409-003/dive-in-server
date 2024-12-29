@@ -23,25 +23,27 @@ jobs:
         with:
           java-version: '17'
           distribution: 'zulu'
-      # Bearer Token 발급
-      - name: Get NCP Bearer Token
-        id: get_token
+      # 시그니처 생성
+      - name: Generate Signature
+        id: generate_signature
         run: |
-          TOKEN_RESPONSE=$(curl -X POST "https://api.ncloud.com/v2/common/token" \
-          -H "Content-Type: application/json" \
-          -d '{
-            "accessKey": "${{ secrets.NCP_ACCESS_KEY }}",
-            "secretKey": "${{ secrets.NCP_SECRET_KEY }}"
-          }')
-          echo "Bearer Token: $(echo $TOKEN_RESPONSE | jq -r '.token')"
-          echo "NCP_ACCESS_TOKEN=$(echo $TOKEN_RESPONSE | jq -r '.token')" >> $GITHUB_ENV
+          TIMESTAMP=$(date +%s%N | cut -b1-13)  
+          ACCESS_KEY="${{ secrets.NCP_ACCESS_KEY }}"
+          SECRET_KEY="${{ secrets.NCP_SECRET_KEY }}"
+          METHOD="POST"
+          URI="/v2/compute/vserver/acg/addAccessControlGroupInboundRule" 
+          
+          SIGNATURE=$(echo -n "${METHOD} ${URI}\n${TIMESTAMP}\n${ACCESS_KEY}" | openssl dgst -sha256 -hmac "${SECRET_KEY}" -binary | base64)
+          echo "NCP_SIGNATURE=${SIGNATURE}" >> $GITHUB_ENV
 
       # Add GitHub Action IP to Security group
       - name: Add Github Action Ip to Security group
         run: |
           curl -X POST "https://api.ncloud.com/v2/compute/vserver/acg/addAccessControlGroupInboundRule" \
           -H "Content-Type: application/json" \
-          -H "Authorization: Bearer ${{ env.NCP_ACCESS_TOKEN }}" \
+          -H "x-ncp-apigw-timestamp: ${{ steps.generate_signature.outputs.timestamp }}" \
+          -H "x-ncp-iam-access-key: ${{ secrets.NCP_ACCESS_KEY }}" \
+          -H "x-ncp-apigw-signature-v2: ${{ env.NCP_SIGNATURE }}" \
           -d '{
             "regionCode": "KR",
             "vpcNo": "${{ secrets.NCP_VPC_NO }}",
@@ -56,7 +58,9 @@ jobs:
           }'
           curl -X POST "https://api.ncloud.com/v2/compute/vserver/acg/addAccessControlGroupInboundRule" \
           -H "Content-Type: application/json" \
-          -H "Authorization: Bearer ${{ env.NCP_ACCESS_TOKEN }}" \
+          -H "x-ncp-apigw-timestamp: ${{ steps.generate_signature.outputs.timestamp }}" \
+          -H "x-ncp-iam-access-key: ${{ secrets.NCP_ACCESS_KEY }}" \
+          -H "x-ncp-apigw-signature-v2: ${{ env.NCP_SIGNATURE }}" \
           -d '{
             "regionCode": "KR",
             "vpcNo": "${{ secrets.NCP_VPC_NO }}",
@@ -115,7 +119,9 @@ jobs:
         run: |
           curl -X POST "https://api.ncloud.com/v2/compute/vserver/acg/removeAccessControlGroupInboundRule" \
           -H "Content-Type: application/json" \
-          -H "Authorization: Bearer ${{ env.NCP_ACCESS_TOKEN }}" \
+          -H "x-ncp-apigw-timestamp: ${{ steps.generate_signature.outputs.timestamp }}" \
+          -H "x-ncp-iam-access-key: ${{ secrets.NCP_ACCESS_KEY }}" \
+          -H "x-ncp-apigw-signature-v2: ${{ env.NCP_SIGNATURE }}" \
           -d '{
             "regionCode": "KR",
             "vpcNo": "${{ secrets.NCP_VPC_NO }}",
@@ -130,7 +136,9 @@ jobs:
           }'
           curl -X POST "https://api.ncloud.com/v2/compute/vserver/acg/removeAccessControlGroupInboundRule" \
           -H "Content-Type: application/json" \
-          -H "Authorization: Bearer ${{ env.NCP_ACCESS_TOKEN }}" \
+          -H "x-ncp-apigw-timestamp: ${{ steps.generate_signature.outputs.timestamp }}" \
+          -H "x-ncp-iam-access-key: ${{ secrets.NCP_ACCESS_KEY }}" \
+          -H "x-ncp-apigw-signature-v2: ${{ env.NCP_SIGNATURE }}" \
           -d '{
             "regionCode": "KR",
             "vpcNo": "${{ secrets.NCP_VPC_NO }}",
