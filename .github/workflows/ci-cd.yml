@@ -27,7 +27,7 @@ jobs:
       - name: Setting NCP CLI & Credentials
         run: |
           cd ~
-          wget --timeout=3000 --tries=3 --verbose https://www.ncloud.com/api/support/download/5/65
+          wget --timeout=30000 --tries=5 https://www.ncloud.com/api/support/download/5/65
           unzip 65
           mkdir ~/.ncloud
           echo -e "[DEFAULT]\nncloud_access_key_id = ${{ secrets.NCP_ACCESS_KEY }}\nncloud_secret_access_key = ${{ secrets.NCP_SECRET_KEY }}\nncloud_api_url = ${{ secrets.NCP_API_URL }}" >> ~/.ncloud/configure
@@ -86,8 +86,6 @@ jobs:
             docker rm -f diveincontainer || true
             docker pull ${{ secrets.DOCKER_USERNAME }}/dive-in
             docker run -d -p 8080:8080 --network web-network --name diveincontainer ${{ secrets.DOCKER_USERNAME }}/dive-in
-
-
       - name: Remove Github Action Ip to Security group
         run: |
           chmod -R 777 ~/cli_linux
