@@ -4,7 +4,6 @@ import com.poten.dive_in.common.dto.CommonResponse;
 import com.poten.dive_in.community.post.dto.PostDetailResponseDto;
 import com.poten.dive_in.community.post.dto.PostListResponseDto;
 import com.poten.dive_in.community.post.dto.PostRequestDto;
-import com.poten.dive_in.community.post.entity.Post;
 import com.poten.dive_in.community.post.service.PostService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -36,14 +35,14 @@ public class PostController {
 
     @PutMapping("/{id}")
     public ResponseEntity<CommonResponse<PostDetailResponseDto>> updatePost(@PathVariable("id") Long id, @Valid PostRequestDto requestDTO, @RequestParam(value = "images", required = false) List<MultipartFile> multipartFileList) {
-        Post post = postService.updatePost(id, requestDTO, multipartFileList);
-        return new ResponseEntity<>(CommonResponse.success("글 수정 완료", PostDetailResponseDto.ofEntity(post)), HttpStatus.OK); //200
+        PostDetailResponseDto postDetailResponseDto = postService.updatePost(id, requestDTO, multipartFileList);
+        return new ResponseEntity<>(CommonResponse.success("글 수정 완료", postDetailResponseDto), HttpStatus.OK); //200
     }
 
     @GetMapping("/list/{categoryType}/{pageNum}")
     public ResponseEntity<CommonResponse<List<PostListResponseDto>>> getAllPosts(@PathVariable("categoryType") String categoryType, @PathVariable("pageNum") Integer pageNum) {
-        List<PostListResponseDto> responseDTOs = postService.getAllPosts(categoryType, pageNum);
-        return new ResponseEntity<>(CommonResponse.success(null, responseDTOs), HttpStatus.OK);
+        List<PostListResponseDto> postListResponseDTOs = postService.getAllPosts(categoryType, pageNum);
+        return new ResponseEntity<>(CommonResponse.success(null, postListResponseDTOs), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")

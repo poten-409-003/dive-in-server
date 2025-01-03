@@ -43,7 +43,7 @@ public class Post extends BaseTimeEntity {
     private String title;
 
     @JoinColumn(name = "post_ctgr_cd", referencedColumnName = "cd", nullable = false)
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     private CommonCode categoryCode;
 
     @Column(name = "cntn")
