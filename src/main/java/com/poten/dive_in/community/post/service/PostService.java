@@ -106,7 +106,7 @@ public class PostService {
     }
 
     @Transactional
-    public Post updatePost(Long id, PostRequestDto requestDTO, List<MultipartFile> multipartFileList) {
+    public PostDetailResponseDto updatePost(Long id, PostRequestDto requestDTO, List<MultipartFile> multipartFileList) {
         Post existingPost = postRepository.findByIdWithDetail(id)
                 .orElseThrow(() -> new EntityNotFoundException("해당 글이 존재하지 않습니다."));
         Member member = existingPost.getMember();
@@ -141,8 +141,8 @@ public class PostService {
             }
 
         }
-
-        return postRepository.save(existingPost);
+        Post updatedPost = postRepository.save(existingPost);
+        return PostDetailResponseDto.ofEntity(updatedPost);
     }
 
     @Transactional(readOnly = true)

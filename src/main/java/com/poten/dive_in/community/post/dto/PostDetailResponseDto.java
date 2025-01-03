@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 @Builder
 public class PostDetailResponseDto {
     private Long postId;
+    private String categoryName;
     private String title;
     private String content;
     private List<PostImageDto> images;
@@ -25,6 +26,7 @@ public class PostDetailResponseDto {
     private String createdAt;
     private List<CommentResponseDTO> commentList;
     private Boolean isLiked;
+    private Boolean isPopular; //TODO 인기글 표시 로직 추가
 
     public static PostDetailResponseDto ofEntity(Post post) {
 
@@ -42,6 +44,7 @@ public class PostDetailResponseDto {
 
         return PostDetailResponseDto.builder()
                 .postId(post.getId())
+                .categoryName(post.getCategoryCode().getCodeName())
                 .title(post.getTitle())
                 .content(post.getContent())
                 .images(postImageDtoList)
