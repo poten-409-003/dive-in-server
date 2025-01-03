@@ -2,6 +2,7 @@ package com.poten.dive_in.community.post.service;
 
 import com.poten.dive_in.auth.entity.Member;
 import com.poten.dive_in.auth.repository.MemberRepository;
+import com.poten.dive_in.community.post.dto.LikeResponseDto;
 import com.poten.dive_in.community.post.entity.Post;
 import com.poten.dive_in.community.post.entity.PostLike;
 import com.poten.dive_in.community.post.repository.PostLikeRepository;
@@ -21,7 +22,7 @@ public class PostLikeService {
 
 
     @Transactional
-    public PostLike likePost(Long postId, Long memberId) {
+    public LikeResponseDto likePost(Long postId, Long memberId) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new EntityNotFoundException("글이 존재하지 않습니다."));
 
@@ -40,11 +41,13 @@ public class PostLikeService {
         post.adjustLikeCount(1);
         postRepository.save(post);
 
-        return postLike;
+        return LikeResponseDto.builder()
+                .likeCnt(post.getLikeCount())
+                .build();
     }
 
     @Transactional
-    public void unlikePost(Long postId, Long memberId) {
+    public LikeResponseDto unlikePost(Long postId, Long memberId) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new IllegalArgumentException("글이 존재하지 않습니다."));
 
@@ -56,5 +59,9 @@ public class PostLikeService {
         // 좋아요 수 감소
         post.adjustLikeCount(-1);
         postRepository.save(post);
+
+        return LikeResponseDto.builder()
+                .likeCnt(post.getLikeCount())
+                .build();
     }
 }

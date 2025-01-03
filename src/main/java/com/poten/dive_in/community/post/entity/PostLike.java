@@ -27,5 +27,9 @@ public class PostLike extends CreateTimeEntity {
     @JoinColumn(name = "member_id", nullable = false)
     @ManyToOne(fetch = FetchType.LAZY)
     private Member member;
+
+    public void assignPost(Post post) {
+        this.post = post;
+    }
 }
 

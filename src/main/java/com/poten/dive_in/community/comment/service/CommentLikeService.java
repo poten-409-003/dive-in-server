@@ -6,6 +6,7 @@ import com.poten.dive_in.community.comment.entity.Comment;
 import com.poten.dive_in.community.comment.entity.CommentLike;
 import com.poten.dive_in.community.comment.repository.CommentLikeRepository;
 import com.poten.dive_in.community.comment.repository.CommentRepository;
+import com.poten.dive_in.community.post.dto.LikeResponseDto;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,7 +22,7 @@ public class CommentLikeService {
 
 
     @Transactional
-    public CommentLike likeComment(Long commentId, Long memberId) {
+    public LikeResponseDto likeComment(Long commentId, Long memberId) {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new EntityNotFoundException("댓글이 존재하지 않습니다."));
 
@@ -41,11 +42,13 @@ public class CommentLikeService {
         comment.adjustLikeCount(1);
         commentRepository.save(comment);
 
-        return commentLike;
+        return LikeResponseDto.builder()
+                .likeCnt(comment.getLikeCount())
+                .build();
     }
 
     @Transactional
-    public void unlikeComment(Long commentId, Long memberId) {
+    public LikeResponseDto unlikeComment(Long commentId, Long memberId) {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new EntityNotFoundException("댓글이 존재하지 않습니다."));
 
@@ -56,5 +59,9 @@ public class CommentLikeService {
 
         comment.adjustLikeCount(-1);
         commentRepository.save(comment);
+
+        return LikeResponseDto.builder()
+                .likeCnt(comment.getLikeCount())
+                .build();
     }
 }
