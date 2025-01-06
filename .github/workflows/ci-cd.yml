@@ -7,7 +7,7 @@ on:
   workflow_dispatch:  # 수동 실행 트리거 추가
 
 jobs:
-  build:
+  build_and_deploy:
     runs-on: ubuntu-latest
     steps:
       # 소스코드 체크아웃
@@ -23,20 +23,29 @@ jobs:
         with:
           java-version: '17'
           distribution: 'zulu'
-      # NCP ACG GitHub Actions ip add
+      # NCP ACG GitHub Actions IP 추가 및 CLI 설정
       - name: Setting NCP CLI & Credentials
         run: |
           cd ~
-          wget https://www.ncloud.com/api/support/download/5/65
+          wget --timeout=30000 --tries=5 --verbose https://www.ncloud.com/api/support/download/5/65
           unzip 65
           mkdir ~/.ncloud
           echo -e "[DEFAULT]\nncloud_access_key_id = ${{ secrets.NCP_ACCESS_KEY }}\nncloud_secret_access_key = ${{ secrets.NCP_SECRET_KEY }}\nncloud_api_url = ${{ secrets.NCP_API_URL }}" >> ~/.ncloud/configure
-      - name: Add Github Action Ip to Security group
+      # IP를 보안 그룹에 추가
+      - name: Add Github Action IP to Security group
         run: |
           chmod -R 777 ~/cli_linux
           cd ~/cli_linux
-          ./ncloud vserver addAccessControlGroupInboundRule --regionCode KR --vpcNo ${{ secrets.NCP_VPC_NO }} --accessControlGroupNo ${{ secrets.NCP_DB_AGC_NO }} --accessControlGroupRuleList "protocolTypeCode='TCP', ipBlock='${{ steps.ip.outputs.ipv4 }}/32', portRange='${{ secrets.NCP_DB_PORT }}'"
-          ./ncloud vserver addAccessControlGroupInboundRule --regionCode KR --vpcNo ${{ secrets.NCP_VPC_NO }} --accessControlGroupNo ${{ secrets.NCP_WEB_AGC_NO }} --accessControlGroupRuleList "protocolTypeCode='TCP', ipBlock='${{ steps.ip.outputs.ipv4 }}/32', portRange='${{ secrets.NCP_SSH_PORT }}'"
+          
+          echo "Adding IP to Security Group:"
+          echo "Public IP: ${{ steps.ip.outputs.ipv4 }}"
+          echo "VPC No: ${{ secrets.NCP_VPC_NO }}"
+          echo "DB ACG No: ${{ secrets.NCP_DB_ACG_NO }}"
+          echo "Web ACG No: ${{ secrets.NCP_WEB_ACG_NO }}"
+          
+          ./ncloud vserver addAccessControlGroupInboundRule --regionCode KR --vpcNo ${{ secrets.NCP_VPC_NO }} --accessControlGroupNo ${{ secrets.NCP_DB_ACG_NO }} --accessControlGroupRuleList "protocolTypeCode=TCP,ipBlock='${{ steps.ip.outputs.ipv4 }}/32',portRange='${{ secrets.NCP_DB_PORT }}'"
+          ./ncloud vserver addAccessControlGroupInboundRule --regionCode KR --vpcNo ${{ secrets.NCP_VPC_NO }} --accessControlGroupNo ${{ secrets.NCP_WEB_ACG_NO }} --accessControlGroupRuleList "protocolTypeCode=TCP,ipBlock='${{ steps.ip.outputs.ipv4 }}/32',portRange='${{ secrets.NCP_SSH_PORT }}'"
+
       # Application YML 파일 생성
       - name: Make application.yml
         run: |
@@ -58,41 +67,25 @@ jobs:
           docker build -t ${{ secrets.DOCKER_USERNAME }}/dive-in .
           docker push ${{ secrets.DOCKER_USERNAME }}/dive-in
 
-  deploy:
-    # needs를 통해 build job이 수행 성공시에 작업되도록 설정
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      # Docker image pull & run (로컬에서 바로 실행)
-      - name: Docker image pull and run locally
-        run: |
-          docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
-          docker network create web-network || true
-          docker stop diveincontainer || true
-          docker rm -f diveincontainer || true
-          docker pull ${{ secrets.DOCKER_USERNAME }}/dive-in
-          docker run -d -p 8080:8080 --network web-network --name diveincontainer ${{ secrets.DOCKER_USERNAME }}/dive-in
       # NCP 서버에 SSH 접속하여 Docker 이미지 실행
       - name: Deploy to NCP Server
         uses: appleboy/ssh-action@v0.1.6
         with:
           host: ${{ secrets.NCP_WEB_SERVER_IP }}  # NCP 서버 IP
           username: ${{ secrets.NCP_SSH_USERNAME }}  # SSH 사용자 이름
-          password: ${{ secrets.NCP_SSH_PASSWORD }}  # SSH 비밀번호
+          password: ${{ secrets.NCP_SSH_PASSWORD }}  # SSH 비밀번호 사용
           port: ${{ secrets.NCP_SSH_PORT }}  # SSH 포트
           script: |
             docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
-            docker network create web-network || true
-            docker stop diveincontainer || true
-            docker rm -f diveincontainer || true
+            cd dive-in-project
             docker pull ${{ secrets.DOCKER_USERNAME }}/dive-in
-            docker run -d -p 8080:8080 --network web-network --name diveincontainer ${{ secrets.DOCKER_USERNAME }}/dive-in
-
-
-      - name: Remove Github Action Ip to Security group
+            docker-compose down 
+            docker-compose up -d --force-recreate
+      # IP를 보안 그룹에서 제거
+      - name: Remove Github Action IP from Security group
         run: |
           chmod -R 777 ~/cli_linux
           cd ~/cli_linux
-          ./ncloud vserver removeAccessControlGroupInboundRule --regionCode KR --vpcNo ${{ secrets.NCP_VPC_NO }} --accessControlGroupNo ${{ secrets.NCP_DB_AGC_NO }} --accessControlGroupRuleList "protocolTypeCode='TCP', ipBlock='${{ steps.ip.outputs.ipv4 }}/32', portRange='${{ secrets.NCP_DB_PORT }}'"
-          ./ncloud vserver removeAccessControlGroupInboundRule --regionCode KR --vpcNo ${{ secrets.NCP_VPC_NO }} --accessControlGroupNo ${{ secrets.NCP_WEB_AGC_NO }} --accessControlGroupRuleList "protocolTypeCode='TCP', ipBlock='${{ steps.ip.outputs.ipv4 }}/32', portRange='${{ secrets.NCP_SSH_PORT }}'"
-
+          
+          ./ncloud vserver removeAccessControlGroupInboundRule --regionCode KR --vpcNo ${{ secrets.NCP_VPC_NO }} --accessControlGroupNo ${{ secrets.NCP_DB_ACG_NO }} --accessControlGroupRuleList "protocolTypeCode='TCP',ipBlock='${{ steps.ip.outputs.ipv4 }}/32',portRange='${{ secrets.NCP_DB_PORT }}'"
+          ./ncloud vserver removeAccessControlGroupInboundRule --regionCode KR --vpcNo ${{ secrets.NCP_VPC_NO }} --accessControlGroupNo ${{ secrets.NCP_WEB_ACG_NO }} --accessControlGroupRuleList "protocolTypeCode='TCP',ipBlock='${{ steps.ip.outputs.ipv4 }}/32',portRange='${{ secrets.NCP_SSH_PORT }}'"
