@@ -34,7 +34,7 @@ public class CommentController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<CommonResponse<Boolean>> deleteComment(@PathVariable("id") Long id, @RequestParam Long memberId) {
+    public ResponseEntity<CommonResponse<Boolean>> deleteComment(@PathVariable("id") Long id, @RequestParam("memberId") Long memberId) {
         commentService.deleteComment(id, memberId);
         return new ResponseEntity<>(CommonResponse.success("댓글 삭제 완료", true), HttpStatus.NO_CONTENT);
     }

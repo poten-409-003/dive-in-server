@@ -13,6 +13,7 @@ import java.util.Set;
 @Builder
 public class PostListResponseDto {
     private Long postId;
+    private String categoryName;
     private String title;
     private String content;
     private PostImageDto image;
@@ -22,6 +23,7 @@ public class PostListResponseDto {
     private String writer;
     private String writerProfile;
     private String createdAt;
+    private Boolean isPopular; //TODO 인기글 표시 로직 추가
 
     public static PostListResponseDto ofEntity(Post post) {
         Set<PostImage> images = post.getImages();
@@ -36,6 +38,7 @@ public class PostListResponseDto {
 
         return PostListResponseDto.builder()
                 .postId(post.getId())
+                .categoryName(post.getCategoryCode().getCodeName())
                 .title(post.getTitle())
                 .content(truncateContent(post.getContent()))
                 .image(postImageDto)

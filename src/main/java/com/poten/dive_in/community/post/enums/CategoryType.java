@@ -16,14 +16,13 @@ public enum CategoryType {
         return koreanName;
     }
 
-    // 입력값에 해당하는 enum 항목을 찾는 메서드
     public static String findKoreanNameByInput(String input) {
         for (CategoryType type : CategoryType.values()) {
             if (type.name().equalsIgnoreCase(input)) {
                 return type.getKoreanName();
             }
         }
-        return null; // 일치하는 항목이 없을 경우 null 반환
+        return null;
     }
 }
 
