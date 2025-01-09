@@ -2,6 +2,7 @@ package com.poten.dive_in.community.post.controller;
 
 import com.poten.dive_in.common.dto.CommonResponse;
 import com.poten.dive_in.community.post.dto.PostDetailResponseDto;
+import com.poten.dive_in.community.post.dto.PostEditRequestDto;
 import com.poten.dive_in.community.post.dto.PostListResponseDto;
 import com.poten.dive_in.community.post.dto.PostRequestDto;
 import com.poten.dive_in.community.post.service.PostService;
@@ -34,7 +35,7 @@ public class PostController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<CommonResponse<PostDetailResponseDto>> updatePost(@PathVariable("id") Long id, @Valid PostRequestDto requestDTO, @RequestParam(value = "images", required = false) List<MultipartFile> multipartFileList) {
+    public ResponseEntity<CommonResponse<PostDetailResponseDto>> updatePost(@PathVariable("id") Long id, @Valid PostEditRequestDto requestDTO, @RequestParam(value = "newImages", required = false) List<MultipartFile> multipartFileList) {
         PostDetailResponseDto postDetailResponseDto = postService.updatePost(id, requestDTO, multipartFileList);
         return new ResponseEntity<>(CommonResponse.success("글 수정 완료", postDetailResponseDto), HttpStatus.OK); //200
     }

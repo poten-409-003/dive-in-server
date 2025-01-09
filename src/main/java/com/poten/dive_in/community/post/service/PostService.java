@@ -6,9 +6,7 @@ import com.poten.dive_in.auth.repository.MemberRepository;
 import com.poten.dive_in.cmmncode.entity.CommonCode;
 import com.poten.dive_in.cmmncode.repository.CmmnCdRepository;
 import com.poten.dive_in.common.service.S3Service;
-import com.poten.dive_in.community.post.dto.PostDetailResponseDto;
-import com.poten.dive_in.community.post.dto.PostListResponseDto;
-import com.poten.dive_in.community.post.dto.PostRequestDto;
+import com.poten.dive_in.community.post.dto.*;
 import com.poten.dive_in.community.post.entity.Post;
 import com.poten.dive_in.community.post.entity.PostImage;
 import com.poten.dive_in.community.post.enums.CategoryType;
@@ -106,7 +104,7 @@ public class PostService {
     }
 
     @Transactional
-    public PostDetailResponseDto updatePost(Long id, PostRequestDto requestDTO, List<MultipartFile> multipartFileList) {
+    public PostDetailResponseDto updatePost(Long id, PostEditRequestDto requestDTO, List<MultipartFile> multipartFileList) {
         Post existingPost = postRepository.findByIdWithDetail(id)
                 .orElseThrow(() -> new EntityNotFoundException("해당 글이 존재하지 않습니다."));
         Member member = existingPost.getMember();
@@ -118,6 +116,25 @@ public class PostService {
         if (!member.getId().equals(requestDTO.getMemberId())) {
             throw new IllegalArgumentException("자신의 글만 수정 가능합니다.");
         }
+
+        /* 이미 등록된 이미지 체크 후 삭제 */
+        /*
+         * 1. 삭제할 이미지 SET 선별
+         * 2. 해당 Set 기준 s3 이미지 삭제
+         * 3. 해당 이미지 기존 imageset에서 제거 addImage
+         * */
+        List<PostImageDto> existingImages = requestDTO.getExistingImages();
+        boolean notExistRepImage = true;
+        Set<PostImage> modifiedImageList = existingPost.getImages();
+        if (existingImages != null && !existingImages.isEmpty()) {
+            for (PostImageDto postImageDto : existingImages) {
+                if (postImageDto.getRepImage()) {
+                    notExistRepImage = false;
+                }
+            }
+            // deletePostImagesFromS3
+        }
+
 
         CommonCode commonCode = cmmnCdRepository.findByCodeName(CategoryType.findKoreanNameByInput(requestDTO.getCategoryType())).orElseThrow(() -> new EntityNotFoundException("해당 카테고리가 존재하지 않습니다."));
 
@@ -135,11 +152,9 @@ public class PostService {
                 }
             }
             if (isNotEmpty) {
-                deletePostImagesFromS3(existingPost.getImages());
-                Set<PostImage> postImageList = uploadAndCreatePostImages(multipartFileList, existingPost);
-                existingPost.replaceImageList(postImageList);
+                Set<PostImage> postImageList = uploadAndCreatePostImages(multipartFileList, existingPost, notExistRepImage);
+                existingPost.appendImageList(postImageList);
             }
-
         }
         Post updatedPost = postRepository.save(existingPost);
         return PostDetailResponseDto.ofEntity(updatedPost);
@@ -212,7 +227,26 @@ public class PostService {
         return postImageList;
     }
 
-    private void deletePostImagesFromS3(Set<PostImage> postImageList) {
+    private Set<PostImage> uploadAndCreatePostImages(List<MultipartFile> multipartFileList, Post post, Boolean notExistRepImage) {
+        Set<PostImage> postImageList = new HashSet<>();
+        List<String> uploadFileList = s3Service.uploadFile(multipartFileList);
+
+        for (int i = 0; i < uploadFileList.size(); i++) {
+            boolean repImage = (i == 0);
+
+            PostImage postImage = PostImage.builder()
+                    .imageUrl(uploadFileList.get(i))
+                    .isRepresentative(notExistRepImage && repImage ? "Y" : "N")
+                    .post(post)
+                    .build();
+
+            postImageList.add(postImage);
+        }
+
+        return postImageList;
+    }
+
+    private void deletePostImagesFromS3(List<PostImageDto> postImageList) {
         if (postImageList != null && !postImageList.isEmpty()) {
             postImageList.forEach(postImage -> {
                 String fileName = extractFileName(postImage.getImageUrl());
