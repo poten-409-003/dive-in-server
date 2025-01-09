@@ -5,6 +5,8 @@ import com.poten.dive_in.community.comment.entity.Comment;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Builder
 public class CommentResponseDTO {
@@ -17,8 +19,14 @@ public class CommentResponseDTO {
     private String writerProfile; // 작성자 프로필 이미지 URL
     private Integer likeCnt; // 좋아요 수
     private String createdAt; // 생성 날짜
+    private String updatedAt; // 수정 날짜
 
     public static CommentResponseDTO ofEntity(Comment comment) {
+        String updatedAtStr = null;
+        LocalDateTime updatedAt = comment.getUpdatedAt();
+        if (! comment.getCreatedAt().equals(updatedAt)) {
+            updatedAtStr = DateTimeUtil.formatDateTimeToKorean(comment.getUpdatedAt());
+        }
         return CommentResponseDTO.builder()
                 .cmmtId(comment.getId())
                 .content(comment.getContent())
@@ -29,6 +37,7 @@ public class CommentResponseDTO {
                 .writerProfile(comment.getMember().getProfileImageUrl())
                 .likeCnt(comment.getLikeCount())
                 .createdAt(DateTimeUtil.formatDateTimeToKorean(comment.getCreatedAt()))
+                .updatedAt(updatedAtStr)
                 .build();
 
     }
