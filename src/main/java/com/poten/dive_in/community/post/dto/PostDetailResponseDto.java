@@ -45,7 +45,7 @@ public class PostDetailResponseDto {
                 : new ArrayList<>();
         String updatedAtStr = null;
         LocalDateTime updatedAt = post.getUpdatedAt();
-        if (! post.getCreatedAt().equals(updatedAt)) {
+        if (!post.getCreatedAt().equals(updatedAt)) {
             updatedAtStr = DateTimeUtil.formatDateTimeToKorean(post.getUpdatedAt());
         }
         return PostDetailResponseDto.builder()
@@ -62,11 +62,15 @@ public class PostDetailResponseDto {
                 .createdAt(DateTimeUtil.formatDateTimeToKorean(post.getCreatedAt()))
                 .updatedAt(updatedAtStr)
                 .commentList(commentResponseDTOList)
+                .isPopular(false)
                 .build();
     }
 
     public void assignIsLiked(Boolean isliked) {
         this.isLiked = isliked;
     }
-    public void assignIsPopular(Boolean isPopular) { this.isPopular = isPopular; }
+
+    public void assignIsPopular(Boolean isPopular) {
+        this.isPopular = isPopular;
+    }
 }

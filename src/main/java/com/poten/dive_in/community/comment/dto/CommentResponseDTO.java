@@ -5,6 +5,7 @@ import com.poten.dive_in.community.comment.entity.Comment;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 
 @Getter
@@ -20,12 +21,21 @@ public class CommentResponseDTO {
     private Integer likeCnt; // 좋아요 수
     private String createdAt; // 생성 날짜
     private String updatedAt; // 수정 날짜
+    private Boolean isLiked; // 좋아요 여부 추가
 
     public static CommentResponseDTO ofEntity(Comment comment) {
+        return ofEntity(comment, null);
+    }
+
+    public static CommentResponseDTO ofEntity(Comment comment, Boolean isLiked) {
         String updatedAtStr = null;
         LocalDateTime updatedAt = comment.getUpdatedAt();
-        if (! comment.getCreatedAt().equals(updatedAt)) {
-            updatedAtStr = DateTimeUtil.formatDateTimeToKorean(comment.getUpdatedAt());
+        LocalDateTime createdAt = comment.getCreatedAt();
+
+        Duration duration = Duration.between(createdAt, updatedAt);
+
+        if (duration.toMillis() > 500) { // 0.5초는 500밀리초
+            updatedAtStr = DateTimeUtil.formatDateTimeToKorean(updatedAt);
         }
         return CommentResponseDTO.builder()
                 .cmmtId(comment.getId())
@@ -38,7 +48,12 @@ public class CommentResponseDTO {
                 .likeCnt(comment.getLikeCount())
                 .createdAt(DateTimeUtil.formatDateTimeToKorean(comment.getCreatedAt()))
                 .updatedAt(updatedAtStr)
+                .isLiked(isLiked)
                 .build();
 
+    }
+
+    public void assignIsLiked(Boolean isLiked) {
+        this.isLiked = isLiked;
     }
 }

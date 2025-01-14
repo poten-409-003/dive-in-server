@@ -6,6 +6,8 @@ import com.poten.dive_in.auth.repository.MemberRepository;
 import com.poten.dive_in.cmmncode.entity.CommonCode;
 import com.poten.dive_in.cmmncode.repository.CmmnCdRepository;
 import com.poten.dive_in.common.service.S3Service;
+import com.poten.dive_in.community.comment.dto.CommentResponseDTO;
+import com.poten.dive_in.community.comment.repository.CommentLikeRepository;
 import com.poten.dive_in.community.post.dto.*;
 import com.poten.dive_in.community.post.entity.Post;
 import com.poten.dive_in.community.post.entity.PostImage;
@@ -22,6 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -38,6 +41,7 @@ public class PostService {
     private final CmmnCdRepository cmmnCdRepository;
     private final MemberRepository memberRepository;
     private final PostLikeRepository postLikeRepository;
+    private final CommentLikeRepository commentLikeRepository;
 
     @Transactional
     public PostDetailResponseDto createPost(PostRequestDto postRequestDTO, List<MultipartFile> multipartFileList) {
@@ -99,7 +103,9 @@ public class PostService {
         if (!member.getId().equals(memberId)) {
             throw new IllegalArgumentException("자신의 글만 삭제 가능합니다.");
         }
-
+        deletePostImagesFromS3(post.getImages().stream()
+                .map(PostImageDto::ofEntity)
+                .collect(Collectors.toList()));
         postRepository.delete(post);
     }
 
@@ -117,22 +123,22 @@ public class PostService {
             throw new IllegalArgumentException("자신의 글만 수정 가능합니다.");
         }
 
-        /* 이미 등록된 이미지 체크 후 삭제 */
-        /*
-         * 1. 삭제할 이미지 SET 선별
-         * 2. 해당 Set 기준 s3 이미지 삭제
-         * 3. 해당 이미지 기존 imageset에서 제거 addImage
-         * */
         List<PostImageDto> existingImages = requestDTO.getExistingImages();
-        boolean notExistRepImage = true;
-        Set<PostImage> modifiedImageList = existingPost.getImages();
+
         if (existingImages != null && !existingImages.isEmpty()) {
-            for (PostImageDto postImageDto : existingImages) {
-                if (postImageDto.getRepImage()) {
-                    notExistRepImage = false;
-                }
+            Set<String> requestImageUrls = existingImages.stream()
+                    .map(PostImageDto::getImageUrl)
+                    .collect(Collectors.toSet());
+
+            Set<PostImage> imagesToDelete = existingPost.getImages().stream()
+                    .filter(postImage -> !requestImageUrls.contains(postImage.getImageUrl()))
+                    .collect(Collectors.toSet());
+
+            for (PostImage image : imagesToDelete) {
+                String fileName = extractFileName(image.getImageUrl());
+                s3Service.deleteFile(fileName);
+                existingPost.getImages().remove(image);
             }
-            // deletePostImagesFromS3
         }
 
 
@@ -152,12 +158,27 @@ public class PostService {
                 }
             }
             if (isNotEmpty) {
-                Set<PostImage> postImageList = uploadAndCreatePostImages(multipartFileList, existingPost, notExistRepImage);
+                Set<PostImage> postImageList = uploadAndCreatePostImages(multipartFileList, existingPost, existingImages.stream().anyMatch(PostImageDto::getRepImage));
                 existingPost.appendImageList(postImageList);
             }
         }
+
+        Long memberId = requestDTO.getMemberId();
         Post updatedPost = postRepository.save(existingPost);
-        return PostDetailResponseDto.ofEntity(updatedPost);
+        PostDetailResponseDto detailResponseDto = PostDetailResponseDto.ofEntity(updatedPost);
+
+        for (CommentResponseDTO comment : detailResponseDto.getCommentList()) {
+            boolean pushLike = memberId != null && commentLikeRepository.existsByCommentIdAndMemberId(comment.getCmmtId(), memberId);
+            comment.assignIsLiked(pushLike);
+        }
+
+        LocalDateTime oneMonthAgo = LocalDateTime.now().minusMonths(1);
+        Set<Long> popularPostIds = postRepository.findPopularPostIds(oneMonthAgo);
+
+        Boolean pushLike = postLikeRepository.existsByPostIdAndMemberId(updatedPost.getId(), memberId);
+        detailResponseDto.assignIsLiked(pushLike);
+        detailResponseDto.assignIsPopular(popularPostIds.contains(updatedPost.getId()));
+        return detailResponseDto;
     }
 
     @Transactional(readOnly = true)
@@ -165,45 +186,66 @@ public class PostService {
         int sizePerPage = 10;
         Page<Post> posts;
 
+        LocalDateTime oneMonthAgo = LocalDateTime.now().minusMonths(1);
         Pageable pageable = PageRequest.of(page, sizePerPage);
+
+        Set<Long> popularPostIds = postRepository.findPopularPostIds(oneMonthAgo);
+
         if ("none".equals(categoryType)) {
             posts = postRepository.findActivePosts(pageable);
-
         } else if ("popular".equals(categoryType)) {
-            List<Post> popularPosts = postRepository.findPopularPosts(pageable);
+            List<Post> popularPosts = postRepository.findPopularPosts(oneMonthAgo);
             return popularPosts.isEmpty() ? new ArrayList<>() : popularPosts.stream()
-                    .map(PostListResponseDto::ofEntity)
+                    .map(post -> PostListResponseDto.ofEntity(post, true))
                     .collect(Collectors.toList());
         } else {
             String koreanName = CategoryType.findKoreanNameByInput(categoryType);
-            CommonCode code = cmmnCdRepository.findByCodeName(koreanName).orElseThrow(() -> new EntityNotFoundException("카테고리가 존재하지 않습니다."));
+            CommonCode code = cmmnCdRepository.findByCodeName(koreanName)
+                    .orElseThrow(() -> new EntityNotFoundException("카테고리가 존재하지 않습니다."));
 
             posts = postRepository.findByCategoryCodeCd(code.getCode(), pageable);
         }
+
         return posts.isEmpty() ? new ArrayList<>() : posts.stream()
-                .map(PostListResponseDto::ofEntity)
+                .map(post -> PostListResponseDto.ofEntity(post, popularPostIds.contains(post.getId())))
                 .collect(Collectors.toList());
     }
 
     @Transactional
-    public PostDetailResponseDto getPostById(Long id) {
+    public PostDetailResponseDto getPostById(Long id, Long memberId) {
         Post post = postRepository.findByIdWithDetail(id).orElseThrow(() -> new IllegalArgumentException("해당 글이 존재하지 않습니다."));
         post.adjustViewCount();
         postRepository.save(post);
+        // PostDetailResponseDto 생성
         PostDetailResponseDto detailResponseDto = PostDetailResponseDto.ofEntity(post);
-        Boolean pushLike = postLikeRepository.existsByPostIdAndMemberId(post.getId(), post.getMember().getId());
+
+        LocalDateTime oneMonthAgo = LocalDateTime.now().minusMonths(1);
+        Set<Long> popularPostIds = postRepository.findPopularPostIds(oneMonthAgo);
+
+        for (CommentResponseDTO comment : detailResponseDto.getCommentList()) {
+            boolean pushLike = memberId != null && commentLikeRepository.existsByCommentIdAndMemberId(comment.getCmmtId(), memberId);
+            comment.assignIsLiked(pushLike);
+        }
+        Boolean pushLike = postLikeRepository.existsByPostIdAndMemberId(post.getId(), memberId);
         detailResponseDto.assignIsLiked(pushLike);
+        detailResponseDto.assignIsPopular(popularPostIds.contains(post.getId()));
+
         return detailResponseDto;
 
     }
 
     @Transactional(readOnly = true)
-    public List<PostListResponseDto> getPostsByUserId(Long userId, Integer page) {
+    public List<PostListResponseDto> getPostsByMemberId(Long memberId, Integer page) {
         int pageSize = 10;
         Pageable pageable = PageRequest.of(page, pageSize);
-        Page<Post> posts = postRepository.findPostsByMemberId(pageable, userId);
+
+        LocalDateTime oneMonthAgo = LocalDateTime.now().minusMonths(1);
+        Set<Long> popularPostIds = postRepository.findPopularPostIds(oneMonthAgo);
+
+        Page<Post> posts = postRepository.findPostsByMemberId(pageable, memberId);
+
         return posts.isEmpty() ? new ArrayList<>() : posts.stream()
-                .map(PostListResponseDto::ofEntity)
+                .map(post -> PostListResponseDto.ofEntity(post, popularPostIds.contains(post.getId())))
                 .collect(Collectors.toList());
     }
 
@@ -265,18 +307,18 @@ public class PostService {
         return original;
     }
 
-    @Transactional(readOnly = true)
-    public List<PostListResponseDto> searchPosts(String query, Integer page) {
-        int sizePerPage = 10;
-        if (query == null || query.trim().isEmpty()) {
-            return List.of();
-        }
-
-        Pageable pageable = PageRequest.of(page, sizePerPage);
-        Page<Post> posts = postRepository.searchPosts(query, pageable);
-
-        return posts.stream()
-                .map(PostListResponseDto::ofEntity)
-                .collect(Collectors.toList());
-    }
+//    @Transactional(readOnly = true)
+//    public List<PostListResponseDto> searchPosts(String query, Integer page) {
+//        int sizePerPage = 10;
+//        if (query == null || query.trim().isEmpty()) {
+//            return List.of();
+//        }
+//
+//        Pageable pageable = PageRequest.of(page, sizePerPage);
+//        Page<Post> posts = postRepository.searchPosts(query, pageable);
+//
+//        return posts.stream()
+//                .map(PostListResponseDto::ofEntity)
+//                .collect(Collectors.toList());
+//    }
 }

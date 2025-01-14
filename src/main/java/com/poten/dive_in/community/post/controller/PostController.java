@@ -46,22 +46,22 @@ public class PostController {
         return new ResponseEntity<>(CommonResponse.success(null, postListResponseDTOs), HttpStatus.OK);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<CommonResponse<PostDetailResponseDto>> getPostById(@PathVariable("id") Long id) {
-        PostDetailResponseDto responseDto = postService.getPostById(id);
+    @GetMapping("/{id}/{memberId}")
+    public ResponseEntity<CommonResponse<PostDetailResponseDto>> getPostById(@PathVariable("id") Long id, @PathVariable(name = "memberId", required = false) Long memberId) {
+        PostDetailResponseDto responseDto = postService.getPostById(id, memberId);
         return new ResponseEntity<>(CommonResponse.success(null, responseDto), HttpStatus.OK);
     }
 
     @GetMapping("/user/{memberId}/{pageNum}")
     public ResponseEntity<CommonResponse<List<PostListResponseDto>>> getPostsByUserId(@PathVariable("memberId") Long memberId, @PathVariable("pageNum") Integer pageNum) {
-        List<PostListResponseDto> responseDtos = postService.getPostsByUserId(memberId, pageNum);
+        List<PostListResponseDto> responseDtos = postService.getPostsByMemberId(memberId, pageNum);
         return new ResponseEntity<>(CommonResponse.success(null, responseDtos), HttpStatus.OK);
     }
 
-    @GetMapping("/search/{pageNum}")
-    public ResponseEntity<CommonResponse<List<PostListResponseDto>>> searchPosts(@RequestParam String query, @PathVariable("pageNum") Integer pageNum) {
-        List<PostListResponseDto> responseDtos = postService.searchPosts(query, pageNum);
-        return new ResponseEntity<>(CommonResponse.success(null, responseDtos), HttpStatus.OK);
-    }
+//    @GetMapping("/search/{pageNum}")
+//    public ResponseEntity<CommonResponse<List<PostListResponseDto>>> searchPosts(@RequestParam String query, @PathVariable("pageNum") Integer pageNum) {
+//        List<PostListResponseDto> responseDtos = postService.searchPosts(query, pageNum);
+//        return new ResponseEntity<>(CommonResponse.success(null, responseDtos), HttpStatus.OK);
+//    }
 
 }

@@ -27,7 +27,7 @@ public class PostListResponseDto {
     private String updatedAt;
     private Boolean isPopular; //TODO 인기글 표시 로직 추가
 
-    public static PostListResponseDto ofEntity(Post post) {
+    public static PostListResponseDto ofEntity(Post post, Boolean isPopular) {
         Set<PostImage> images = post.getImages();
 
         PostImageDto postImageDto = (images != null && !images.isEmpty())
@@ -39,7 +39,7 @@ public class PostListResponseDto {
                 : null;
         String updatedAtStr = null;
         LocalDateTime updatedAt = post.getUpdatedAt();
-        if (! post.getCreatedAt().equals(updatedAt)) {
+        if (!post.getCreatedAt().equals(updatedAt)) {
             updatedAtStr = DateTimeUtil.formatDateTimeToKorean(post.getUpdatedAt());
         }
         return PostListResponseDto.builder()
@@ -55,6 +55,7 @@ public class PostListResponseDto {
                 .writerProfile(post.getMember().getProfileImageUrl())
                 .createdAt(DateTimeUtil.formatDateTimeToKorean(post.getCreatedAt()))
                 .updatedAt(updatedAtStr)
+                .isPopular(isPopular)
                 .build();
     }
 
