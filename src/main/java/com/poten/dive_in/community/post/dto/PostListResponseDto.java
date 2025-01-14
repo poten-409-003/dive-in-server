@@ -6,6 +6,7 @@ import com.poten.dive_in.community.post.entity.PostImage;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.time.LocalDateTime;
 import java.util.Set;
 
 
@@ -23,9 +24,10 @@ public class PostListResponseDto {
     private String writer;
     private String writerProfile;
     private String createdAt;
+    private String updatedAt;
     private Boolean isPopular; //TODO 인기글 표시 로직 추가
 
-    public static PostListResponseDto ofEntity(Post post) {
+    public static PostListResponseDto ofEntity(Post post, Boolean isPopular) {
         Set<PostImage> images = post.getImages();
 
         PostImageDto postImageDto = (images != null && !images.isEmpty())
@@ -35,7 +37,11 @@ public class PostListResponseDto {
                 .map(PostImageDto::ofEntity)
                 .orElse(null)
                 : null;
-
+        String updatedAtStr = null;
+        LocalDateTime updatedAt = post.getUpdatedAt();
+        if (!post.getCreatedAt().equals(updatedAt)) {
+            updatedAtStr = DateTimeUtil.formatDateTimeToKorean(post.getUpdatedAt());
+        }
         return PostListResponseDto.builder()
                 .postId(post.getId())
                 .categoryName(post.getCategoryCode().getCodeName())
@@ -48,6 +54,8 @@ public class PostListResponseDto {
                 .writer(post.getMember().getNickname())
                 .writerProfile(post.getMember().getProfileImageUrl())
                 .createdAt(DateTimeUtil.formatDateTimeToKorean(post.getCreatedAt()))
+                .updatedAt(updatedAtStr)
+                .isPopular(isPopular)
                 .build();
     }
 

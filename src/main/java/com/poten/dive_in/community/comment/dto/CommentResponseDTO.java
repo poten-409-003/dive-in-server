@@ -5,6 +5,9 @@ import com.poten.dive_in.community.comment.entity.Comment;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+
 @Getter
 @Builder
 public class CommentResponseDTO {
@@ -17,8 +20,23 @@ public class CommentResponseDTO {
     private String writerProfile; // 작성자 프로필 이미지 URL
     private Integer likeCnt; // 좋아요 수
     private String createdAt; // 생성 날짜
+    private String updatedAt; // 수정 날짜
+    private Boolean isLiked; // 좋아요 여부 추가
 
     public static CommentResponseDTO ofEntity(Comment comment) {
+        return ofEntity(comment, null);
+    }
+
+    public static CommentResponseDTO ofEntity(Comment comment, Boolean isLiked) {
+        String updatedAtStr = null;
+        LocalDateTime updatedAt = comment.getUpdatedAt();
+        LocalDateTime createdAt = comment.getCreatedAt();
+
+        Duration duration = Duration.between(createdAt, updatedAt);
+
+        if (duration.toMillis() > 500) { // 0.5초는 500밀리초
+            updatedAtStr = DateTimeUtil.formatDateTimeToKorean(updatedAt);
+        }
         return CommentResponseDTO.builder()
                 .cmmtId(comment.getId())
                 .content(comment.getContent())
@@ -29,7 +47,13 @@ public class CommentResponseDTO {
                 .writerProfile(comment.getMember().getProfileImageUrl())
                 .likeCnt(comment.getLikeCount())
                 .createdAt(DateTimeUtil.formatDateTimeToKorean(comment.getCreatedAt()))
+                .updatedAt(updatedAtStr)
+                .isLiked(isLiked)
                 .build();
 
+    }
+
+    public void assignIsLiked(Boolean isLiked) {
+        this.isLiked = isLiked;
     }
 }

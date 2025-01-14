@@ -92,6 +92,14 @@ public class Post extends BaseTimeEntity {
         this.images = postImageList;
     }
 
+    public void appendImageList(Set<PostImage> newPostImageList) {
+        if (this.images != null) {
+            this.images.addAll(newPostImageList);
+        } else {
+            this.images = new HashSet<>(newPostImageList);
+        }
+    }
+
     public void replaceImageList(Set<PostImage> newPostImageList) {
         if (this.images != null) {
             this.images.clear();

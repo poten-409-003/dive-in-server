@@ -55,9 +55,9 @@ public class CommentController {
 
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<CommonResponse<List<CommentResponseDTO>>> getCommentById(@PathVariable("id") Long id) {
-        List<CommentResponseDTO> responseDTOs = commentService.getCommentById(id);
+    @GetMapping("/{id}/{memberId}")
+    public ResponseEntity<CommonResponse<List<CommentResponseDTO>>> getCommentById(@PathVariable("id") Long id, @PathVariable(name = "memberId", required = false) Long memberId) {
+        List<CommentResponseDTO> responseDTOs = commentService.getCommentById(id, memberId);
         return new ResponseEntity<>(CommonResponse.success(null, responseDTOs), HttpStatus.OK);
     }
 
