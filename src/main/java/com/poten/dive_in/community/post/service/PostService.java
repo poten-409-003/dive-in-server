@@ -7,7 +7,9 @@ import com.poten.dive_in.cmmncode.entity.CommonCode;
 import com.poten.dive_in.cmmncode.repository.CmmnCdRepository;
 import com.poten.dive_in.common.service.S3Service;
 import com.poten.dive_in.community.comment.dto.CommentResponseDTO;
+import com.poten.dive_in.community.comment.entity.Comment;
 import com.poten.dive_in.community.comment.repository.CommentLikeRepository;
+import com.poten.dive_in.community.comment.repository.CommentRepository;
 import com.poten.dive_in.community.post.dto.*;
 import com.poten.dive_in.community.post.entity.Post;
 import com.poten.dive_in.community.post.entity.PostImage;
@@ -25,10 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.poten.dive_in.common.service.S3Service.extractFileName;
@@ -41,6 +40,7 @@ public class PostService {
     private final CmmnCdRepository cmmnCdRepository;
     private final MemberRepository memberRepository;
     private final PostLikeRepository postLikeRepository;
+    private final CommentRepository commentRepository;
     private final CommentLikeRepository commentLikeRepository;
 
     @Transactional
@@ -168,7 +168,7 @@ public class PostService {
         PostDetailResponseDto detailResponseDto = PostDetailResponseDto.ofEntity(updatedPost);
 
         for (CommentResponseDTO comment : detailResponseDto.getCommentList()) {
-            boolean pushLike = memberId != null && commentLikeRepository.existsByCommentIdAndMemberId(comment.getCmmtId(), memberId);
+            boolean pushLike = memberId != null && commentLikeRepository.existsByCommentIdAndMemberId(comment.getCmntId(), memberId);
             comment.assignIsLiked(pushLike);
         }
 
@@ -212,23 +212,34 @@ public class PostService {
     }
 
     @Transactional
-    public PostDetailResponseDto getPostById(Long id, Long memberId) {
+    public PostDetailResponseDto getPostById(Long id) {
         Post post = postRepository.findByIdWithDetail(id).orElseThrow(() -> new IllegalArgumentException("해당 글이 존재하지 않습니다."));
         post.adjustViewCount();
         postRepository.save(post);
-        // PostDetailResponseDto 생성
+
         PostDetailResponseDto detailResponseDto = PostDetailResponseDto.ofEntity(post);
 
         LocalDateTime oneMonthAgo = LocalDateTime.now().minusMonths(1);
         Set<Long> popularPostIds = postRepository.findPopularPostIds(oneMonthAgo);
 
-        for (CommentResponseDTO comment : detailResponseDto.getCommentList()) {
-            boolean pushLike = memberId != null && commentLikeRepository.existsByCommentIdAndMemberId(comment.getCmmtId(), memberId);
-            comment.assignIsLiked(pushLike);
-        }
-        Boolean pushLike = postLikeRepository.existsByPostIdAndMemberId(post.getId(), memberId);
-        detailResponseDto.assignIsLiked(pushLike);
+//        for (CommentResponseDTO comment : detailResponseDto.getCommentList()) {
+//            boolean pushLike = memberId != null && commentLikeRepository.existsByCommentIdAndMemberId(comment.getCmmtId(), memberId);
+//            comment.assignIsLiked(pushLike);
+//        }
+//        Boolean pushLike = postLikeRepository.existsByPostIdAndMemberId(post.getId(), memberId);
+//        detailResponseDto.assignIsLiked(pushLike);
         detailResponseDto.assignIsPopular(popularPostIds.contains(post.getId()));
+
+        List<Comment> comments = commentRepository.findCommentsWithReplyCountByPostId(id);
+
+        Map<Integer, Long> replyCountMap = comments.stream()
+                .filter(c -> c.getCmntClass() == 1)
+                .collect(Collectors.groupingBy(Comment::getGroupName, Collectors.counting()));
+
+        for (CommentResponseDTO comment : detailResponseDto.getCommentList()) {
+            Long replyCount = replyCountMap.get(comment.getGroupName());
+            comment.assignReplyCnt(replyCount != null ? replyCount.intValue() : 0);
+        }
 
         return detailResponseDto;
 
