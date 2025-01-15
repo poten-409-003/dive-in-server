@@ -46,10 +46,8 @@ public class SecurityConfig {
                                 .requestMatchers(HttpMethod.GET, "/lessons/**").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/api/openGraph/fetch").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/pools/**").permitAll()
-                                .requestMatchers("/community/posts/user/**").authenticated()  // 회원의 게시글 조회는 인증 필요
-                                .requestMatchers("/community/comments/user/**").authenticated()  // 회원의 댓글 조회는 인증 필요
-                                .requestMatchers("/user/profile").hasAnyRole("USER", "ADMIN")  // 로그인 후 접근 가능한 URL
-                                .anyRequest().authenticated()  // 그 외의 요청은 인증 필요
+                                .requestMatchers("/user/profile", "/community/posts/user/**", "/community/comments/user/**").hasAnyRole("USER", "ADMIN")  // 로그인 후 접근 가능한 URL
+                                .anyRequest().authenticated()
 //                                .anyRequest().permitAll()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

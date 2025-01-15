@@ -95,4 +95,13 @@ public class CommentRepositoryCustomImpl implements CommentRepositoryCustom {
                 .where((qComment.groupName.eq(id.intValue())))
                 .fetch();
     }
+
+    public List<Comment> findCommentsWithReplyCountByPostId(Long postId) {
+        QComment qComment = QComment.comment;
+
+        return queryFactory
+                .selectFrom(qComment)
+                .where(qComment.post.id.eq(postId))
+                .fetch();
+    }
 }

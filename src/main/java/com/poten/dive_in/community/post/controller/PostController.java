@@ -46,9 +46,9 @@ public class PostController {
         return new ResponseEntity<>(CommonResponse.success(null, postListResponseDTOs), HttpStatus.OK);
     }
 
-    @GetMapping("/{id}/{memberId}")
-    public ResponseEntity<CommonResponse<PostDetailResponseDto>> getPostById(@PathVariable("id") Long id, @PathVariable(name = "memberId", required = false) Long memberId) {
-        PostDetailResponseDto responseDto = postService.getPostById(id, memberId);
+    @GetMapping("/{id}")
+    public ResponseEntity<CommonResponse<PostDetailResponseDto>> getPostById(@PathVariable("id") Long id) {
+        PostDetailResponseDto responseDto = postService.getPostById(id);
         return new ResponseEntity<>(CommonResponse.success(null, responseDto), HttpStatus.OK);
     }
 

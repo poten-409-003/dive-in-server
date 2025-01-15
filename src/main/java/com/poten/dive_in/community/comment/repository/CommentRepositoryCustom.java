@@ -17,5 +17,5 @@ public interface CommentRepositoryCustom {
 
     List<Comment> findCommentsById(Long id);
 
-
+    List<Comment> findCommentsWithReplyCountByPostId(Long postId);
 }

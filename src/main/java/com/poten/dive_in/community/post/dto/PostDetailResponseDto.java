@@ -62,6 +62,7 @@ public class PostDetailResponseDto {
                 .createdAt(DateTimeUtil.formatDateTimeToKorean(post.getCreatedAt()))
                 .updatedAt(updatedAtStr)
                 .commentList(commentResponseDTOList)
+                .isLiked(false) //isLiked TODO token 회원정보 확인 후 수정 필요
                 .isPopular(false)
                 .build();
     }
