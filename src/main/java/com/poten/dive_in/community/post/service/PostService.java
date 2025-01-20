@@ -211,11 +211,10 @@ public class PostService {
                 .collect(Collectors.toList());
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public PostDetailResponseDto getPostById(Long id) {
-        Post post = postRepository.findByIdWithDetail(id).orElseThrow(() -> new IllegalArgumentException("해당 글이 존재하지 않습니다."));
-        post.adjustViewCount();
-        postRepository.save(post);
+        addViewCnt(id);
+        Post post = postRepository.findByIdWithDetail(id).orElseThrow(() -> new EntityNotFoundException("해당 글이 존재하지 않습니다."));
 
         PostDetailResponseDto detailResponseDto = PostDetailResponseDto.ofEntity(post);
 
@@ -238,7 +237,13 @@ public class PostService {
 
         for (CommentResponseDTO comment : detailResponseDto.getCommentList()) {
             Long replyCount = replyCountMap.get(comment.getGroupName());
-            comment.assignReplyCnt(replyCount != null ? replyCount.intValue() : 0);
+            if (comment.getCmntClass() == 0) {
+                if (replyCount != null) {
+                    comment.assignRemainReplyCnt(replyCount >= 3 ? replyCount.intValue()-3 : replyCount.intValue() );
+                } else {
+                    comment.assignRemainReplyCnt(0);
+                }
+            }
         }
 
         return detailResponseDto;
@@ -318,6 +323,12 @@ public class PostService {
         return original;
     }
 
+    @Transactional
+    public void addViewCnt(Long id) {
+        Post originPost = postRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("해당 글이 존재하지 않습니다."));
+        originPost.adjustViewCount();
+        postRepository.save(originPost); /* TODO 해당 부분에서 댓글 삭제됨 */
+    }
 //    @Transactional(readOnly = true)
 //    public List<PostListResponseDto> searchPosts(String query, Integer page) {
 //        int sizePerPage = 10;
