@@ -22,7 +22,7 @@ public class CommentResponseDTO {
     private String createdAt; // 생성 날짜
     private String updatedAt; // 수정 날짜
     private Boolean isLiked; // 좋아요 여부 추가
-    private Integer replyCnt; // 대댓글 총 개수 추가
+    private Integer remainReplyCnt; // 대댓글 총 개수 추가
 
     public static CommentResponseDTO ofEntity(Comment comment) {
         return ofEntity(comment, null);
@@ -57,5 +57,5 @@ public class CommentResponseDTO {
     public void assignIsLiked(Boolean isLiked) {
         this.isLiked = isLiked;
     }
-    public void assignReplyCnt(Integer replyCnt) { this.replyCnt = replyCnt; }
+    public void assignRemainReplyCnt(Integer remainReplyCnt) { this.remainReplyCnt = remainReplyCnt; }
 }
