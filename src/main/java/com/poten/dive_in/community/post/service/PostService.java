@@ -140,7 +140,7 @@ public class PostService {
                     .collect(Collectors.toSet());
 
             Set<PostImage> imagesToDelete = existingPost.getImages().stream()
-                    .filter(postImage -> !requestImageUrls.contains(postImage.getImageUrl()))
+                    .filter(postImage -> requestImageUrls.contains(postImage.getImageUrl()))
                     .collect(Collectors.toSet());
 
             for (PostImage image : imagesToDelete) {
