@@ -1,6 +1,9 @@
 package com.poten.dive_in.community.post.service;
 
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.poten.dive_in.auth.entity.Member;
 import com.poten.dive_in.auth.repository.MemberRepository;
 import com.poten.dive_in.cmmncode.entity.CommonCode;
@@ -122,9 +125,15 @@ public class PostService {
         if (!member.getId().equals(requestDTO.getMemberId())) {
             throw new IllegalArgumentException("자신의 글만 수정 가능합니다.");
         }
+        ObjectMapper objectMapper = new ObjectMapper();
 
-        List<PostImageDto> existingImages = requestDTO.getExistingImages();
-
+        List<PostImageDto> existingImages = null;
+        try {
+            existingImages = objectMapper.readValue(requestDTO.getExistingImages(), new TypeReference<List<PostImageDto>>() {
+            });
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
         if (existingImages != null && !existingImages.isEmpty()) {
             Set<String> requestImageUrls = existingImages.stream()
                     .map(PostImageDto::getImageUrl)
@@ -239,7 +248,7 @@ public class PostService {
             Long replyCount = replyCountMap.get(comment.getGroupName());
             if (comment.getCmntClass() == 0) {
                 if (replyCount != null) {
-                    comment.assignRemainReplyCnt(replyCount >= 3 ? replyCount.intValue()-3 : replyCount.intValue() );
+                    comment.assignRemainReplyCnt(replyCount >= 3 ? replyCount.intValue() - 3 : replyCount.intValue());
                 } else {
                     comment.assignRemainReplyCnt(0);
                 }

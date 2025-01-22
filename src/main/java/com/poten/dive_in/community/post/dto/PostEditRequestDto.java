@@ -6,8 +6,6 @@ import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.List;
-
 @Getter
 @Setter
 public class PostEditRequestDto {
@@ -25,5 +23,5 @@ public class PostEditRequestDto {
     @NotNull(message = "회원은 필수입니다.")
     private Long memberId;
 
-    private List<PostImageDto> existingImages;
+    private String existingImages;
 }
