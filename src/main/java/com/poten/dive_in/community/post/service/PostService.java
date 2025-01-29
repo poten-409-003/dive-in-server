@@ -134,20 +134,22 @@ public class PostService {
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
+        Set<PostImage> imagesToRemove = null;
         if (existingImages != null && !existingImages.isEmpty()) {
             Set<String> requestImageUrls = existingImages.stream()
                     .map(PostImageDto::getImageUrl)
                     .collect(Collectors.toSet());
 
-            Set<PostImage> imagesToDelete = existingPost.getImages().stream()
-                    .filter(postImage -> requestImageUrls.contains(postImage.getImageUrl()))
-                    .collect(Collectors.toSet());
-
-            for (PostImage image : imagesToDelete) {
-                String fileName = extractFileName(image.getImageUrl());
-                s3Service.deleteFile(fileName);
-                existingPost.getImages().remove(image);
-            }
+            imagesToRemove = new HashSet<>(existingPost.getImages().stream()
+                    .filter(postImage -> ! requestImageUrls.contains(postImage.getImageUrl()))
+                    .collect(Collectors.toSet()));
+        } else {
+            imagesToRemove = new HashSet<>(existingPost.getImages());
+        }
+        for (PostImage image : imagesToRemove) {
+            String fileName = extractFileName(image.getImageUrl());
+            s3Service.deleteFile(fileName);
+            existingPost.getImages().remove(image);
         }
 
 
@@ -167,7 +169,7 @@ public class PostService {
                 }
             }
             if (isNotEmpty) {
-                Set<PostImage> postImageList = uploadAndCreatePostImages(multipartFileList, existingPost, existingImages.stream().anyMatch(PostImageDto::getRepImage));
+                Set<PostImage> postImageList = uploadAndCreatePostImages(multipartFileList, existingPost, existingImages.stream().noneMatch(PostImageDto::getRepImage));
                 existingPost.appendImageList(postImageList);
             }
         }
@@ -191,7 +193,7 @@ public class PostService {
     }
 
     @Transactional(readOnly = true)
-    public List<PostListResponseDto> getAllPosts(String categoryType, int page) {
+    public PostListResponseDto getAllPosts(String categoryType, int page) {
         int sizePerPage = 10;
         Page<Post> posts;
 
@@ -200,24 +202,35 @@ public class PostService {
 
         Set<Long> popularPostIds = postRepository.findPopularPostIds(oneMonthAgo);
 
+        Long totalPosts = null;
+        boolean hasMore = false;
+
         if ("none".equals(categoryType)) {
             posts = postRepository.findActivePosts(pageable);
+            totalPosts = postRepository.countActivePosts();
+            hasMore = posts.hasNext(); // 다음 페이지 존재 여부
         } else if ("popular".equals(categoryType)) {
             List<Post> popularPosts = postRepository.findPopularPosts(oneMonthAgo);
-            return popularPosts.isEmpty() ? new ArrayList<>() : popularPosts.stream()
-                    .map(post -> PostListResponseDto.ofEntity(post, true))
+            totalPosts = (long) popularPosts.size();
+            List<PostResponseDto> popularPostDtos = popularPosts.stream()
+                    .map(post -> PostResponseDto.ofEntity(post, true))
                     .collect(Collectors.toList());
+
+            return PostListResponseDto.toPostListResponseDto(popularPostDtos, totalPosts, hasMore);
         } else {
             String koreanName = CategoryType.findKoreanNameByInput(categoryType);
             CommonCode code = cmmnCdRepository.findByCodeName(koreanName)
                     .orElseThrow(() -> new EntityNotFoundException("카테고리가 존재하지 않습니다."));
 
             posts = postRepository.findByCategoryCodeCd(code.getCode(), pageable);
+            totalPosts = postRepository.countPostsByCategoryCode(code.getCode());
+            hasMore = posts.hasNext();
         }
 
-        return posts.isEmpty() ? new ArrayList<>() : posts.stream()
-                .map(post -> PostListResponseDto.ofEntity(post, popularPostIds.contains(post.getId())))
+        List<PostResponseDto> postDtos = posts.isEmpty() ? new ArrayList<>() : posts.stream()
+                .map(post -> PostResponseDto.ofEntity(post, popularPostIds.contains(post.getId())))
                 .collect(Collectors.toList());
+        return PostListResponseDto.toPostListResponseDto(postDtos, totalPosts, hasMore);
     }
 
     @Transactional(readOnly = true)
@@ -260,7 +273,7 @@ public class PostService {
     }
 
     @Transactional(readOnly = true)
-    public List<PostListResponseDto> getPostsByMemberId(Long memberId, Integer page) {
+    public PostListResponseDto getPostsByMemberId(Long memberId, Integer page) {
         int pageSize = 10;
         Pageable pageable = PageRequest.of(page, pageSize);
 
@@ -268,10 +281,14 @@ public class PostService {
         Set<Long> popularPostIds = postRepository.findPopularPostIds(oneMonthAgo);
 
         Page<Post> posts = postRepository.findPostsByMemberId(pageable, memberId);
+        Long totalPosts = postRepository.countPostsByMemberId(memberId);
+        boolean hasMore = posts.hasNext();
 
-        return posts.isEmpty() ? new ArrayList<>() : posts.stream()
-                .map(post -> PostListResponseDto.ofEntity(post, popularPostIds.contains(post.getId())))
+        List<PostResponseDto> postResponseDtos = posts.isEmpty() ? new ArrayList<>() : posts.stream()
+                .map(post -> PostResponseDto.ofEntity(post, popularPostIds.contains(post.getId())))
                 .collect(Collectors.toList());
+
+        return PostListResponseDto.toPostListResponseDto(postResponseDtos, totalPosts, hasMore);
     }
 
 

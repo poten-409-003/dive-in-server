@@ -8,6 +8,7 @@ import com.poten.dive_in.community.comment.entity.Comment;
 import com.poten.dive_in.community.comment.repository.CommentLikeRepository;
 import com.poten.dive_in.community.comment.repository.CommentRepository;
 import com.poten.dive_in.community.post.dto.PostListResponseDto;
+import com.poten.dive_in.community.post.dto.PostResponseDto;
 import com.poten.dive_in.community.post.entity.Post;
 import com.poten.dive_in.community.post.repository.PostRepository;
 import com.vane.badwordfiltering.BadWordFiltering;
@@ -142,8 +143,8 @@ public class CommentService {
     }
 
     @Transactional(readOnly = true)
-    public List<PostListResponseDto> getPostsAboutCommentByMemberId(Long memberId, Integer page) {
-        int pageSize = 20;
+    public PostListResponseDto getPostsAboutCommentByMemberId(Long memberId, Integer page) {
+        int pageSize = 10;
 
         LocalDateTime oneMonthAgo = LocalDateTime.now().minusMonths(1);
         Pageable pageable = PageRequest.of(page, pageSize);
@@ -151,9 +152,13 @@ public class CommentService {
         Set<Long> popularPostIds = postRepository.findPopularPostIds(oneMonthAgo);
 
         Page<Post> posts = commentRepository.findDistinctPostsByMemberId(memberId, pageable);
-        return posts.isEmpty() ? new ArrayList<>() : posts.stream()
-                .map(post -> PostListResponseDto.ofEntity(post, popularPostIds.contains(post.getId())))
+        Long totalPosts = commentRepository.countPostByComment(memberId);
+        boolean hasMore = posts.hasNext();
+
+        List<PostResponseDto> postResponseDtos = posts.isEmpty() ? new ArrayList<>() : posts.stream()
+                .map(post -> PostResponseDto.ofEntity(post, popularPostIds.contains(post.getId())))
                 .collect(Collectors.toList());
+        return PostListResponseDto.toPostListResponseDto(postResponseDtos, totalPosts, hasMore);
     }
 
     @Transactional(readOnly = true)
