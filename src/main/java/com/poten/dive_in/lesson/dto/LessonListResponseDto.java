@@ -55,7 +55,7 @@ public class LessonListResponseDto {
                 .academyImageUrl(url)
                 .keyword(keywords)
                 .lessonName(swimClass.getName() != null ? swimClass.getName() : null)
-                .price(swimClass.getPrice() != null ? String.valueOf(swimClass.getPrice()) : null)
+                .price(swimClass.getPrice() != null ? String.valueOf(swimClass.getPrice()) : "가격 문의")
                 .build();
     }
 }

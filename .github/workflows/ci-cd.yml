@@ -2,8 +2,8 @@ name: Build and Deploy to NCP
 on:
   push:
     branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+#  pull_request:
+#    branches: [ "main" ]
   workflow_dispatch:  # 수동 실행 트리거 추가
 
 jobs:
