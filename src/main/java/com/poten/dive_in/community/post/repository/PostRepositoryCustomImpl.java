@@ -79,7 +79,8 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
                 .leftJoin(qPost.member, qMember).fetchJoin()
                 .leftJoin(qPost.categoryCode, qCommonCode).fetchJoin()
                 .leftJoin(qPost.images, qPostImage).fetchJoin()
-                .where(qPost.id.eq(id))
+                .where(qPost.id.eq(id)
+                        .and(qPost.isActive.eq("Y")))
                 .fetchOne();
 
         // 댓글 설정 및 정렬
@@ -123,19 +124,25 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
                 .limit(pageable.getPageSize())
                 .fetch();
 
-        long total = queryFactory
+        long total = countActivePosts();
+
+        return new PageImpl<>(posts, pageable, total);
+    }
+
+    public Long countActivePosts() {
+        QPost qPost = QPost.post;
+        return queryFactory
                 .selectFrom(qPost)
                 .where(qPost.isActive.eq("Y"))
                 .stream().count();
-
-        return new PageImpl<>(posts, pageable, total);
     }
 
     public List<Post> findPopularPosts(LocalDateTime conditionDate) {
         QPost qPost = QPost.post;
         return queryFactory
                 .selectFrom(qPost)
-                .where(qPost.createdAt.goe(conditionDate)
+                .where(qPost.isActive.eq("Y")
+                        .and(qPost.createdAt.goe(conditionDate))
                         .and(qPost.likeCount.goe(1)))
                 .orderBy(qPost.likeCount.desc())
                 .limit(10)
@@ -148,7 +155,8 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
         return new HashSet<>(queryFactory
                 .select(qPost.id)
                 .from(qPost)
-                .where(qPost.createdAt.goe(conditionDate)
+                .where(qPost.isActive.eq("Y")
+                        .and(qPost.createdAt.goe(conditionDate))
                         .and(qPost.likeCount.goe(1)))
                 .orderBy(qPost.likeCount.desc())
                 .limit(10)
@@ -159,18 +167,25 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
         QPost qPost = QPost.post;
         List<Post> posts = queryFactory
                 .selectFrom(qPost)
-                .where(qPost.categoryCode.code.eq(categoryType))
+                .where(qPost.isActive.eq("Y")
+                        .and(qPost.categoryCode.code.eq(categoryType)))
                 .orderBy(qPost.createdAt.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
 
-        long total = queryFactory
-                .selectFrom(qPost)
-                .where(qPost.categoryCode.code.eq(categoryType))
-                .stream().count();
+        long total = countPostsByCategoryCode(categoryType);
 
         return new PageImpl<>(posts, pageable, total);
+    }
+
+    public Long countPostsByCategoryCode(String categoryType) {
+        QPost qPost = QPost.post;
+        return queryFactory
+                .selectFrom(qPost)
+                .where(qPost.isActive.eq("Y")
+                        .and(qPost.categoryCode.code.eq(categoryType)))
+                .stream().count();
     }
 
     // 회원 ID로 게시글 조회
@@ -178,18 +193,25 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
         QPost qPost = QPost.post;
         List<Post> posts = queryFactory
                 .selectFrom(qPost)
-                .where(qPost.member.id.eq(memberId))
+                .where(qPost.member.id.eq(memberId)
+                        .and(qPost.isActive.eq("Y")))
                 .orderBy(qPost.createdAt.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
 
-        long total = queryFactory
-                .selectFrom(qPost)
-                .where(qPost.member.id.eq(memberId))
-                .stream().count();
+        long total = countPostsByMemberId(memberId);
 
         return new PageImpl<>(posts, pageable, total);
+    }
+
+    public Long countPostsByMemberId(Long memberId) {
+        QPost qPost = QPost.post;
+        return queryFactory
+                .selectFrom(qPost)
+                .where(qPost.member.id.eq(memberId)
+                        .and(qPost.isActive.eq("Y")))
+                .stream().count();
     }
 
 //    public Page<Post> searchPosts(String query, Pageable pageable) {

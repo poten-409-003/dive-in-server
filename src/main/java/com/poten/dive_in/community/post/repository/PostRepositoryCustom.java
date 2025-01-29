@@ -25,6 +25,11 @@ public interface PostRepositoryCustom {
 
     Page<Post> findPostsByMemberId(Pageable pageable, Long memberId);
 
+    Long countPostsByMemberId(Long memberId);
+
+    Long countActivePosts();
+
+    Long countPostsByCategoryCode(String categoryType);
 //    Page<Post> searchPosts(String query, Pageable pageable);
 
 }
