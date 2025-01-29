@@ -68,7 +68,7 @@ public class PoolDetailResponseDto {
                 : new ArrayList<>();
 
         String[] addrs = pool.getRoadAddress().split(" ");
-        String region = addrs[0] + addrs[1];
+        String region = addrs[0] + " " + addrs[1];
 
         return PoolDetailResponseDto.builder()
                 .id(pool.getPoolId())

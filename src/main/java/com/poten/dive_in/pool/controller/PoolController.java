@@ -39,14 +39,14 @@ public class PoolController {
 
     // 상세 조회
     @GetMapping("/pools/{id}")
-    public ResponseEntity<CommonResponse<PoolDetailResponseDto>> getPool(@PathVariable Long id) throws JsonProcessingException {
+    public ResponseEntity<CommonResponse<PoolDetailResponseDto>> getPool(@PathVariable("id") Long id) throws JsonProcessingException {
         PoolDetailResponseDto poolResponseDto = poolService.getPool(id);
         String responseData = objectMapper.writeValueAsString(poolResponseDto);
         return new ResponseEntity<>(CommonResponse.success(null, poolResponseDto), HttpStatus.OK);
     }
 
     @PutMapping("/pools/{id}")
-    public ResponseEntity<CommonResponse<PoolDetailResponseDto>> updatePool(@PathVariable Long id,
+    public ResponseEntity<CommonResponse<PoolDetailResponseDto>> updatePool(@PathVariable("id") Long id,
                                                                             @Valid PoolRequestDto poolRequestDto,
                                                                             @RequestParam(value = "images", required = false) List<MultipartFile> multipartFileList) {
 
@@ -55,7 +55,7 @@ public class PoolController {
     }
 
     @DeleteMapping("/pools/{id}")
-    public ResponseEntity<CommonResponse<PoolDetailResponseDto>> deletePool(@PathVariable Long id) {
+    public ResponseEntity<CommonResponse<PoolDetailResponseDto>> deletePool(@PathVariable("id") Long id) {
 
         poolService.deletePool(id);
         return new ResponseEntity<>(CommonResponse.error("수영장 삭제 완료되었습니다.", null), HttpStatus.OK);
