@@ -21,7 +21,7 @@ public class PostDetailResponseDto {
     private List<PostImageDto> images;
     private Integer likesCnt;
     private Integer viewCnt;
-    private Integer cmntCnt;
+    private Integer cmmtCnt;
     private String writer;
     private String writerProfile;
     private String createdAt;
@@ -56,7 +56,7 @@ public class PostDetailResponseDto {
                 .images(postImageDtoList)
                 .likesCnt(post.getLikeCount())
                 .viewCnt(post.getViewCount())
-                .cmntCnt(post.getCommentCount())
+                .cmmtCnt(post.getCommentCount())
                 .writer(post.getMember().getNickname())
                 .writerProfile(post.getMember().getProfileImageUrl())
                 .createdAt(DateTimeUtil.formatDateTimeToKorean(post.getCreatedAt()))
