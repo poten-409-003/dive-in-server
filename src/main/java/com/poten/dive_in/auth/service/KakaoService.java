@@ -99,7 +99,6 @@ public class KakaoService {
             String email = kakaoAccountNode.path("email").asText();
             log.info("이메일: " + email);
 
-
             // DTO 생성
             kakaoAccountDto = KakaoAccountDto.builder()
                     .email(email)
