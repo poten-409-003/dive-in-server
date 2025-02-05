@@ -47,8 +47,8 @@ public class SecurityConfig {
                                 .requestMatchers(HttpMethod.GET, "/api/openGraph/fetch").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/pools/**").permitAll()
                                 .requestMatchers("/user/profile", "/community/posts/user/**", "/community/comments/user/**").hasAnyRole("USER", "ADMIN")  // 로그인 후 접근 가능한 URL
-//                                .anyRequest().authenticated()
-                                .anyRequest().permitAll()
+                                .anyRequest().hasAnyRole("USER", "ADMIN")
+//                                .anyRequest().permitAll()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 

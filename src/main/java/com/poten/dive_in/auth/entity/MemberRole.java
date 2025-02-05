@@ -12,13 +12,14 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "user_role")
+@Table(name = "member_role")
 public class MemberRole {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "role_id")
     private Long id;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "role_nm")
     private Role name;
 
