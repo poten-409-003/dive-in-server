@@ -26,7 +26,6 @@ import java.util.Set;
         attributeNodes = {
                 @NamedAttributeNode("instructorTeam"),
                 @NamedAttributeNode("pool"),
-                @NamedAttributeNode("level"),
                 @NamedAttributeNode("images"),
                 @NamedAttributeNode("qualifications"),
                 @NamedAttributeNode("refunds"),
@@ -52,9 +51,8 @@ public class SwimClass extends BaseTimeEntity {
     @Column(name = "lesson_name")
     private String name; // 수업 이름
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "level_cd", referencedColumnName = "cd")
-    private CommonCode level; // 수업 레벨
+    @Column(name = "level_cd")
+    private String level; // 수업 레벨
 
     @Column(name = "nmbr_of_pepl")
     private Integer participantCount; // 인원수
@@ -115,10 +113,6 @@ public class SwimClass extends BaseTimeEntity {
 
     public void assignCoachingTeam(CoachingTeam team) {
         this.instructorTeam = team;
-    }
-
-    public void assignLevel(CommonCode level) {
-        this.level = level;
     }
 
     public void addImages(List<SwimClassImage> lessonImageList) {
