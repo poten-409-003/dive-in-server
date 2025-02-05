@@ -19,11 +19,12 @@ public class TokenManager extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "token_manager_id")
+    @Column(name = "token_id")
     private Long id;
 
     private String refreshToken;
 
+    @Column(name = "expry_dt")
     private LocalDateTime expirationDate;
 
     @ManyToOne
