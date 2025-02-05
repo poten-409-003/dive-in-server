@@ -31,12 +31,12 @@ public class LessonListResponseDto {
             for (LessonKeyword keyword : lessonKeywords) {
                 keywordList.add(keyword.getKeyword().getCodeName());
             }
-            keywords = keywordList.toString();
+            keywords = String.join(", ", keywordList);
         }
 
         String level = null;
         if (swimClass.getLevel() != null) {
-            level = swimClass.getLevel().getCodeName();
+            level = getLevelsByCode(swimClass.getLevel());
         }
         String url = null;
         if (swimClass.getImages() != null) {
@@ -57,5 +57,29 @@ public class LessonListResponseDto {
                 .lessonName(swimClass.getName() != null ? swimClass.getName() : null)
                 .price(swimClass.getPrice() != null ? String.valueOf(swimClass.getPrice()) : "가격 문의")
                 .build();
+    }
+
+    public static String getLevelsByCode(String levelCd) {
+        List<String> levels = new ArrayList<>();
+
+        String master = "01000";
+        String advanced = "00100";
+        String intermediate = "00010";
+        String beginner = "00001";
+
+        if ((Integer.parseInt(levelCd, 2) & Integer.parseInt(master, 2)) != 0) {
+            levels.add("마스터즈");
+        }
+        if ((Integer.parseInt(levelCd, 2) & Integer.parseInt(advanced, 2)) != 0) {
+            levels.add("상급");
+        }
+        if ((Integer.parseInt(levelCd, 2) & Integer.parseInt(intermediate, 2)) != 0) {
+            levels.add("중급");
+        }
+        if ((Integer.parseInt(levelCd, 2) & Integer.parseInt(beginner, 2)) != 0) {
+            levels.add("초급");
+        }
+
+        return String.join(", ", levels);
     }
 }
