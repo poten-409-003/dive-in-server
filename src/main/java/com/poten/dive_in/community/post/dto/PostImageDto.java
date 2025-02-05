@@ -1,17 +1,15 @@
 package com.poten.dive_in.community.post.dto;
 
 import com.poten.dive_in.community.post.entity.PostImage;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.ToString;
+import lombok.*;
 
 @Getter
 @Builder
-@ToString
+@NoArgsConstructor
+@AllArgsConstructor
 public class PostImageDto {
 
     private Boolean repImage;
-
     private String imageUrl;
 
     public static PostImageDto ofEntity(PostImage postImage) {

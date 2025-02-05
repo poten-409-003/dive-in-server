@@ -75,14 +75,20 @@ public class CommentRepositoryCustomImpl implements CommentRepositoryCustom {
                 post.addImage(images.stream().collect(Collectors.toSet()));
             }
         }
-        long total = queryFactory
+        long total = countPostByComment(memberId);
+
+        return new PageImpl<>(posts, pageable, total);
+    }
+
+    public Long countPostByComment(Long memberId) {
+        QComment qComment = QComment.comment;
+        QPost qPost = QPost.post;
+        return queryFactory
                 .select(qPost.countDistinct())
                 .from(qComment)
                 .join(qComment.post, qPost)
                 .where(qComment.member.id.eq(memberId))
                 .fetchOne();
-
-        return new PageImpl<>(posts, pageable, total);
     }
 
     public List<Comment> findCommentsById(Long id) {
@@ -93,6 +99,15 @@ public class CommentRepositoryCustomImpl implements CommentRepositoryCustom {
                 .selectFrom(qComment)
                 .leftJoin(qComment.member, qMember).fetchJoin()
                 .where((qComment.groupName.eq(id.intValue())))
+                .fetch();
+    }
+
+    public List<Comment> findCommentsWithReplyCountByPostId(Long postId) {
+        QComment qComment = QComment.comment;
+
+        return queryFactory
+                .selectFrom(qComment)
+                .where(qComment.post.id.eq(postId))
                 .fetch();
     }
 }

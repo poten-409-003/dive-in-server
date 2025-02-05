@@ -1,9 +1,7 @@
 package com.poten.dive_in.community.post.controller;
 
 import com.poten.dive_in.common.dto.CommonResponse;
-import com.poten.dive_in.community.post.dto.PostDetailResponseDto;
-import com.poten.dive_in.community.post.dto.PostListResponseDto;
-import com.poten.dive_in.community.post.dto.PostRequestDto;
+import com.poten.dive_in.community.post.dto.*;
 import com.poten.dive_in.community.post.service.PostService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -22,8 +20,8 @@ public class PostController {
     private final PostService postService;
 
     @PostMapping
-    public ResponseEntity<CommonResponse<PostDetailResponseDto>> createPost(@Valid PostRequestDto requestDTO, @RequestParam(value = "images", required = false) List<MultipartFile> multipartFileList) {
-        PostDetailResponseDto postDetailResponseDto = postService.createPost(requestDTO, multipartFileList);
+    public ResponseEntity<CommonResponse<PostDetailResponseDto>> createPost(@Valid PostRequestDto requestDto, @RequestParam(value = "images", required = false) List<MultipartFile> multipartFileList) {
+        PostDetailResponseDto postDetailResponseDto = postService.createPost(requestDto, multipartFileList);
         return new ResponseEntity<>(CommonResponse.success("글 등록 완료", postDetailResponseDto), HttpStatus.CREATED); //201
     }
 
@@ -34,15 +32,15 @@ public class PostController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<CommonResponse<PostDetailResponseDto>> updatePost(@PathVariable("id") Long id, @Valid PostRequestDto requestDTO, @RequestParam(value = "images", required = false) List<MultipartFile> multipartFileList) {
-        PostDetailResponseDto postDetailResponseDto = postService.updatePost(id, requestDTO, multipartFileList);
+    public ResponseEntity<CommonResponse<PostDetailResponseDto>> updatePost(@PathVariable("id") Long id, @Valid @ModelAttribute PostEditRequestDto requestDto, @RequestParam(value = "newImages", required = false) List<MultipartFile> multipartFileList) {
+        PostDetailResponseDto postDetailResponseDto = postService.updatePost(id, requestDto, multipartFileList);
         return new ResponseEntity<>(CommonResponse.success("글 수정 완료", postDetailResponseDto), HttpStatus.OK); //200
     }
 
     @GetMapping("/list/{categoryType}/{pageNum}")
-    public ResponseEntity<CommonResponse<List<PostListResponseDto>>> getAllPosts(@PathVariable("categoryType") String categoryType, @PathVariable("pageNum") Integer pageNum) {
-        List<PostListResponseDto> postListResponseDTOs = postService.getAllPosts(categoryType, pageNum);
-        return new ResponseEntity<>(CommonResponse.success(null, postListResponseDTOs), HttpStatus.OK);
+    public ResponseEntity<CommonResponse<PostListResponseDto>> getAllPosts(@PathVariable("categoryType") String categoryType, @PathVariable("pageNum") Integer pageNum) {
+        PostListResponseDto postListResponseDto = postService.getAllPosts(categoryType, pageNum);
+        return new ResponseEntity<>(CommonResponse.success(null, postListResponseDto), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
@@ -52,15 +50,15 @@ public class PostController {
     }
 
     @GetMapping("/user/{memberId}/{pageNum}")
-    public ResponseEntity<CommonResponse<List<PostListResponseDto>>> getPostsByUserId(@PathVariable("memberId") Long memberId, @PathVariable("pageNum") Integer pageNum) {
-        List<PostListResponseDto> responseDtos = postService.getPostsByUserId(memberId, pageNum);
+    public ResponseEntity<CommonResponse<PostListResponseDto>> getPostsByUserId(@PathVariable("memberId") Long memberId, @PathVariable("pageNum") Integer pageNum) {
+        PostListResponseDto responseDtos = postService.getPostsByMemberId(memberId, pageNum);
         return new ResponseEntity<>(CommonResponse.success(null, responseDtos), HttpStatus.OK);
     }
 
-    @GetMapping("/search/{pageNum}")
-    public ResponseEntity<CommonResponse<List<PostListResponseDto>>> searchPosts(@RequestParam String query, @PathVariable("pageNum") Integer pageNum) {
-        List<PostListResponseDto> responseDtos = postService.searchPosts(query, pageNum);
-        return new ResponseEntity<>(CommonResponse.success(null, responseDtos), HttpStatus.OK);
-    }
+//    @GetMapping("/search/{pageNum}")
+//    public ResponseEntity<CommonResponse<List<PostListResponseDto>>> searchPosts(@RequestParam String query, @PathVariable("pageNum") Integer pageNum) {
+//        List<PostListResponseDto> responseDtos = postService.searchPosts(query, pageNum);
+//        return new ResponseEntity<>(CommonResponse.success(null, responseDtos), HttpStatus.OK);
+//    }
 
 }

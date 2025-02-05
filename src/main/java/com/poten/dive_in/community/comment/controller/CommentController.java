@@ -5,6 +5,7 @@ import com.poten.dive_in.community.comment.dto.CommentRequestDTO;
 import com.poten.dive_in.community.comment.dto.CommentResponseDTO;
 import com.poten.dive_in.community.comment.service.CommentService;
 import com.poten.dive_in.community.post.dto.PostListResponseDto;
+import com.poten.dive_in.community.post.dto.PostResponseDto;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -49,15 +50,15 @@ public class CommentController {
     }
 
     @GetMapping("/user/{memberId}/{pageNum}")
-    public ResponseEntity<CommonResponse<List<PostListResponseDto>>> getPostsAboutCommentsByMemberId(@PathVariable("memberId") Long memberId, @PathVariable("pageNum") Integer pageNum) {
-        List<PostListResponseDto> postListResponseDtos = commentService.getPostsAboutCommentByMemberId(memberId, pageNum);
-        return new ResponseEntity<>(CommonResponse.success(null, postListResponseDtos), HttpStatus.OK);
+    public ResponseEntity<CommonResponse<PostListResponseDto>> getPostsAboutCommentsByMemberId(@PathVariable("memberId") Long memberId, @PathVariable("pageNum") Integer pageNum) {
+        PostListResponseDto postResponseDtos = commentService.getPostsAboutCommentByMemberId(memberId, pageNum);
+        return new ResponseEntity<>(CommonResponse.success(null, postResponseDtos), HttpStatus.OK);
 
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<CommonResponse<List<CommentResponseDTO>>> getCommentById(@PathVariable("id") Long id) {
-        List<CommentResponseDTO> responseDTOs = commentService.getCommentById(id);
+    @GetMapping("/{id}/{memberId}")
+    public ResponseEntity<CommonResponse<List<CommentResponseDTO>>> getCommentById(@PathVariable("id") Long id, @PathVariable(name = "memberId", required = false) Long memberId) {
+        List<CommentResponseDTO> responseDTOs = commentService.getCommentById(id, memberId);
         return new ResponseEntity<>(CommonResponse.success(null, responseDTOs), HttpStatus.OK);
     }
 

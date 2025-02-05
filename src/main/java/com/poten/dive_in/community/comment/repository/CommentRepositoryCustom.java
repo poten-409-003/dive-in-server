@@ -15,7 +15,9 @@ public interface CommentRepositoryCustom {
 
     Page<Post> findDistinctPostsByMemberId(Long memberId, Pageable pageable);
 
+    Long countPostByComment(Long memberId);
+
     List<Comment> findCommentsById(Long id);
 
-
+    List<Comment> findCommentsWithReplyCountByPostId(Long postId);
 }

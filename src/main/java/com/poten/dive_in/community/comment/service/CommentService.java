@@ -5,8 +5,10 @@ import com.poten.dive_in.auth.repository.MemberRepository;
 import com.poten.dive_in.community.comment.dto.CommentRequestDTO;
 import com.poten.dive_in.community.comment.dto.CommentResponseDTO;
 import com.poten.dive_in.community.comment.entity.Comment;
+import com.poten.dive_in.community.comment.repository.CommentLikeRepository;
 import com.poten.dive_in.community.comment.repository.CommentRepository;
 import com.poten.dive_in.community.post.dto.PostListResponseDto;
+import com.poten.dive_in.community.post.dto.PostResponseDto;
 import com.poten.dive_in.community.post.entity.Post;
 import com.poten.dive_in.community.post.repository.PostRepository;
 import com.vane.badwordfiltering.BadWordFiltering;
@@ -18,9 +20,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,8 +32,10 @@ import java.util.stream.Collectors;
 public class CommentService {
 
     private final CommentRepository commentRepository;
+    private final CommentLikeRepository commentLikeRepository;
     private final MemberRepository memberRepository;
     private final PostRepository postRepository;
+
 
     @Transactional
     public CommentResponseDTO createComment(CommentRequestDTO requestDTO) {
@@ -127,21 +133,36 @@ public class CommentService {
         comment.assignContent(filteredContent);
         Comment updatedComment = commentRepository.save(comment);
 
-        return CommentResponseDTO.ofEntity(updatedComment);
+        Long memberId = requestDTO.getMemberId();
+
+        boolean pushLike = memberId != null && commentLikeRepository.existsByCommentIdAndMemberId(updatedComment.getId(), memberId);
+        CommentResponseDTO commentResponseDTO = CommentResponseDTO.ofEntity(updatedComment);
+        commentResponseDTO.assignIsLiked(pushLike);
+
+        return commentResponseDTO;
     }
 
     @Transactional(readOnly = true)
-    public List<PostListResponseDto> getPostsAboutCommentByMemberId(Long memberId, Integer page) {
-        int pageSize = 20;
+    public PostListResponseDto getPostsAboutCommentByMemberId(Long memberId, Integer page) {
+        int pageSize = 10;
+
+        LocalDateTime oneMonthAgo = LocalDateTime.now().minusMonths(1);
         Pageable pageable = PageRequest.of(page, pageSize);
+
+        Set<Long> popularPostIds = postRepository.findPopularPostIds(oneMonthAgo);
+
         Page<Post> posts = commentRepository.findDistinctPostsByMemberId(memberId, pageable);
-        return posts.isEmpty() ? new ArrayList<>() : posts.stream()
-                .map(PostListResponseDto::ofEntity)
+        Long totalPosts = commentRepository.countPostByComment(memberId);
+        boolean hasMore = posts.hasNext();
+
+        List<PostResponseDto> postResponseDtos = posts.isEmpty() ? new ArrayList<>() : posts.stream()
+                .map(post -> PostResponseDto.ofEntity(post, popularPostIds.contains(post.getId())))
                 .collect(Collectors.toList());
+        return PostListResponseDto.toPostListResponseDto(postResponseDtos, totalPosts, hasMore);
     }
 
     @Transactional(readOnly = true)
-    public List<CommentResponseDTO> getCommentById(Long id) {
+    public List<CommentResponseDTO> getCommentById(Long id, Long memberId) {
         Comment comment = commentRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 댓글입니다."));
 
@@ -151,7 +172,10 @@ public class CommentService {
                 .thenComparing(Comment::getOrderNumber));
 
         return comments.stream()
-                .map(CommentResponseDTO::ofEntity)
+                .map(c -> {
+                    boolean isLiked = memberId != null && commentLikeRepository.existsByCommentIdAndMemberId(c.getId(), memberId);
+                    return CommentResponseDTO.ofEntity(c, isLiked);
+                })
                 .collect(Collectors.toList());
     }
 
