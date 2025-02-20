@@ -78,19 +78,19 @@ public class HomeService {
         // Post 검색
         List<Post> posts = postRepository.findByTitleContainingOrContentContaining(keyword, keyword);
         result.addAll(posts.stream()
-                .map(post -> new ResultDto(post.getTitle(), post.getContent(), "커뮤니티"))
+                .map(post -> ResultDto.ofEntity(keyword, post.getTitle(), "커뮤니티", null, post.getCreatedAt()))
                 .collect(Collectors.toList()));
 
         // SwimClass 검색
         List<SwimClass> swimClasses = lessonRepository.findByNameContainingOrKeywordsKeywordCodeNameContaining(keyword, keyword);
         result.addAll(swimClasses.stream()
-                .map(swimClass -> new ResultDto(swimClass.getName(), swimClass.getDescription(), "수영수업"))
+                .map(swimClass -> ResultDto.ofEntity(keyword, swimClass.getName(), "수영수업", null, swimClass.getCreatedAt()))
                 .collect(Collectors.toList()));
 
         // Pool 검색
         List<Pool> pools = poolRepository.findByNameContaining(keyword);
         result.addAll(pools.stream()
-                .map(pool -> new ResultDto(pool.getName(), pool.getAddress(), "수영장"))
+                .map(pool -> ResultDto.ofEntity(keyword, pool.getPoolName(), "수영장", pool.getRoadAddress(), pool.getCreatedAt()))
                 .collect(Collectors.toList()));
 
         // 결과를 등록일시 내림차순으로 정렬
