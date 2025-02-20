@@ -214,7 +214,43 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
                 .stream().count();
     }
 
-//    public Page<Post> searchPosts(String query, Pageable pageable) {
+
+    @Override
+    public List<Post> findNewPosts() {
+        QPost qPost = QPost.post;
+
+        return queryFactory
+                .selectFrom(qPost)
+                .where(qPost.categoryCode.codeName.ne("수영대회").and(qPost.isActive.eq("Y")))
+                .orderBy(qPost.createdAt.desc())
+                .limit(2)
+                .fetch();
+    }
+
+    @Override
+    public List<Post> findCompetitionPosts() {
+        QPost qPost = QPost.post;
+
+        return queryFactory
+                .selectFrom(qPost)
+                .where(qPost.categoryCode.codeName.eq("수영대회").and(qPost.isActive.eq("Y")))
+                .orderBy(qPost.createdAt.desc())
+                .limit(3)
+                .fetch();
+    }
+
+    @Override
+    public List<Post> findTopViewPosts() {
+        QPost qPost = QPost.post;
+
+        return queryFactory
+                .selectFrom(qPost)
+                .where(qPost.categoryCode.codeName.ne("수영대회").and(qPost.viewCount.gt(1)).and(qPost.isActive.eq("Y")))
+                .orderBy(qPost.viewCount.desc())
+                .limit(2)
+                .fetch();
+    }
+    //    public Page<Post> searchPosts(String query, Pageable pageable) {
 //        QPost qPost = QPost.post;
 //        List<Post> posts = queryFactory
 //                .selectFrom(qPost)

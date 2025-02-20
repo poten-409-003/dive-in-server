@@ -30,6 +30,13 @@ public interface PostRepositoryCustom {
     Long countActivePosts();
 
     Long countPostsByCategoryCode(String categoryType);
+
+    List<Post> findTopViewPosts();
+
+    List<Post> findNewPosts();
+
+    List<Post> findCompetitionPosts();
+
 //    Page<Post> searchPosts(String query, Pageable pageable);
 
 }
