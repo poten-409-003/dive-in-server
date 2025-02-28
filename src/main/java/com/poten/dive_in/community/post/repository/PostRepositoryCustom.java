@@ -37,6 +37,7 @@ public interface PostRepositoryCustom {
 
     List<Post> findCompetitionPosts();
 
+    List<Post> findByKeyword(String keyword);
 //    Page<Post> searchPosts(String query, Pageable pageable);
 
 }

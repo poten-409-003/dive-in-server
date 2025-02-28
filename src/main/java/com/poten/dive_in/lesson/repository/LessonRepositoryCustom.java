@@ -8,4 +8,6 @@ public interface LessonRepositoryCustom {
     List<SwimClass> findTopViewLessons();
 
     List<SwimClass> findNewLessons();
+
+    List<SwimClass> findByKeyword(String keyword);
 }

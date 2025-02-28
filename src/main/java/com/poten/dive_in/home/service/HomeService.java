@@ -35,21 +35,11 @@ public class HomeService {
      * competitionPostList; //3개
      */
     public HomeResponseDto getInitialData() {
-        List<LessonHomeListResponseDto> topViewLessonList = lessonRepository.findTopViewLessons().stream()
-                .map(LessonHomeListResponseDto::ofEntity)
-                .collect(Collectors.toList());
-        List<LessonHomeListResponseDto> newLessonList = lessonRepository.findNewLessons().stream()
-                .map(LessonHomeListResponseDto::ofEntity)
-                .collect(Collectors.toList());
-        List<PostHomeResponseDto> topViewPostList = postRepository.findTopViewPosts().stream()
-                .map(PostHomeResponseDto::ofEntity)
-                .collect(Collectors.toList());
-        List<PostHomeResponseDto> newPostList = postRepository.findNewPosts().stream()
-                .map(PostHomeResponseDto::ofEntity)
-                .collect(Collectors.toList());
-        List<PostHomeResponseDto> competitionPostList = postRepository.findCompetitionPosts().stream()
-                .map(PostHomeResponseDto::ofEntity)
-                .collect(Collectors.toList());
+        List<LessonHomeListResponseDto> topViewLessonList = getLessonHomeListDtoList(lessonRepository.findTopViewLessons());
+        List<LessonHomeListResponseDto> newLessonList = getLessonHomeListDtoList(lessonRepository.findNewLessons());
+        List<PostHomeResponseDto> topViewPostList = getPostHomeResponseDtoList(postRepository.findTopViewPosts());
+        List<PostHomeResponseDto> newPostList = getPostHomeResponseDtoList(postRepository.findNewPosts());
+        List<PostHomeResponseDto> competitionPostList = getPostHomeResponseDtoList(postRepository.findCompetitionPosts());
 
         return HomeResponseDto.ofDtoList(
                 topViewLessonList,
@@ -58,6 +48,18 @@ public class HomeService {
                 newPostList,
                 competitionPostList
         );
+    }
+
+    private List<LessonHomeListResponseDto> getLessonHomeListDtoList(List<SwimClass> lessons) {
+        return lessons.stream()
+                .map(LessonHomeListResponseDto::ofEntity)
+                .collect(Collectors.toList());
+    }
+
+    private List<PostHomeResponseDto> getPostHomeResponseDtoList(List<Post> posts) {
+        return posts.stream()
+                .map(PostHomeResponseDto::ofEntity)
+                .collect(Collectors.toList());
     }
 
     /**
@@ -75,27 +77,51 @@ public class HomeService {
     public List<ResultDto> getListByKeyword(String keyword) {
         List<ResultDto> result = new ArrayList<>();
 
-        // Post 검색
-        List<Post> posts = postRepository.findByTitleContainingOrContentContaining(keyword, keyword);
+        // Post 검색 (Custom Repository 메서드 호출)
+        List<Post> posts = postRepository.findByKeyword(keyword);
         result.addAll(posts.stream()
-                .map(post -> ResultDto.ofEntity(keyword, post.getTitle(), "커뮤니티", null, post.getCreatedAt()))
+                .map(post -> {
+                    String content = post.getContent();
+                    String contentSummary = extractSummary(content, keyword);
+                    return ResultDto.ofEntity(keyword, post.getTitle(), "커뮤니티", null, post.getCreatedAt(), contentSummary);
+                })
                 .collect(Collectors.toList()));
 
-        // SwimClass 검색
-        List<SwimClass> swimClasses = lessonRepository.findByNameContainingOrKeywordsKeywordCodeNameContaining(keyword, keyword);
+        // SwimClass 검색 (Custom Repository 메서드 호출)
+        List<SwimClass> swimClasses = lessonRepository.findByKeyword(keyword);
         result.addAll(swimClasses.stream()
-                .map(swimClass -> ResultDto.ofEntity(keyword, swimClass.getName(), "수영수업", null, swimClass.getCreatedAt()))
+                .map(swimClass -> {
+                    String description = swimClass.getIntroduction(); // 수업 소개를 내용으로 사용
+                    String contentSummary = extractSummary(description, keyword);
+                    return ResultDto.ofEntity(keyword, swimClass.getName(), "수영수업", null, swimClass.getCreatedAt(), contentSummary);
+                })
                 .collect(Collectors.toList()));
 
-        // Pool 검색
-        List<Pool> pools = poolRepository.findByNameContaining(keyword);
+        // Pool 검색 (Custom Repository 메서드 호출)
+        List<Pool> pools = poolRepository.findByKeyword(keyword);
         result.addAll(pools.stream()
-                .map(pool -> ResultDto.ofEntity(keyword, pool.getPoolName(), "수영장", pool.getRoadAddress(), pool.getCreatedAt()))
+                .map(pool -> {
+                    String poolDescription = pool.getOperatingHours(); // 운영시간을 내용으로 사용, 필요에 따라 수정
+                    String contentSummary = extractSummary(poolDescription, keyword);
+                    return ResultDto.ofEntity(keyword, pool.getPoolName(), "수영장", pool.getRoadAddress(), pool.getCreatedAt(), contentSummary);
+                })
                 .collect(Collectors.toList()));
-
-        // 결과를 등록일시 내림차순으로 정렬
-        result.sort((r1, r2) -> r2.getCreatedAt().compareTo(r1.getCreatedAt()));
 
         return result;
     }
+
+    private String extractSummary(String content, String keyword) {
+        if (content == null || content.isEmpty()) {
+            return "";
+        }
+        int keywordIndex = content.toLowerCase().indexOf(keyword.toLowerCase()); // case-insensitive 검색
+        if (keywordIndex != -1) {
+            int startIndex = keywordIndex;
+            int endIndex = Math.min(keywordIndex + keyword.length() + 30, content.length()); // 키워드 뒤 30자
+            return "..." + content.substring(startIndex, endIndex) + "..."; // 요약문 앞뒤로 "..." 추가
+        } else {
+            return content.length() > 100 ? content.substring(0, 100) + "..." : content; // 키워드 없으면 기존 요약 방식 유지
+        }
+    }
+
 }

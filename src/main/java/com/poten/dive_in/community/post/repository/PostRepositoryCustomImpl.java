@@ -8,6 +8,7 @@ import com.poten.dive_in.community.post.entity.Post;
 import com.poten.dive_in.community.post.entity.QPost;
 import com.poten.dive_in.community.post.entity.QPostImage;
 import com.poten.dive_in.community.post.entity.QPostLike;
+import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -248,6 +249,20 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
                 .where(qPost.categoryCode.codeName.ne("수영대회").and(qPost.viewCount.gt(1)).and(qPost.isActive.eq("Y")))
                 .orderBy(qPost.viewCount.desc())
                 .limit(2)
+                .fetch();
+    }
+
+    @Override
+    public List<Post> findByKeyword(String keyword) {
+        QPost post = QPost.post;
+        BooleanBuilder builder = new BooleanBuilder();
+        builder.or(post.title.contains(keyword))
+                .or(post.content.contains(keyword));
+
+        return queryFactory
+                .selectFrom(post)
+                .where(builder)
+                .orderBy(post.createdAt.desc())
                 .fetch();
     }
     //    public Page<Post> searchPosts(String query, Pageable pageable) {
