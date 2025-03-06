@@ -43,6 +43,7 @@ public class LessonService {
     public LessonDetailResponseDto getLessonDetail(Long lessonId) {
         SwimClass swimClass = lessonRepository.findById(lessonId)
                 .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 수업입니다."));
+
         return LessonDetailResponseDto.ofEntity(swimClass);
     }
 

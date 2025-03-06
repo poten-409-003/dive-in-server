@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static com.poten.dive_in.lesson.dto.LessonListResponseDto.getLevelsByCode;
+import static com.poten.dive_in.lesson.service.LessonUtils.getLevelsByCode;
 
 @Getter
 @Builder

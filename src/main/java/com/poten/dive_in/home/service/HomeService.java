@@ -35,7 +35,7 @@ public class HomeService {
      * competitionPostList; //3개
      */
     public HomeResponseDto getInitialData() {
-        List<LessonHomeListResponseDto> topViewLessonList = getLessonHomeListDtoList(lessonRepository.findTopViewLessons());
+        List<LessonHomeListResponseDto> topViewLessonList = getLessonHomeListDtoList(lessonRepository.findNewLessons()); //lessonRepository.findTopViewLessons()
         List<LessonHomeListResponseDto> newLessonList = getLessonHomeListDtoList(lessonRepository.findNewLessons());
         List<PostHomeResponseDto> topViewPostList = getPostHomeResponseDtoList(postRepository.findTopViewPosts());
         List<PostHomeResponseDto> newPostList = getPostHomeResponseDtoList(postRepository.findNewPosts());
@@ -82,18 +82,62 @@ public class HomeService {
         result.addAll(posts.stream()
                 .map(post -> {
                     String content = post.getContent();
+                    String title = post.getTitle();
                     String contentSummary = extractSummary(content, keyword);
-                    return ResultDto.ofEntity(keyword, post.getTitle(), "커뮤니티", null, post.getCreatedAt(), contentSummary);
+                    String resultTitle; // ResultDto에 표시될 제목
+
+                    boolean keywordInTitle = title != null && title.toLowerCase().contains(keyword.toLowerCase());
+                    boolean keywordInContent = content != null && content.toLowerCase().contains(keyword.toLowerCase());
+
+                    if (keywordInTitle && keywordInContent) {
+                        // 제목과 내용 모두에 키워드 포함: 게시글 제목 사용
+                        resultTitle = title;
+                    } else if (!keywordInTitle && keywordInContent) {
+                        // 내용에만 키워드 포함: "게시글 내용 중 검색결과" 사용
+                        resultTitle = "게시글 내용 중 검색결과";
+                    } else if (keywordInTitle && !keywordInContent) {
+                        // 제목에만 키워드 포함: 게시글 제목 사용, 내용 요약은 빈 문자열
+                        resultTitle = title;
+                        contentSummary = ""; // 내용 요약 비움
+                    } else {
+                        // (만약의 경우) 제목, 내용 모두에 키워드 없는 경우: 게시글 제목 사용 (원래 로직 유지)
+                        resultTitle = title;
+                    }
+
+                    return ResultDto.ofEntity(keyword, resultTitle, "커뮤니티", null, post.getCreatedAt(), contentSummary);
                 })
                 .collect(Collectors.toList()));
 
-        // SwimClass 검색 (Custom Repository 메서드 호출)
+
+        // SwimClass 검색 (수정된 부분)
         List<SwimClass> swimClasses = lessonRepository.findByKeyword(keyword);
         result.addAll(swimClasses.stream()
                 .map(swimClass -> {
-                    String description = swimClass.getIntroduction(); // 수업 소개를 내용으로 사용
+                    String description = swimClass.getIntroduction();
                     String contentSummary = extractSummary(description, keyword);
-                    return ResultDto.ofEntity(keyword, swimClass.getName(), "수영수업", null, swimClass.getCreatedAt(), contentSummary);
+                    String swimClassName = swimClass.getName();
+                    String keywords = swimClass.getKeyword(); // SwimClass 엔티티에 getKeyword() 메서드 추가됨을 가정
+                    String resultTitle;
+
+                    boolean keywordInName = swimClassName != null && swimClassName.toLowerCase().contains(keyword.toLowerCase());
+                    boolean keywordInKeywords = keywords != null && keywords.toLowerCase().contains(keyword.toLowerCase());
+
+                    if (keywordInName && keywordInKeywords) {
+                        // 수업 이름과 키워드 모두에 키워드 포함: 수업 이름 사용
+                        resultTitle = swimClassName;
+                    } else if (!keywordInName && keywordInKeywords) {
+                        // 키워드에만 키워드 포함: "수영 수업 키워드 검색 결과" 사용
+                        resultTitle = "수영 수업 키워드 검색 결과";
+                    } else if (keywordInName && !keywordInKeywords) {
+                        // 수업 이름에만 키워드 포함: 수업 이름 사용, 내용 요약은 빈 문자열
+                        resultTitle = swimClassName;
+                        contentSummary = "";
+                    } else {
+                        // (만약의 경우) 이름, 키워드 모두에 키워드 없는 경우: 수업 이름 사용 (원래 로직 유지)
+                        resultTitle = swimClassName;
+                    }
+
+                    return ResultDto.ofEntity(keyword, resultTitle, "수영수업", null, swimClass.getCreatedAt(), contentSummary);
                 })
                 .collect(Collectors.toList()));
 
@@ -110,7 +154,7 @@ public class HomeService {
         return result;
     }
 
-    private String extractSummary(String content, String keyword) {
+    public String extractSummary(String content, String keyword) {
         if (content == null || content.isEmpty()) {
             return "";
         }

@@ -1,6 +1,5 @@
 package com.poten.dive_in.lesson.entity;
 
-import com.poten.dive_in.cmmncode.entity.CommonCode;
 import com.poten.dive_in.common.entity.BaseTimeEntity;
 import com.poten.dive_in.instructor.dto.LessonInstructorResponseDto;
 import com.poten.dive_in.instructor.entity.Instructor;
@@ -169,6 +168,8 @@ public class SwimClass extends BaseTimeEntity {
         }
         return keywords;
     }
+
+
 }
 //public class Lesson extends BaseTimeEntity {
 //
