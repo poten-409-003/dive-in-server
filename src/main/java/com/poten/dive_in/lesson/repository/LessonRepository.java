@@ -15,7 +15,8 @@ public interface LessonRepository extends JpaRepository<SwimClass, Long>, Lesson
     @EntityGraph(value = "SwimClass.detail", type = EntityGraph.EntityGraphType.LOAD)
     Optional<SwimClass> findById(Long id);
 
-    List<SwimClass> findByNameContainingOrKeywordsKeywordCodeNameContaining(String name, String keyword);
+//    @EntityGraph(value = "SwimClass.detail", type = EntityGraph.EntityGraphType.LOAD)
+//    List<SwimClass> findByNameContainingOrKeywordsKeywordCodeNameContaining(String name, String keyword);
 
 
 }

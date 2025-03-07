@@ -25,6 +25,7 @@ public class LessonHomeListResponseDto {
     private String lessonImgUrl;
     private String level;
     private String price; //보류
+    private Integer viewCnt;
 
     public static LessonHomeListResponseDto ofEntity(SwimClass swimClass) {
         Set<LessonKeyword> lessonKeywords = swimClass.getKeywords();
@@ -60,6 +61,7 @@ public class LessonHomeListResponseDto {
                 .lessonName(swimClass.getName() != null ? swimClass.getName() : null)
                 .lessonImgUrl(url)
                 .price(swimClass.getPrice() != null ? String.valueOf(swimClass.getPrice()) : "가격 문의")
+                .viewCnt(swimClass.getViewCount() != null ? swimClass.getViewCount() : 0)
                 .build();
     }
 

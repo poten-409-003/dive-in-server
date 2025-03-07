@@ -114,6 +114,11 @@ public class SwimClass extends BaseTimeEntity {
         this.instructorTeam = team;
     }
 
+    public void assignViewCnt(Integer increase) {
+        if (this.viewCount == null) this.viewCount = 1;
+        else this.viewCount += increase;
+    }
+
     public void addImages(List<SwimClassImage> lessonImageList) {
         this.images.clear();
         this.images.addAll(lessonImageList);
