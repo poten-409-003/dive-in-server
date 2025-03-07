@@ -47,16 +47,16 @@ public class PostController {
     @GetMapping("/{id}")
     public ResponseEntity<CommonResponse<PostDetailResponseDto>> getPostById(@PathVariable("id") Long id, Principal principal) {
 
-        String email = null; // email 초기화
-        if (principal != null) { // principal 이 null 이 아닌 경우 (로그인 사용자)
-            email = principal.getName(); // principal.getName() 으로 email 획득
+        String email = null;
+        if (principal != null) {
+            email = principal.getName();
         }
-        PostDetailResponseDto responseDto = postService.getPostById(id, email); // email 파라미터 (optional) 전달
+        PostDetailResponseDto responseDto = postService.getPostById(id, email);
         postService.addViewCnt(id);
         return new ResponseEntity<>(CommonResponse.success(null, responseDto), HttpStatus.OK);
     }
 
-    @GetMapping("/user/{pageNum}") //
+    @GetMapping("/user/{pageNum}")
     public ResponseEntity<CommonResponse<PostListResponseDto>> getPostsByUserId(
             @PathVariable("pageNum") Integer pageNum,
             Principal principal) {
