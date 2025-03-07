@@ -22,15 +22,15 @@ public class PostLikeService {
 
 
     @Transactional
-    public LikeResponseDto likePost(Long postId, Long memberId) {
+    public LikeResponseDto likePost(Long postId, String email) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new EntityNotFoundException("글이 존재하지 않습니다."));
+        Member member = memberRepository.findByEmail(email).orElseThrow(() -> new EntityNotFoundException("존재하지 않는 회원입니다."));
 
-        if (postLikeRepository.existsByPostIdAndMemberId(postId, memberId)) {
+
+        if (postLikeRepository.existsByPostIdAndMemberId(postId, member.getId())) {
             throw new IllegalArgumentException("이미 좋아요를 눌렀습니다.");
         }
-
-        Member member = memberRepository.findById(memberId).orElseThrow(() -> new EntityNotFoundException("해당 회원이 존재하지 않습니다."));
         PostLike postLike = PostLike.builder()
                 .post(post)
                 .member(member)
@@ -47,11 +47,13 @@ public class PostLikeService {
     }
 
     @Transactional
-    public LikeResponseDto unlikePost(Long postId, Long memberId) {
+    public LikeResponseDto unlikePost(Long postId, String email) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new IllegalArgumentException("글이 존재하지 않습니다."));
 
-        PostLike postLike = postLikeRepository.findByPostIdAndMemberId(postId, memberId)
+        Member member = memberRepository.findByEmail(email).orElseThrow(() -> new EntityNotFoundException("존재하지 않는 회원입니다."));
+
+        PostLike postLike = postLikeRepository.findByPostIdAndMemberId(postId, member.getId())
                 .orElseThrow(() -> new IllegalArgumentException("좋아요를 누른 이력이 없습니다."));
 
         postLikeRepository.delete(postLike);

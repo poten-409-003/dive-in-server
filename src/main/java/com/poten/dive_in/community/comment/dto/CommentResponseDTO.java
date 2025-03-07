@@ -25,7 +25,7 @@ public class CommentResponseDTO {
     private Integer remainReplyCnt; // 대댓글 총 개수 추가
 
     public static CommentResponseDTO ofEntity(Comment comment) {
-        return ofEntity(comment, null);
+        return ofEntity(comment, false);
     }
 
     public static CommentResponseDTO ofEntity(Comment comment, Boolean isLiked) {
@@ -49,7 +49,7 @@ public class CommentResponseDTO {
                 .likeCnt(comment.getLikeCount())
                 .createdAt(DateTimeUtil.formatDateTimeToKorean(comment.getCreatedAt()))
                 .updatedAt(updatedAtStr)
-                .isLiked(false) //isLiked TODO token 회원정보 확인 후 수정 필요
+                .isLiked(isLiked)
                 .build();
 
     }
@@ -57,5 +57,8 @@ public class CommentResponseDTO {
     public void assignIsLiked(Boolean isLiked) {
         this.isLiked = isLiked;
     }
-    public void assignRemainReplyCnt(Integer remainReplyCnt) { this.remainReplyCnt = remainReplyCnt; }
+
+    public void assignRemainReplyCnt(Integer remainReplyCnt) {
+        this.remainReplyCnt = remainReplyCnt;
+    }
 }

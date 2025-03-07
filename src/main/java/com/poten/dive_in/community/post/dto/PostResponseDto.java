@@ -25,7 +25,7 @@ public class PostResponseDto {
     private String writerProfile;
     private String createdAt;
     private String updatedAt;
-    private Boolean isPopular; //TODO 인기글 표시 로직 추가
+    private Boolean isPopular;
 
     public static PostResponseDto ofEntity(Post post, Boolean isPopular) {
         Set<PostImage> images = post.getImages();
@@ -58,6 +58,7 @@ public class PostResponseDto {
                 .isPopular(isPopular)
                 .build();
     }
+
     private static String truncateContent(String content) {
         if (content != null && content.length() > 30) {
             return content.substring(0, 30) + "...";

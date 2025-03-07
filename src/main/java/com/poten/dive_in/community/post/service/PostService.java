@@ -1,6 +1,5 @@
 package com.poten.dive_in.community.post.service;
 
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -47,8 +46,8 @@ public class PostService {
     private final CommentLikeRepository commentLikeRepository;
 
     @Transactional
-    public PostDetailResponseDto createPost(PostRequestDto postRequestDTO, List<MultipartFile> multipartFileList) {
-        Member member = memberRepository.findById(postRequestDTO.getMemberId()).orElseThrow(() -> new EntityNotFoundException("존재하지 않는 회원입니다."));
+    public PostDetailResponseDto createPost(PostRequestDto postRequestDTO, List<MultipartFile> multipartFileList, String email) {
+        Member member = memberRepository.findByEmail(email).orElseThrow(() -> new EntityNotFoundException("존재하지 않는 회원입니다."));
 
         String categoryName = CategoryType.findKoreanNameByInput(postRequestDTO.getCategoryType());
         if (categoryName == null) {
@@ -74,7 +73,7 @@ public class PostService {
                 .isActive("Y")
                 .build();
 
-        // 이미지가 있는 경우만
+
         if (multipartFileList != null && !multipartFileList.isEmpty()) {
             boolean isNotEmpty = true;
             for (MultipartFile file : multipartFileList) {
@@ -93,17 +92,17 @@ public class PostService {
     }
 
     @Transactional
-    public void deletePost(Long id, Long memberId) {
+    public void deletePost(Long id, String email) {
         Post post = postRepository.findByIdWithMember(id)
                 .orElseThrow(() -> new IllegalArgumentException("Post not found"));
-        Member member = post.getMember();
+        Member member = memberRepository.findByEmail(email).orElseThrow(() -> new EntityNotFoundException("존재하지 않는 회원입니다."));
         if ("수영대회".equals(post.getCategoryCode().getCodeName())) {
             if (member.getRole().getId() == 1) {
                 throw new IllegalArgumentException("글 삭제 권한이 없습니다.");
             }
         }
 
-        if (!member.getId().equals(memberId)) {
+        if (!member.getId().equals(post.getMember().getId())) {
             throw new IllegalArgumentException("자신의 글만 삭제 가능합니다.");
         }
         deletePostImagesFromS3(post.getImages().stream()
@@ -113,16 +112,16 @@ public class PostService {
     }
 
     @Transactional
-    public PostDetailResponseDto updatePost(Long id, PostEditRequestDto requestDTO, List<MultipartFile> multipartFileList) {
+    public PostDetailResponseDto updatePost(Long id, PostEditRequestDto requestDTO, List<MultipartFile> multipartFileList, String email) {
         Post existingPost = postRepository.findByIdWithDetail(id)
                 .orElseThrow(() -> new EntityNotFoundException("해당 글이 존재하지 않습니다."));
-        Member member = existingPost.getMember();
+        Member member = memberRepository.findByEmail(email).orElseThrow(() -> new EntityNotFoundException("존재하지 않는 회원입니다."));
         if ("수영대회".equals(existingPost.getCategoryCode().getCodeName())) {
             if (member.getRole().getId() == 1) {
                 throw new IllegalArgumentException("글 수정 권한이 없습니다.");
             }
         }
-        if (!member.getId().equals(requestDTO.getMemberId())) {
+        if (!member.getId().equals(existingPost.getMember().getId())) {
             throw new IllegalArgumentException("자신의 글만 수정 가능합니다.");
         }
         ObjectMapper objectMapper = new ObjectMapper();
@@ -141,7 +140,7 @@ public class PostService {
                     .collect(Collectors.toSet());
 
             imagesToRemove = new HashSet<>(existingPost.getImages().stream()
-                    .filter(postImage -> ! requestImageUrls.contains(postImage.getImageUrl()))
+                    .filter(postImage -> !requestImageUrls.contains(postImage.getImageUrl()))
                     .collect(Collectors.toSet()));
         } else {
             imagesToRemove = new HashSet<>(existingPost.getImages());
@@ -174,7 +173,7 @@ public class PostService {
             }
         }
 
-        Long memberId = requestDTO.getMemberId();
+        Long memberId = member.getId();
         Post updatedPost = postRepository.save(existingPost);
         PostDetailResponseDto detailResponseDto = PostDetailResponseDto.ofEntity(updatedPost);
 
@@ -208,7 +207,7 @@ public class PostService {
         if ("none".equals(categoryType)) {
             posts = postRepository.findActivePosts(pageable);
             totalPosts = postRepository.countActivePosts();
-            hasMore = posts.hasNext(); // 다음 페이지 존재 여부
+            hasMore = posts.hasNext();
         } else if ("popular".equals(categoryType)) {
             List<Post> popularPosts = postRepository.findPopularPosts(oneMonthAgo);
             totalPosts = (long) popularPosts.size();
@@ -234,21 +233,21 @@ public class PostService {
     }
 
     @Transactional(readOnly = true)
-    public PostDetailResponseDto getPostById(Long id) {
-        addViewCnt(id);
+    public PostDetailResponseDto getPostById(Long id, String email) {
+//        addViewCnt(id);
         Post post = postRepository.findByIdWithDetail(id).orElseThrow(() -> new EntityNotFoundException("해당 글이 존재하지 않습니다."));
+        boolean isLiked = false;
+        if (email != null) {
+            Member member = memberRepository.findByEmail(email).orElseThrow(() -> new EntityNotFoundException("존재하지 않는 회원입니다."));
+            isLiked = postLikeRepository.existsByPostIdAndMemberId(post.getId(), member.getId());
+        }
 
-        PostDetailResponseDto detailResponseDto = PostDetailResponseDto.ofEntity(post);
+        PostDetailResponseDto detailResponseDto = PostDetailResponseDto.ofEntity(post, isLiked);
 
         LocalDateTime oneMonthAgo = LocalDateTime.now().minusMonths(1);
         Set<Long> popularPostIds = postRepository.findPopularPostIds(oneMonthAgo);
 
-//        for (CommentResponseDTO comment : detailResponseDto.getCommentList()) {
-//            boolean pushLike = memberId != null && commentLikeRepository.existsByCommentIdAndMemberId(comment.getCmmtId(), memberId);
-//            comment.assignIsLiked(pushLike);
-//        }
-//        Boolean pushLike = postLikeRepository.existsByPostIdAndMemberId(post.getId(), memberId);
-//        detailResponseDto.assignIsLiked(pushLike);
+
         detailResponseDto.assignIsPopular(popularPostIds.contains(post.getId()));
 
         List<Comment> comments = commentRepository.findCommentsWithReplyCountByPostId(id);
@@ -273,12 +272,15 @@ public class PostService {
     }
 
     @Transactional(readOnly = true)
-    public PostListResponseDto getPostsByMemberId(Long memberId, Integer page) {
+    public PostListResponseDto getPostsByMemberId(String email, Integer page) {
         int pageSize = 10;
         Pageable pageable = PageRequest.of(page, pageSize);
 
         LocalDateTime oneMonthAgo = LocalDateTime.now().minusMonths(1);
         Set<Long> popularPostIds = postRepository.findPopularPostIds(oneMonthAgo);
+
+        Member member = memberRepository.findByEmail(email).orElseThrow(() -> new EntityNotFoundException("존재하지 않는 회원입니다.")); // ✅ email로 Member 조회
+        Long memberId = member.getId();
 
         Page<Post> posts = postRepository.findPostsByMemberId(pageable, memberId);
         Long totalPosts = postRepository.countPostsByMemberId(memberId);
@@ -353,20 +355,6 @@ public class PostService {
     public void addViewCnt(Long id) {
         Post originPost = postRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("해당 글이 존재하지 않습니다."));
         originPost.adjustViewCount();
-        postRepository.save(originPost); /* TODO 해당 부분에서 댓글 삭제됨 */
+        postRepository.save(originPost);
     }
-//    @Transactional(readOnly = true)
-//    public List<PostListResponseDto> searchPosts(String query, Integer page) {
-//        int sizePerPage = 10;
-//        if (query == null || query.trim().isEmpty()) {
-//            return List.of();
-//        }
-//
-//        Pageable pageable = PageRequest.of(page, sizePerPage);
-//        Page<Post> posts = postRepository.searchPosts(query, pageable);
-//
-//        return posts.stream()
-//                .map(PostListResponseDto::ofEntity)
-//                .collect(Collectors.toList());
-//    }
 }
