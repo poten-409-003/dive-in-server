@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static com.poten.dive_in.lesson.dto.LessonListResponseDto.getLevelsByCode;
+import static com.poten.dive_in.lesson.service.LessonUtils.getLevelsByCode;
 
 @Getter
 @Builder
@@ -38,6 +38,8 @@ public class LessonDetailResponseDto {
     private String lessonSchedule;
 
     private String lessonStatus;
+
+    private Integer viewCnt;
 
     @JsonProperty("academy")
     private CoachingTeamResponseDto coachingTeamResponseDto;
@@ -93,11 +95,12 @@ public class LessonDetailResponseDto {
                 .lessonName(swimClass.getName())
                 .level(level)
                 .capacity(swimClass.getParticipantCount() != null ? String.valueOf(swimClass.getParticipantCount()) : null)
-                .price(swimClass.getPrice() != null ? String.valueOf(swimClass.getPrice()) : null)
+                .price(swimClass.getPrice() != null ? String.valueOf(swimClass.getPrice()) : "가격 문의")
                 .keyword(keywords)
                 .lessonDetail(swimClass.getIntroduction() != null ? swimClass.getIntroduction() : null)
                 .lessonSchedule(swimClass.getOperatingHours() != null ? swimClass.getOperatingHours() : null)
                 .lessonStatus(swimClass.getIsActive() != null ? swimClass.getIsActive() : null)
+                .viewCnt(swimClass.getViewCount())
                 .coachingTeamResponseDto(swimClass.getInstructorTeam() != null ? CoachingTeamResponseDto.ofEntity(swimClass.getInstructorTeam()) : null)
                 .poolResponseDto(swimClass.getPool() != null ? PoolListResponseDto.ofEntity(swimClass.getPool()) : null)
 /*TODO instr_team_mpng 테이블 테스트 데이터 생성되면 수정*/

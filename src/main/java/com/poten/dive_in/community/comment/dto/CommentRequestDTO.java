@@ -16,6 +16,4 @@ public class CommentRequestDTO {
     @NotNull(message = "글은 필수입니다.")
     private Long postId; // 게시글 ID
 
-    @NotNull(message = "회원은 필수입니다.")
-    private Long memberId; // 작성자 ID
 }

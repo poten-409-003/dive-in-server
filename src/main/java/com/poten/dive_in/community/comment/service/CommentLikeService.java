@@ -22,15 +22,14 @@ public class CommentLikeService {
 
 
     @Transactional
-    public LikeResponseDto likeComment(Long commentId, Long memberId) {
+    public LikeResponseDto likeComment(Long commentId, String email) {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new EntityNotFoundException("댓글이 존재하지 않습니다."));
+        Member member = memberRepository.findByEmail(email).orElseThrow(() -> new EntityNotFoundException("존재하지 않는 회원입니다."));
 
-        if (commentLikeRepository.existsByCommentIdAndMemberId(commentId, memberId)) {
+        if (commentLikeRepository.existsByCommentIdAndMemberId(commentId, member.getId())) {
             throw new IllegalArgumentException("이미 좋아요를 눌렀습니다.");
         }
-
-        Member member = memberRepository.findById(memberId).orElseThrow(() -> new EntityNotFoundException("해당 회원이 존재하지 않습니다."));
 
         CommentLike commentLike = CommentLike.builder()
                 .comment(comment)
@@ -48,11 +47,12 @@ public class CommentLikeService {
     }
 
     @Transactional
-    public LikeResponseDto unlikeComment(Long commentId, Long memberId) {
+    public LikeResponseDto unlikeComment(Long commentId, String email) {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new EntityNotFoundException("댓글이 존재하지 않습니다."));
+        Member member = memberRepository.findByEmail(email).orElseThrow(() -> new EntityNotFoundException("존재하지 않는 회원입니다."));
 
-        CommentLike commentLike = commentLikeRepository.findByCommentIdAndMemberId(commentId, memberId)
+        CommentLike commentLike = commentLikeRepository.findByCommentIdAndMemberId(commentId, member.getId())
                 .orElseThrow(() -> new IllegalArgumentException("좋아요를 누른 이력이 없습니다."));
 
         commentLikeRepository.delete(commentLike);

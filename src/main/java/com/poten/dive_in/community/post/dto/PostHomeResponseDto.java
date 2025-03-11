@@ -9,10 +9,9 @@ import lombok.Getter;
 import java.time.LocalDateTime;
 import java.util.Set;
 
-
 @Getter
 @Builder
-public class PostResponseDto {
+public class PostHomeResponseDto {
     private Long postId;
     private String categoryName;
     private String title;
@@ -25,9 +24,8 @@ public class PostResponseDto {
     private String writerProfile;
     private String createdAt;
     private String updatedAt;
-    private Boolean isPopular;
 
-    public static PostResponseDto ofEntity(Post post, Boolean isPopular) {
+    public static PostHomeResponseDto ofEntity(Post post) {
         Set<PostImage> images = post.getImages();
 
         PostImageDto postImageDto = (images != null && !images.isEmpty())
@@ -42,7 +40,7 @@ public class PostResponseDto {
         if (!post.getCreatedAt().equals(updatedAt)) {
             updatedAtStr = DateTimeUtil.formatDateTimeToKorean(post.getUpdatedAt());
         }
-        return PostResponseDto.builder()
+        return PostHomeResponseDto.builder()
                 .postId(post.getId())
                 .categoryName(post.getCategoryCode().getCodeName())
                 .title(post.getTitle())
@@ -55,7 +53,6 @@ public class PostResponseDto {
                 .writerProfile(post.getMember().getProfileImageUrl())
                 .createdAt(DateTimeUtil.formatDateTimeToKorean(post.getCreatedAt()))
                 .updatedAt(updatedAtStr)
-                .isPopular(isPopular)
                 .build();
     }
 

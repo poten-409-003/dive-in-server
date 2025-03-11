@@ -39,6 +39,7 @@ public class LessonController {
 
     @GetMapping("/lessons/{id}")
     public ResponseEntity<CommonResponse<LessonDetailResponseDto>> getLessonDetail(@PathVariable("id") Long id) {
+        lessonService.addViewCnt(id);
         LessonDetailResponseDto lessonResponseDto = lessonService.getLessonDetail(id);
         return new ResponseEntity<>(CommonResponse.success(null, lessonResponseDto), HttpStatus.OK);
     }

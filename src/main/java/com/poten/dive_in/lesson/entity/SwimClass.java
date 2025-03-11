@@ -1,6 +1,5 @@
 package com.poten.dive_in.lesson.entity;
 
-import com.poten.dive_in.cmmncode.entity.CommonCode;
 import com.poten.dive_in.common.entity.BaseTimeEntity;
 import com.poten.dive_in.instructor.dto.LessonInstructorResponseDto;
 import com.poten.dive_in.instructor.entity.Instructor;
@@ -115,6 +114,11 @@ public class SwimClass extends BaseTimeEntity {
         this.instructorTeam = team;
     }
 
+    public void assignViewCnt(Integer increase) {
+        if (this.viewCount == null) this.viewCount = 1;
+        else this.viewCount += increase;
+    }
+
     public void addImages(List<SwimClassImage> lessonImageList) {
         this.images.clear();
         this.images.addAll(lessonImageList);
@@ -169,6 +173,8 @@ public class SwimClass extends BaseTimeEntity {
         }
         return keywords;
     }
+
+
 }
 //public class Lesson extends BaseTimeEntity {
 //

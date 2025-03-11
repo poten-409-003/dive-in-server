@@ -38,8 +38,8 @@ public class CommentService {
 
 
     @Transactional
-    public CommentResponseDTO createComment(CommentRequestDTO requestDTO) {
-        Member member = memberRepository.findById(requestDTO.getMemberId()).orElseThrow(() -> new EntityNotFoundException("존재하지 않는 회원입니다."));
+    public CommentResponseDTO createComment(CommentRequestDTO requestDTO, String email) {
+        Member member = memberRepository.findByEmail(email).orElseThrow(() -> new EntityNotFoundException("존재하지 않는 회원입니다."));
         Post post = postRepository.findById(requestDTO.getPostId()).orElseThrow(() -> new EntityNotFoundException("존재하지 않는 글입니다."));
         post.adjustCommentCount(1);
         String filteredContent = badwordFiltering(requestDTO.getContent());
@@ -47,7 +47,7 @@ public class CommentService {
                 .post(post)
                 .member(member)
                 .content(filteredContent)
-                .cmntClass(0) // 댓글로 설정
+                .cmntClass(0)
                 .orderNumber(0)
                 .likeCount(0)
                 .isActive("Y")
@@ -56,21 +56,19 @@ public class CommentService {
         Comment createdComment = commentRepository.save(comment);
 
         createdComment.assignGroupName(createdComment.getId().intValue());
-        Comment updatedComment = commentRepository.save(createdComment);
+        Comment savedReply = commentRepository.save(createdComment);
 
-        return CommentResponseDTO.ofEntity(updatedComment);
+        return CommentResponseDTO.ofEntity(savedReply);
     }
 
     @Transactional
-    public CommentResponseDTO createReply(Long parentId, CommentRequestDTO requestDTO) {
-        Member member = memberRepository.findById(requestDTO.getMemberId()).orElseThrow(() -> new EntityNotFoundException("존재하지 않는 회원입니다."));
+    public CommentResponseDTO createReply(Long parentId, CommentRequestDTO requestDTO, String email) {
+        Member member = memberRepository.findByEmail(email).orElseThrow(() -> new EntityNotFoundException("존재하지 않는 회원입니다."));
         Post post = postRepository.findById(requestDTO.getPostId()).orElseThrow(() -> new EntityNotFoundException("존재하지 않는 글입니다."));
         post.adjustCommentCount(1);
-        // 부모 댓글 조회
         Comment parentComment = commentRepository.findById(parentId)
                 .orElseThrow(() -> new EntityNotFoundException("댓글이 존재하지 않습니다."));
 
-        // 대댓글의 그룹 번호와 순서 번호 설정
         Integer groupName = parentComment.getGroupName();
         Integer orderNumber = commentRepository.countByGroupName(groupName).intValue();
         String filteredContent = badwordFiltering(requestDTO.getContent());
@@ -80,8 +78,8 @@ public class CommentService {
                 .post(post)
                 .content(filteredContent)
                 .groupName(groupName)
-                .orderNumber(orderNumber) // 순서 번호 설정
-                .cmntClass(1) // 대댓글로 설정
+                .orderNumber(orderNumber)
+                .cmntClass(1)
                 .likeCount(0)
                 .isActive("Y")
                 .build();
@@ -92,13 +90,12 @@ public class CommentService {
     }
 
     @Transactional
-    public void deleteComment(Long commentId, Long memberId) {
-        //댓글 존재 확인
+    public void deleteComment(Long commentId, String email) {
         Comment comment = commentRepository.findByIdWithMemberAndPost(commentId)
                 .orElseThrow(() -> new EntityNotFoundException("댓글이 존재하지 않습니다."));
 
-        // 작성자 확인
-        if (!comment.getMember().getId().equals(memberId)) {
+        Member member = memberRepository.findByEmail(email).orElseThrow(() -> new EntityNotFoundException("존재하지 않는 회원입니다."));
+        if (!comment.getMember().getId().equals(member.getId())) {
             throw new EntityNotFoundException("본인의 댓글만 삭제할 수 있습니다.");
         }
 
@@ -107,6 +104,7 @@ public class CommentService {
         if (comment.getCmntClass() == 0) {
             List<Comment> replies = commentRepository.findCommentsByGroupName(comment.getGroupName());
             for (Comment reply : replies) {
+                commentLikeRepository.deleteByCommentId(reply.getId());
                 commentRepository.delete(reply);
             }
             int deleteCnt = replies.size();
@@ -115,17 +113,17 @@ public class CommentService {
             post.adjustCommentCount(-1);
         }
         comment.assignPost(post);
+        commentLikeRepository.deleteByCommentId(commentId);
         commentRepository.delete(comment);
     }
 
     @Transactional
-    public CommentResponseDTO updateComment(Long commentId, CommentRequestDTO requestDTO) {
-        //댓글 존재 확인
+    public CommentResponseDTO updateComment(Long commentId, CommentRequestDTO requestDTO, String email) {
         Comment comment = commentRepository.findByIdWithMember(commentId)
                 .orElseThrow(() -> new EntityNotFoundException("댓글이 존재하지 않습니다."));
 
-        // 작성자 확인
-        if (!comment.getMember().getId().equals(requestDTO.getMemberId())) {
+        Member member = memberRepository.findByEmail(email).orElseThrow(() -> new EntityNotFoundException("존재하지 않는 회원입니다."));
+        if (!comment.getMember().getId().equals(member.getId())) {
             throw new EntityNotFoundException("본인의 댓글만 수정할 수 있습니다.");
         }
         String filteredContent = badwordFiltering(requestDTO.getContent());
@@ -133,23 +131,25 @@ public class CommentService {
         comment.assignContent(filteredContent);
         Comment updatedComment = commentRepository.save(comment);
 
-        Long memberId = requestDTO.getMemberId();
+        Long memberId = member.getId();
 
         boolean pushLike = memberId != null && commentLikeRepository.existsByCommentIdAndMemberId(updatedComment.getId(), memberId);
-        CommentResponseDTO commentResponseDTO = CommentResponseDTO.ofEntity(updatedComment);
-        commentResponseDTO.assignIsLiked(pushLike);
+        CommentResponseDTO commentResponseDTO = CommentResponseDTO.ofEntity(updatedComment, pushLike);
 
         return commentResponseDTO;
     }
 
     @Transactional(readOnly = true)
-    public PostListResponseDto getPostsAboutCommentByMemberId(Long memberId, Integer page) {
+    public PostListResponseDto getPostsAboutCommentByMemberId(String email, Integer page) {
         int pageSize = 10;
 
         LocalDateTime oneMonthAgo = LocalDateTime.now().minusMonths(1);
         Pageable pageable = PageRequest.of(page, pageSize);
 
         Set<Long> popularPostIds = postRepository.findPopularPostIds(oneMonthAgo);
+
+        Member member = memberRepository.findByEmail(email).orElseThrow(() -> new EntityNotFoundException("존재하지 않는 회원입니다."));
+        Long memberId = member.getId();
 
         Page<Post> posts = commentRepository.findDistinctPostsByMemberId(memberId, pageable);
         Long totalPosts = commentRepository.countPostByComment(memberId);
@@ -162,7 +162,7 @@ public class CommentService {
     }
 
     @Transactional(readOnly = true)
-    public List<CommentResponseDTO> getCommentById(Long id, Long memberId) {
+    public List<CommentResponseDTO> getCommentById(Long id, Long memberId) { // memberId 파라미터 유지 (optional)
         Comment comment = commentRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 댓글입니다."));
 
@@ -179,15 +179,18 @@ public class CommentService {
                 .collect(Collectors.toList());
     }
 
+    public Long getMemberIdByEmail(String email) {
+        Member member = memberRepository.findByEmail(email).orElseThrow(() -> new EntityNotFoundException("존재하지 않는 회원입니다."));
+        return member.getId();
+    }
+
+
     private String badwordFiltering(String original) {
         BadWordFiltering badWordFiltering = new BadWordFiltering();
-        // 욕 사이의 공백, 숫자, 특수기호 제거
         String cleanedInput = original.replaceAll("[\\s0-9!@#$%^&*()_+=-]", "");
         if (badWordFiltering.check(cleanedInput)) {
             return badWordFiltering.change(cleanedInput);
         }
         return original;
     }
-
-
 }

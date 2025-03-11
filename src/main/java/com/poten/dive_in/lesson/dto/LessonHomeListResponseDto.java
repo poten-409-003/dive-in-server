@@ -13,20 +13,21 @@ import java.util.Set;
 
 import static com.poten.dive_in.lesson.service.LessonUtils.getLevelsByCode;
 
-
 @Getter
 @Builder
 @ToString
-public class LessonListResponseDto {
+public class LessonHomeListResponseDto {
     private Long id;
-    private String academyName;
-    private String academyImageUrl;
+    private String instructorName;
+    private String instructorImgUrl;
     private String keyword;
     private String lessonName;
+    private String lessonImgUrl;
     private String level;
-    private String price;
+    private String price; //보류
+    private Integer viewCnt;
 
-    public static LessonListResponseDto ofEntity(SwimClass swimClass) {
+    public static LessonHomeListResponseDto ofEntity(SwimClass swimClass) {
         Set<LessonKeyword> lessonKeywords = swimClass.getKeywords();
         String keywords = null;
         if (lessonKeywords != null && lessonKeywords.size() != 0) {
@@ -51,14 +52,18 @@ public class LessonListResponseDto {
                 }
             }
         }
-        return LessonListResponseDto.builder()
+        return LessonHomeListResponseDto.builder()
                 .id(swimClass.getClassId())
                 .level(level)
-                .academyName(swimClass.getInstructorTeam() != null ? swimClass.getInstructorTeam().getName() : null)
-                .academyImageUrl(url)
+                .instructorName(swimClass.getInstructorTeam() != null ? swimClass.getInstructorTeam().getName() : null)
+                .instructorImgUrl(swimClass.getInstructorTeam() != null ? swimClass.getInstructorTeam().getProfileImageUrl() : null)
                 .keyword(keywords)
                 .lessonName(swimClass.getName() != null ? swimClass.getName() : null)
+                .lessonImgUrl(url)
                 .price(swimClass.getPrice() != null ? String.valueOf(swimClass.getPrice()) : "가격 문의")
+                .viewCnt(swimClass.getViewCount() != null ? swimClass.getViewCount() : 0)
                 .build();
     }
+
+
 }

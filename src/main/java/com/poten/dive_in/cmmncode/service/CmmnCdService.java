@@ -18,4 +18,8 @@ public class CmmnCdService {
         return cmmnCdRepository.findByCodeName(codeName).orElseThrow(() -> new EntityNotFoundException("해당 코드가 존재하지 않습니다."));
     }
 
+//    public List<String> getLevelsByLevelCd(String levelCd) {
+//        return cmmnCdRepository.findLevelsByLevelCd(levelCd);
+//    }
+
 }

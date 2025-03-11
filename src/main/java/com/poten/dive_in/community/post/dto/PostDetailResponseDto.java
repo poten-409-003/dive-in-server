@@ -31,6 +31,10 @@ public class PostDetailResponseDto {
     private Boolean isPopular; //TODO 인기글 표시 로직 추가
 
     public static PostDetailResponseDto ofEntity(Post post) {
+        return ofEntity(post, false);
+    }
+
+    public static PostDetailResponseDto ofEntity(Post post, boolean isLiked) {
 
         List<PostImageDto> postImageDtoList = (post.getImages() != null) ?
                 post.getImages().stream()
@@ -62,7 +66,7 @@ public class PostDetailResponseDto {
                 .createdAt(DateTimeUtil.formatDateTimeToKorean(post.getCreatedAt()))
                 .updatedAt(updatedAtStr)
                 .commentList(commentResponseDTOList)
-                .isLiked(false) //isLiked TODO token 회원정보 확인 후 수정 필요
+                .isLiked(isLiked)
                 .isPopular(false)
                 .build();
     }
