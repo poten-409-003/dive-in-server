@@ -136,7 +136,7 @@ public class HomeService {
         if (content.length() <= 30) return content;
         int keywordIndex = content.toLowerCase().indexOf(keyword.toLowerCase()); // case-insensitive 검색
         if (keywordIndex != -1) {
-            if (keywordIndex - 15 < 0) {
+            if (keywordIndex - 15 > 0) {
                 summary = "...";
             }
             if (keywordIndex + keyword.length() + 15 < content.length()) {
