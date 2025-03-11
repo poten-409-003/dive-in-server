@@ -75,24 +75,19 @@ public class HomeService {
         result.addAll(posts.stream()
                 .map(post -> {
                     String content = post.getContent();
+                    content = content.length() > 30 ? content.substring(0, 30) + "..." : content;
                     String title = post.getTitle();
-                    String contentSummary = extractSummary(content, keyword);
-                    String resultTitle = "";
+                    String contentSummary = extractSummary(title, keyword);
+                    String url = "/community/posts/" + post.getId();
 
                     boolean keywordInTitle = title != null && title.toLowerCase().contains(keyword.toLowerCase());
                     boolean keywordInContent = content != null && content.toLowerCase().contains(keyword.toLowerCase());
 
-                    if (keywordInTitle && keywordInContent) {
-                        // 제목과 내용 모두에 키워드 포함: 게시글 제목 사용
-                        resultTitle = title;
-                    } else if (!keywordInTitle && keywordInContent) {
-                        resultTitle = "게시글 내용 중 검색결과";
-                    } else if (keywordInTitle && !keywordInContent) {
-                        resultTitle = title;
-                        contentSummary = ""; // 내용 요약 비움
+                    if (!keywordInTitle && keywordInContent) {
+                        contentSummary = extractSummary(content, keyword);
                     }
 
-                    return ResultDto.ofEntity(keyword, resultTitle, "커뮤니티", null, post.getCreatedAt(), contentSummary);
+                    return ResultDto.ofEntity(title, content, "커뮤니티", post.getCreatedAt(), contentSummary, url);
                 })
                 .collect(Collectors.toList()));
 
@@ -100,35 +95,28 @@ public class HomeService {
         List<SwimClass> swimClasses = lessonRepository.findByKeyword(keyword);
         result.addAll(swimClasses.stream()
                 .map(swimClass -> {
-                    String description = swimClass.getIntroduction();
-                    String contentSummary = extractSummary(description, keyword);
                     String swimClassName = swimClass.getName();
-                    String keywords = swimClass.getKeyword();
-                    String resultTitle = "";
+                    String contentSummary = extractSummary(swimClassName, keyword);
+                    String classKeywords = swimClass.getKeyword();
+                    String url = "/lessons/" + swimClass.getClassId();
 
                     boolean keywordInName = swimClassName != null && swimClassName.toLowerCase().contains(keyword.toLowerCase());
-                    boolean keywordInKeywords = keywords != null && keywords.toLowerCase().contains(keyword.toLowerCase());
-
-                    if (keywordInName && keywordInKeywords) {
-                        // 수업 이름과 키워드 모두에 키워드 포함: 수업 이름 사용
-                        resultTitle = swimClassName;
-                    } else if (!keywordInName && keywordInKeywords) {
-                        resultTitle = "수영 수업 키워드 검색 결과";
-                    } else if (keywordInName && !keywordInKeywords) {
-                        resultTitle = swimClassName;
-                        contentSummary = "";
+                    boolean keywordInKeywords = classKeywords != null && classKeywords.toLowerCase().contains(keyword.toLowerCase());
+                    if (!keywordInName && keywordInKeywords) {
+                        contentSummary = extractSummary(classKeywords, keyword);
                     }
 
-                    return ResultDto.ofEntity(keyword, resultTitle, "수영수업", null, swimClass.getCreatedAt(), contentSummary);
+                    return ResultDto.ofEntity(swimClassName, classKeywords, "수영수업", swimClass.getCreatedAt(), contentSummary, url);
                 })
                 .collect(Collectors.toList()));
 
         List<Pool> pools = poolRepository.findByKeyword(keyword);
         result.addAll(pools.stream()
                 .map(pool -> {
-                    String poolDescription = pool.getOperatingHours(); // 운영시간을 내용으로 사용, 필요에 따라 수정
-                    String contentSummary = extractSummary(poolDescription, keyword);
-                    return ResultDto.ofEntity(keyword, pool.getPoolName(), "수영장", pool.getRoadAddress(), pool.getCreatedAt(), contentSummary);
+                    String poolName = pool.getPoolName();
+                    String address = pool.getRoadAddress();
+                    String url = "/pools/" + pool.getPoolId();
+                    return ResultDto.ofEntity(poolName, address, "수영장", pool.getCreatedAt(), poolName, url);
                 })
                 .collect(Collectors.toList()));
 
@@ -140,32 +128,41 @@ public class HomeService {
     }
 
     public String extractSummary(String content, String keyword) {
+        String summary = "";
+        String endSummary = "";
         if (content == null || content.isEmpty()) {
-            return "";
+            return summary;
         }
+        if (content.length() <= 30) return content;
         int keywordIndex = content.toLowerCase().indexOf(keyword.toLowerCase()); // case-insensitive 검색
         if (keywordIndex != -1) {
+            if (keywordIndex - 15 < 0) {
+                summary = "...";
+            }
+            if (keywordIndex + keyword.length() + 15 < content.length()) {
+                endSummary = "...";
+            }
+
             int startIndex = Math.max(0, keywordIndex - 15);
-            int endIndex = Math.min(content.length(), keywordIndex + keyword.length() + 30);
+            int endIndex = Math.min(content.length(), keywordIndex + keyword.length() + 15);
 
             int summaryLength = endIndex - startIndex;
             if (summaryLength < 30 && content.length() > 30) {
                 endIndex = Math.min(content.length(), startIndex + 30);
             }
 
-            String summary = content.substring(startIndex, endIndex);
-            System.out.println("Keyword: " + keyword); // 로그 추가
-            System.out.println("Keyword Index: " + keywordIndex); // 로그 추가
-            System.out.println("StartIndex: " + startIndex); // 로그 추가
-            System.out.println("EndIndex: " + endIndex); // 로그 추가
-            System.out.println("Summary Length: " + summary.length()); // 로그 추가
-            System.out.println("Extracted Summary: " + summary); // 로그 추가
+            summary += content.substring(startIndex, endIndex);
+//            System.out.println("Keyword: " + keyword); // 로그 추가
+//            System.out.println("Keyword Index: " + keywordIndex); // 로그 추가
+//            System.out.println("StartIndex: " + startIndex); // 로그 추가
+//            System.out.println("EndIndex: " + endIndex); // 로그 추가
+//            System.out.println("Summary Length: " + summary.length()); // 로그 추가
+//            System.out.println("Extracted Summary: " + summary); // 로그 추가
 
 
-            return "..." + summary + "...";
-        } else {
-            return content.length() > 100 ? content.substring(0, 100) + "..." : content; // 키워드 없으면 기존 요약 방식 유지
+            return summary + endSummary;
         }
+        return summary;
     }
 
 }
