@@ -1,7 +1,6 @@
 package com.poten.dive_in.lesson.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.poten.dive_in.instructor.dto.LessonInstructorResponseDto;
 import com.poten.dive_in.lesson.entity.ApplicationQualification;
 import com.poten.dive_in.lesson.entity.LessonKeyword;
 import com.poten.dive_in.lesson.entity.RefundPolicy;
@@ -12,6 +11,7 @@ import lombok.Getter;
 import lombok.ToString;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -61,9 +61,9 @@ public class LessonDetailResponseDto {
     @Getter
     @Builder
     public static class LessonDetailDto {
-        private String classTopic;
+        private String topic;
         private List<String> eligibilityRequirements;
-        private String classIntroduction;
+        private String introduction;
         private List<LessonApplyChannelDto> applicationMethod;
         private List<String> refundPolicy;
     }
@@ -79,16 +79,17 @@ public class LessonDetailResponseDto {
                 : new ArrayList<>();
 
         // 강사 리스트 처리
-        List<LessonInstructorResponseDto> lessonInstructorResponseDtoList = (swimClass.getInstructorTeam() != null &&
-                swimClass.getInstructorTeam().getInstructorTeamMappings() != null) ?
-                swimClass.getInstructorList() :
-                new ArrayList<>();
+//        List<LessonInstructorResponseDto> lessonInstructorResponseDtoList = (swimClass.getInstructorTeam() != null &&
+//                swimClass.getInstructorTeam().getInstructorTeamMappings() != null) ?
+//                swimClass.getInstructorList() :
+//                new ArrayList<>();
 
         // Apply Channel 리스트 처리
         List<LessonApplyChannelDto> lessonApplyChannelList = (swimClass.getApplicationMethods() != null) ?
                 swimClass.getApplicationMethods().stream()
                         .map(LessonApplyChannelDto::ofEntity)
                         .toList() : new ArrayList<>();
+
 
         String level = null;
         if (swimClass.getLevel() != null) {
@@ -110,23 +111,26 @@ public class LessonDetailResponseDto {
         // Build the LessonDetail object with mappings from SwimClass entity
         List<String> eligibilityRequirements = (swimClass.getQualifications() != null) ?
                 swimClass.getQualifications().stream()
+                        .sorted(Comparator.comparing(ApplicationQualification::getOrder)) // Sort by order field
                         .map(ApplicationQualification::getDetails) // Mapping details from ApplicationQualification
                         .collect(Collectors.toList())
                 : new ArrayList<>();
 
         List<String> refundPolicies = (swimClass.getRefunds() != null) ?
                 swimClass.getRefunds().stream()
+                        .sorted(Comparator.comparing(RefundPolicy::getOrder)) // Sort by order field
                         .map(RefundPolicy::getDetails) // Mapping details from RefundPolicy
                         .collect(Collectors.toList())
                 : new ArrayList<>();
+
 
         // Reuse the already created lessonApplyChannelList for applicationMethod
         List<LessonApplyChannelDto> applicationMethods = lessonApplyChannelList;
 
         LessonDetailDto lessonDetailObject = LessonDetailDto.builder()
-                .classTopic(swimClass.getSubject()) // Mapping subject to classTopic
+                .topic(swimClass.getSubject()) // Mapping subject to classTopic
                 .eligibilityRequirements(eligibilityRequirements)
-                .classIntroduction(swimClass.getIntroduction()) // Mapping introduction to classIntroduction
+                .introduction(swimClass.getIntroduction()) // Mapping introduction to classIntroduction
                 .applicationMethod(applicationMethods) // Using the list of LessonApplyChannelDto
                 .refundPolicy(refundPolicies) // Using the list of refund policy details
                 .build();
