@@ -61,9 +61,9 @@ public class LessonDetailResponseDto {
     @Getter
     @Builder
     public static class LessonDetailDto {
-        private String classTopic;
+        private String topic;
         private List<String> eligibilityRequirements;
-        private String classIntroduction;
+        private String introduction;
         private List<LessonApplyChannelDto> applicationMethod;
         private List<String> refundPolicy;
     }
@@ -128,9 +128,9 @@ public class LessonDetailResponseDto {
         List<LessonApplyChannelDto> applicationMethods = lessonApplyChannelList;
 
         LessonDetailDto lessonDetailObject = LessonDetailDto.builder()
-                .classTopic(swimClass.getSubject()) // Mapping subject to classTopic
+                .topic(swimClass.getSubject()) // Mapping subject to classTopic
                 .eligibilityRequirements(eligibilityRequirements)
-                .classIntroduction(swimClass.getIntroduction()) // Mapping introduction to classIntroduction
+                .introduction(swimClass.getIntroduction()) // Mapping introduction to classIntroduction
                 .applicationMethod(applicationMethods) // Using the list of LessonApplyChannelDto
                 .refundPolicy(refundPolicies) // Using the list of refund policy details
                 .build();
