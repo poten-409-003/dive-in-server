@@ -127,11 +127,19 @@ public class LessonDetailResponseDto {
         // Reuse the already created lessonApplyChannelList for applicationMethod
         List<LessonApplyChannelDto> applicationMethods = lessonApplyChannelList;
 
+        // ** Replace \n with <br> in introduction and operatingHours **
+        String introductionWithLineBreaks = swimClass.getIntroduction() != null ?
+                swimClass.getIntroduction().replace("\n", "<br>") : null;
+
+        String lessonScheduleWithLineBreaks = swimClass.getOperatingHours() != null ?
+                swimClass.getOperatingHours().replace("\n", "<br>") : null;
+
+
         LessonDetailDto lessonDetailObject = LessonDetailDto.builder()
                 .topic(swimClass.getSubject()) // Mapping subject to classTopic
                 .eligibilityRequirements(eligibilityRequirements)
-                .introduction(swimClass.getIntroduction()) // Mapping introduction to classIntroduction
-                .applicationMethod(applicationMethods) // Using the list of LessonApplyChannelDto
+                .introduction(introductionWithLineBreaks) // Use string with <br> tags
+                .applicationMethod(lessonApplyChannelList) // Using the sorted list of LessonApplyChannelDto
                 .refundPolicy(refundPolicies) // Using the list of refund policy details
                 .build();
 
@@ -144,7 +152,7 @@ public class LessonDetailResponseDto {
                 .price(swimClass.getPrice() != null ? String.valueOf(swimClass.getPrice()) : "가격 문의")
                 .keyword(keywords)
                 .lessonDetail(lessonDetailObject) // Setting the LessonDetail object
-                .lessonSchedule(swimClass.getOperatingHours() != null ? swimClass.getOperatingHours() : null)
+                .lessonSchedule(lessonScheduleWithLineBreaks)
                 .lessonStatus(swimClass.getIsActive() != null ? swimClass.getIsActive() : null)
                 .viewCnt(swimClass.getViewCount())
                 .coachingTeamResponseDto(swimClass.getInstructorTeam() != null ? CoachingTeamResponseDto.ofEntity(swimClass.getInstructorTeam()) : null)
