@@ -2,7 +2,9 @@ package com.poten.dive_in.lesson.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.poten.dive_in.instructor.dto.LessonInstructorResponseDto;
+import com.poten.dive_in.lesson.entity.ApplicationQualification;
 import com.poten.dive_in.lesson.entity.LessonKeyword;
+import com.poten.dive_in.lesson.entity.RefundPolicy;
 import com.poten.dive_in.lesson.entity.SwimClass;
 import com.poten.dive_in.pool.dto.PoolListResponseDto;
 import lombok.Builder;
@@ -33,7 +35,7 @@ public class LessonDetailResponseDto {
 
     private String keyword;
 
-    private String lessonDetail;
+    private LessonDetailDto lessonDetail; // Changed type to LessonDetail object
 
     private String lessonSchedule;
 
@@ -47,14 +49,25 @@ public class LessonDetailResponseDto {
     @JsonProperty("pool")
     private PoolListResponseDto poolResponseDto;
 
-    @JsonProperty("instructors")
-    private List<LessonInstructorResponseDto> lessonInstructorResponseDtoList;
+//    @JsonProperty("instructors")
+//    private List<LessonInstructorResponseDto> lessonInstructorResponseDtoList;
 
     @JsonProperty("images")
     private List<LessonImageDto> lessonImageDtoList;
 
-    @JsonProperty("applyChannels")
-    private List<LessonApplyChannelDto> lessonApplyChannelDtoList;
+//    @JsonProperty("applyChannels")
+//    private List<LessonApplyChannelDto> lessonApplyChannelDtoList;
+
+    @Getter
+    @Builder
+    public static class LessonDetailDto {
+        private String classTopic;
+        private List<String> eligibilityRequirements;
+        private String classIntroduction;
+        private List<LessonApplyChannelDto> applicationMethod;
+        private List<String> refundPolicy;
+    }
+
 
     public static LessonDetailResponseDto ofEntity(SwimClass swimClass) {
 
@@ -85,10 +98,39 @@ public class LessonDetailResponseDto {
         Set<LessonKeyword> lessonKeywords = swimClass.getKeywords();
         String keywords = null;
         List<String> keywordList = new ArrayList<>();
-        for (LessonKeyword keyword : lessonKeywords) {
-            keywordList.add(keyword.getKeyword().getCodeName());
+        if (lessonKeywords != null) { // Added null check for lessonKeywords
+            for (LessonKeyword keyword : lessonKeywords) {
+                if (keyword.getKeyword() != null) { // Added null check for keyword.getKeyword()
+                    keywordList.add(keyword.getKeyword().getCodeName());
+                }
+            }
         }
         keywords = String.join(", ", keywordList);
+
+        // Build the LessonDetail object with mappings from SwimClass entity
+        List<String> eligibilityRequirements = (swimClass.getQualifications() != null) ?
+                swimClass.getQualifications().stream()
+                        .map(ApplicationQualification::getDetails) // Mapping details from ApplicationQualification
+                        .collect(Collectors.toList())
+                : new ArrayList<>();
+
+        List<String> refundPolicies = (swimClass.getRefunds() != null) ?
+                swimClass.getRefunds().stream()
+                        .map(RefundPolicy::getDetails) // Mapping details from RefundPolicy
+                        .collect(Collectors.toList())
+                : new ArrayList<>();
+
+        // Reuse the already created lessonApplyChannelList for applicationMethod
+        List<LessonApplyChannelDto> applicationMethods = lessonApplyChannelList;
+
+        LessonDetailDto lessonDetailObject = LessonDetailDto.builder()
+                .classTopic(swimClass.getSubject()) // Mapping subject to classTopic
+                .eligibilityRequirements(eligibilityRequirements)
+                .classIntroduction(swimClass.getIntroduction()) // Mapping introduction to classIntroduction
+                .applicationMethod(applicationMethods) // Using the list of LessonApplyChannelDto
+                .refundPolicy(refundPolicies) // Using the list of refund policy details
+                .build();
+
 
         return LessonDetailResponseDto.builder()
                 .id(swimClass.getClassId())
@@ -97,16 +139,16 @@ public class LessonDetailResponseDto {
                 .capacity(swimClass.getParticipantCount() != null ? String.valueOf(swimClass.getParticipantCount()) : null)
                 .price(swimClass.getPrice() != null ? String.valueOf(swimClass.getPrice()) : "가격 문의")
                 .keyword(keywords)
-                .lessonDetail(swimClass.getIntroduction() != null ? swimClass.getIntroduction() : null)
+                .lessonDetail(lessonDetailObject) // Setting the LessonDetail object
                 .lessonSchedule(swimClass.getOperatingHours() != null ? swimClass.getOperatingHours() : null)
                 .lessonStatus(swimClass.getIsActive() != null ? swimClass.getIsActive() : null)
                 .viewCnt(swimClass.getViewCount())
                 .coachingTeamResponseDto(swimClass.getInstructorTeam() != null ? CoachingTeamResponseDto.ofEntity(swimClass.getInstructorTeam()) : null)
                 .poolResponseDto(swimClass.getPool() != null ? PoolListResponseDto.ofEntity(swimClass.getPool()) : null)
-/*TODO instr_team_mpng 테이블 테스트 데이터 생성되면 수정*/
-                .lessonInstructorResponseDtoList(lessonInstructorResponseDtoList)
+                /*TODO instr_team_mpng 테이블 테스트 데이터 생성되면 수정*/
+//                .lessonInstructorResponseDtoList(lessonInstructorResponseDtoList)
                 .lessonImageDtoList(lessonImageDtoList)
-                .lessonApplyChannelDtoList(lessonApplyChannelList)
+//                .lessonApplyChannelDtoList(lessonApplyChannelList) // This line seems redundant now that applicationMethod is part of lessonDetail
                 .build();
     }
 }
