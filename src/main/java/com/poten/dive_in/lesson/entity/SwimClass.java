@@ -32,6 +32,22 @@ import java.util.Set;
                 @NamedAttributeNode("applicationMethods")
         }
 )
+@NamedEntityGraph(
+        name = "SwimClass.withInstructors",
+        attributeNodes = {
+                @NamedAttributeNode(value = "instructorTeam", subgraph = "instructorTeamGraph")
+        },
+        subgraphs = {
+                @NamedSubgraph(
+                        name = "instructorTeamGraph",
+                        attributeNodes = @NamedAttributeNode(value = "instructorTeamMappings", subgraph = "instructorTeamMappingGraph")
+                ),
+                @NamedSubgraph(
+                        name = "instructorTeamMappingGraph",
+                        attributeNodes = @NamedAttributeNode("instructor")
+                )
+        }
+)
 @Table(name = "swmm_cls")
 public class SwimClass extends BaseTimeEntity {
     @Id

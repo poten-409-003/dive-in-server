@@ -16,6 +16,14 @@ import java.util.List;
 @NoArgsConstructor
 @Entity
 @Table(name = "swmm_instr") // DB 테이블명
+@NamedEntityGraph(
+        name = "Instructor.withTeam",
+        attributeNodes = @NamedAttributeNode(value = "teamMappings", subgraph = "teamMappingGraph"),
+        subgraphs = @NamedSubgraph(
+                name = "teamMappingGraph",
+                attributeNodes = @NamedAttributeNode("swmmCchnTeam")
+        )
+)
 public class Instructor extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
