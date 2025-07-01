@@ -56,4 +56,15 @@ public class Instructor extends BaseTimeEntity {
     @OneToMany(mappedBy = "instructor", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<InstructorTeamMapping> teamMappings; // 강사와 팀 매핑 리스트
 
+    public Instructor updateInstructor(String name, String isAthlete, String awards, String certifications, String description) {
+        this.name = name;
+        this.isAthlete = isAthlete;
+        this.awards = awards;
+        this.certifications = certifications;
+        this.description = description;
+
+        return this;
+    }
+
 }
+

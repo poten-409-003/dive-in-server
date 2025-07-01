@@ -68,7 +68,7 @@ public class InstructorService {
                 .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 프로필입니다.")); // 프로필 없음.
 
         // 필요한 연관 엔티티 함께 조회 (예: 팀 정보) - findWithTeamById 사용 가능
-        // Instructor instructor = instructorRepositoryCustom.findWithTeamById(instructor.getId())
+        // Instructor instructor = instructorRepository.findWithTeamById(instructor.getId())
         //         .orElseThrow(() -> new CustomException(ErrorCode.INSTRUCTOR_PROFILE_NOT_FOUND));
 
 
@@ -96,14 +96,7 @@ public class InstructorService {
         }
 
         // DTO 정보 반영하여 엔티티 수정
-        // Instructor 엔티티에 update 메서드 추가 권장
-        // instructor.update(requestDto);
-//        instructor.setName(requestDto.getName());
-//        instructor.setIsAthlete(requestDto.getIsAthlete());
-//        instructor.setAwards(requestDto.getAwards());
-//        instructor.setCertifications(requestDto.getCertifications());
-//        instructor.setDescription(requestDto.getDescription());
-        // isActive 등 다른 필드도 필요에 따라 업데이트
+        instructor.updateInstructor(requestDto.getName(), requestDto.getIsAthlete(), requestDto.getAwards(), requestDto.getCertifications(), requestDto.getDescription());
 
         // 별도의 save 호출 없이 트랜잭션 종료 시 자동 반영 (Dirty Checking)
 
